@@ -43,6 +43,8 @@ import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
 
 import java.util.concurrent.TimeUnit;
 
+import static tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil.*;
+
 public class PacketListener_v1_17_R1 extends PacketListener {
     @Override
     protected void injectPlayer(Player p) {
@@ -51,7 +53,7 @@ public class PacketListener_v1_17_R1 extends PacketListener {
             //On send packet
             public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
                 if (packet instanceof PacketPlayOutMap packetPlayOutMap) {
-                    int id = packetPlayOutMap.b();
+                    int id = (int) getField(packetPlayOutMap, "a");
 
                     if (id < 0) {
                         //It's one of our maps, invert ID and let through!
@@ -76,13 +78,14 @@ public class PacketListener_v1_17_R1 extends PacketListener {
             public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
                 if (packet instanceof PacketPlayInUseEntity packetPlayInUseEntity) {
                     int entityId = (int) getField(packetPlayInUseEntity, "a"); //entityId
-                    Enum<?> action = (Enum<?>) getField(packetPlayInUseEntity, "b"); //action
-                    EnumHand hand = (EnumHand) getField(action, "a"); //hand
+                    Object action = getField(packetPlayInUseEntity, "b"); //action
+                    Enum<?> actionEnum = (Enum<?>) getValue(action, "a"); //action type
+                    EnumHand hand = hasField(action, "a") ? (EnumHand) getField(action, "a") : null; //hand
                     Vec3D pos = hasField(action, "b") ? (Vec3D) getField(action, "b") : null; //pos
 
                     if (Bukkit.getScheduler().callSyncMethod(plugin, () -> {
                         boolean async = !plugin.getServer().isPrimaryThread();
-                        MapInteractEvent event = new MapInteractEvent(p, entityId, action.ordinal(), pos != null ? vec3DToVector(pos) : null, hand != null ? hand.ordinal() : 0, async);
+                        MapInteractEvent event = new MapInteractEvent(p, entityId, actionEnum.ordinal(), pos != null ? vec3DToVector(pos) : null, hand != null ? hand.ordinal() : 0, async);
                         if (event.getFrame() != null && event.getMapWrapper() != null) {
                             Bukkit.getPluginManager().callEvent(event);
                             return event.isCancelled();
@@ -105,19 +108,19 @@ public class PacketListener_v1_17_R1 extends PacketListener {
             }
         };
 
-        ChannelPipeline pipeline = ((CraftPlayer) p).getHandle().connection.connection.channel.pipeline();
+        ChannelPipeline pipeline = ((CraftPlayer) p).getHandle().b.a.k.pipeline(); //connection connection channel
         pipeline.addBefore("packet_handler", p.getName(), channelDuplexHandler);
     }
 
     @Override
     public void removePlayer(Player p) {
-        Channel channel = ((CraftPlayer) p).getHandle().connection.connection.channel;
+        Channel channel = ((CraftPlayer) p).getHandle().b.a.k; //connection connection channel
         channel.eventLoop().submit(() -> channel.pipeline().remove(p.getName()));
     }
 
     @Override
     protected Vector vec3DToVector(Object vec3d) {
         if (!(vec3d instanceof Vec3D vec3dObj)) return new Vector(0, 0, 0);
-        return new Vector(vec3dObj.x, vec3dObj.y, vec3dObj.z);
+        return new Vector(vec3dObj.b, vec3dObj.c, vec3dObj.d); //x, y, z
     }
 }

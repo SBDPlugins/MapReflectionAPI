@@ -31,26 +31,25 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
-
-import java.lang.reflect.Field;
 
 public abstract class PacketListener implements Listener {
     protected JavaPlugin plugin;
 
-    public static PacketListener construct() {
+    public static PacketListener construct(JavaPlugin plugin) throws IllegalStateException {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
+        plugin.getLogger().info("Initializing the packet handler for Minecraft version " + version + "...");
+
         try {
-            final Class<?> clazz = Class.forName("tech.sbdevelopment.mapreflectionapi.nms.MapWrapper_" + version);
-            if (MapWrapper.class.isAssignableFrom(clazz)) {
+            final Class<?> clazz = Class.forName("tech.sbdevelopment.mapreflectionapi.nms.PacketListener_" + version);
+            if (PacketListener.class.isAssignableFrom(clazz)) {
                 return (PacketListener) clazz.getDeclaredConstructor().newInstance();
             } else {
-                throw new IllegalStateException("Plugin corrupted! Detected invalid MapWrapper class.");
+                throw new IllegalStateException("Plugin corrupted! Detected invalid PacketListener class.");
             }
         } catch (Exception ex) {
-            throw new IllegalStateException("This Spigot version is not supported! Contact the developer to get support.");
+            throw new IllegalStateException("This Minecraft version (" + version + ") is not supported! Contact the developer to get support.");
         }
     }
 
@@ -82,17 +81,5 @@ public abstract class PacketListener implements Listener {
         } catch (NoSuchFieldException ex) {
             return false;
         }
-    }
-
-    protected Object getField(Object packet, String field) throws NoSuchFieldException, IllegalAccessException {
-        Field f = packet.getClass().getDeclaredField(field);
-        f.setAccessible(true);
-        return f.get(packet);
-    }
-
-    protected void setField(Object packet, String field, Object value) throws NoSuchFieldException, IllegalAccessException {
-        Field f = packet.getClass().getDeclaredField(field);
-        f.setAccessible(true);
-        f.set(packet, value);
     }
 }

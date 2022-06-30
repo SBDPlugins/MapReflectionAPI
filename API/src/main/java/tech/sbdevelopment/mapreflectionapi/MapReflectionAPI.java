@@ -61,15 +61,19 @@ public class MapReflectionAPI extends JavaPlugin {
             return;
         }
 
-        getLogger().info("Initializing the packet handler...");
-        packetListener = PacketListener.construct();
+        try {
+            packetListener = PacketListener.construct(this);
+        } catch (IllegalStateException e) {
+            getLogger().log(Level.SEVERE, e.getMessage(), e);
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
         packetListener.init(this);
 
-        getLogger().info("Initializing the map manager...");
         try {
-            mapManager = new MapManager();
+            mapManager = new MapManager(this);
         } catch (IllegalStateException e) {
-            e.printStackTrace();
+            getLogger().log(Level.SEVERE, e.getMessage(), e);
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }

@@ -99,7 +99,7 @@ public class MapSender_v1_17_R1 {
                         updateData
                 );
 
-                ((CraftPlayer) player).getHandle().connection.send(packet);
+                ((CraftPlayer) player).getHandle().b.sendPacket(packet); //connection send()
             } catch (Exception e) {
                 e.printStackTrace();
             }

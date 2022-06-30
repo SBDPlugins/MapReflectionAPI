@@ -41,13 +41,12 @@ import tech.sbdevelopment.mapreflectionapi.api.MapController;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 import tech.sbdevelopment.mapreflectionapi.exceptions.MapLimitExceededException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class MapWrapper_v1_12_R1 implements MapWrapper {
-    protected ArrayImage content;
+import static tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil.getField;
+import static tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil.setField;
 
+public class MapWrapper_v1_12_R1 extends MapWrapper {
     protected MapController controller = new MapController() {
         private final Map<UUID, Integer> viewers = new HashMap<>();
 
@@ -140,7 +139,7 @@ public class MapWrapper_v1_12_R1 implements MapWrapper {
             net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 
             PacketPlayOutSetSlot packet = new PacketPlayOutSetSlot(windowId, slot, nmsStack);
-            ((EntityPlayer) player).playerConnection.sendPacket(packet);
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
         }
 
         @Override
@@ -222,23 +221,32 @@ public class MapWrapper_v1_12_R1 implements MapWrapper {
 
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
             net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
-            nmsStack.getTag().setInt("map", mapId);
+            if (nmsStack.getTag() == null) nmsStack.setTag(new NBTTagCompound()); //No orCreate on 1.12.2!
+            nmsStack.getTag().setInt("map", mapId); //getTag putInt
 
-            DataWatcher watcher = new DataWatcher(null);
-            watcher.set(DataWatcher.a(EntityItemFrame.class, DataWatcherRegistry.f), nmsStack);
+            PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(entityId, new DataWatcher(null), true);
 
-            PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(entityId, watcher, true);
-            ((EntityPlayer) player).playerConnection.sendPacket(packet);
+            try {
+                List<DataWatcher.Item<?>> list = new ArrayList<>();
+                DataWatcherObject<net.minecraft.server.v1_12_R1.ItemStack> dataWatcherObject = (DataWatcherObject<net.minecraft.server.v1_12_R1.ItemStack>) getField(EntityItemFrame.class, "c");
+                DataWatcher.Item<?> dataWatcherItem = new DataWatcher.Item<>(dataWatcherObject, nmsStack);
+                list.add(dataWatcherItem);
+                setField(packet, "b", list);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+
+            ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
         }
     };
+
+    public MapWrapper_v1_12_R1(ArrayImage image) {
+        super(image);
+    }
 
     @Override
     public MapController getController() {
         return controller;
-    }
-
-    @Override
-    public ArrayImage getContent() {
-        return content;
     }
 }

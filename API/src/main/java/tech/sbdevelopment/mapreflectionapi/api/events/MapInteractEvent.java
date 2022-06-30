@@ -85,6 +85,8 @@ public class MapInteractEvent extends Event implements Cancellable {
     }
 
     public ItemFrame getFrame() {
+        if (getMapWrapper() == null) return null;
+
         if (frame == null) {
             frame = getMapWrapper().getController().getItemFrameById(player.getWorld(), entityID);
         }

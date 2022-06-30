@@ -21,18 +21,34 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.api;
+package tech.sbdevelopment.mapreflectionapi.util;
 
-public abstract class MapWrapper {
-    protected ArrayImage content;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-    public MapWrapper(ArrayImage image) {
-        this.content = image;
+public class ReflectionUtil {
+    public static Object getField(Object packet, String field) throws NoSuchFieldException, IllegalAccessException {
+        Field f = packet.getClass().getDeclaredField(field);
+        f.setAccessible(true);
+        return f.get(packet);
     }
 
-    public abstract MapController getController();
+    public static Object getField(Class<?> clazz, String field) throws NoSuchFieldException, IllegalAccessException {
+        Field f = clazz.getDeclaredField(field);
+        f.setAccessible(true);
+        return f.get(null);
+    }
 
-    public ArrayImage getContent() {
-        return content;
+    public static void setField(Object packet, String field, Object value) throws NoSuchFieldException, IllegalAccessException {
+        Field f = packet.getClass().getDeclaredField(field);
+        f.setAccessible(true);
+        f.set(packet, value);
+    }
+
+    public static Object getValue(Object packet, String method) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        Method m = packet.getClass().getDeclaredMethod(method, null);
+        m.setAccessible(true);
+        return m.invoke(packet, null);
     }
 }

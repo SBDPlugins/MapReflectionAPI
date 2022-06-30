@@ -26,6 +26,7 @@ package tech.sbdevelopment.mapreflectionapi.api;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.exceptions.MapLimitExceededException;
 
@@ -41,9 +42,11 @@ public class MapManager {
     private final List<MapWrapper> MANAGED_MAPS = new CopyOnWriteArrayList<>();
     private final Class<?> wrapperClass;
 
-    public MapManager() throws IllegalStateException {
+    public MapManager(JavaPlugin plugin) throws IllegalStateException {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
+
+        plugin.getLogger().info("Initializing the map manager for Minecraft version " + version + "...");
 
         try {
             final Class<?> clazz = Class.forName("tech.sbdevelopment.mapreflectionapi.nms.MapWrapper_" + version);
@@ -53,7 +56,7 @@ public class MapManager {
                 throw new IllegalStateException("Plugin corrupted! Detected invalid MapWrapper class.");
             }
         } catch (Exception ex) {
-            throw new IllegalStateException("This Spigot version is not supported! Contact the developer to get support.");
+            throw new IllegalStateException("This Spigot version (" + version + ") is not supported! Contact the developer to get support.");
         }
     }
 
@@ -72,7 +75,7 @@ public class MapManager {
 
     private MapWrapper wrapNewImage(ArrayImage image) {
         try {
-            MapWrapper wrapper = (MapWrapper) wrapperClass.getDeclaredConstructor().newInstance();
+            MapWrapper wrapper = (MapWrapper) wrapperClass.getDeclaredConstructor(ArrayImage.class).newInstance(image);
             MANAGED_MAPS.add(wrapper);
             return wrapper;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |

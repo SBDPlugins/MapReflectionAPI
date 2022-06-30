@@ -38,6 +38,9 @@ import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
 
 import java.util.concurrent.TimeUnit;
 
+import static tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil.getField;
+import static tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil.setField;
+
 public class PacketListener_v1_13_R2 extends PacketListener {
     @Override
     protected void injectPlayer(Player p) {

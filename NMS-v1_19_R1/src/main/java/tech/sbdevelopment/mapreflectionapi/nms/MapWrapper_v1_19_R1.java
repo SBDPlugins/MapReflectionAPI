@@ -26,8 +26,7 @@ package tech.sbdevelopment.mapreflectionapi.nms;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
 import net.minecraft.network.syncher.DataWatcher;
-import net.minecraft.network.syncher.DataWatcherRegistry;
-import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.EntityItemFrame;
 import org.bukkit.*;
@@ -45,13 +44,12 @@ import tech.sbdevelopment.mapreflectionapi.api.MapController;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 import tech.sbdevelopment.mapreflectionapi.exceptions.MapLimitExceededException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class MapWrapper_v1_19_R1 implements MapWrapper {
-    protected ArrayImage content;
+import static tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil.getField;
+import static tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil.setField;
 
+public class MapWrapper_v1_19_R1 extends MapWrapper {
     protected MapController controller = new MapController() {
         private final Map<UUID, Integer> viewers = new HashMap<>();
 
@@ -138,14 +136,14 @@ public class MapWrapper_v1_19_R1 implements MapWrapper {
             }
 
             CraftPlayer craftPlayer = (CraftPlayer) player;
-            int windowId = craftPlayer.getHandle().inventoryMenu.containerId;
-            int stateId = craftPlayer.getHandle().inventoryMenu.getStateId();
+            int windowId = craftPlayer.getHandle().bT.j; //inventoryMenu containerId
+            int stateId = craftPlayer.getHandle().bT.j(); //inventoryMenu getStateId()
 
             ItemStack stack = new ItemStack(Material.MAP, 1);
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 
             PacketPlayOutSetSlot packet = new PacketPlayOutSetSlot(windowId, stateId, slot, nmsStack);
-            ((EntityPlayer) player).connection.send(packet);
+            ((CraftPlayer) player).getHandle().b.a(packet);
         }
 
         @Override
@@ -216,7 +214,7 @@ public class MapWrapper_v1_19_R1 implements MapWrapper {
         public ItemFrame getItemFrameById(World world, int entityId) {
             CraftWorld craftWorld = (CraftWorld) world;
 
-            Entity entity = craftWorld.getHandle().getEntity(entityId);
+            Entity entity = craftWorld.getHandle().a(entityId);
             if (entity == null) return null;
 
             if (entity instanceof ItemFrame) return (ItemFrame) entity;
@@ -226,23 +224,31 @@ public class MapWrapper_v1_19_R1 implements MapWrapper {
 
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
-            nmsStack.getOrCreateTag().putInt("map", mapId);
+            nmsStack.v().a("map", mapId); //getOrCreateTag putInt
 
-            DataWatcher watcher = new DataWatcher(null);
-            watcher.set(DataWatcher.defineId(EntityItemFrame.class, DataWatcherRegistry.ITEM_STACK), nmsStack);
+            PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(entityId, new DataWatcher(null), true);
 
-            PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(entityId, watcher, true);
-            ((EntityPlayer) player).connection.send(packet);
+            try {
+                List<DataWatcher.Item<?>> list = new ArrayList<>();
+                DataWatcherObject<net.minecraft.world.item.ItemStack> dataWatcherObject = (DataWatcherObject<net.minecraft.world.item.ItemStack>) getField(EntityItemFrame.class, "ao");
+                DataWatcher.Item<?> dataWatcherItem = new DataWatcher.Item<>(dataWatcherObject, nmsStack);
+                list.add(dataWatcherItem);
+                setField(packet, "b", list);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+
+            ((CraftPlayer) player).getHandle().b.a(packet);
         }
     };
+
+    public MapWrapper_v1_19_R1(ArrayImage image) {
+        super(image);
+    }
 
     @Override
     public MapController getController() {
         return controller;
-    }
-
-    @Override
-    public ArrayImage getContent() {
-        return content;
     }
 }
