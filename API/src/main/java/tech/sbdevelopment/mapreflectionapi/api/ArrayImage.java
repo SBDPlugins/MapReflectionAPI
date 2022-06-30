@@ -27,6 +27,8 @@ import com.bergerkiller.bukkit.common.map.MapColorPalette;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
+import java.util.Objects;
 
 public class ArrayImage {
     public byte[] array;
@@ -53,7 +55,7 @@ public class ArrayImage {
         this.width = image.getWidth();
         this.height = image.getHeight();
 
-        BufferedImage temp = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage temp = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = temp.createGraphics();
         graphics.drawImage(image, 0, 0, null);
         graphics.dispose();
@@ -67,5 +69,34 @@ public class ArrayImage {
         }
 
         this.array = result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ArrayImage)) return false;
+        ArrayImage that = (ArrayImage) o;
+        return width == that.width && height == that.height && imageType == that.imageType && Arrays.equals(array, that.array);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(width, height, imageType);
+        result = 31 * result + Arrays.hashCode(array);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ArrayImage{" +
+                "array=" + Arrays.toString(array) +
+                ", minX=" + minX +
+                ", minY=" + minY +
+                ", maxX=" + maxX +
+                ", maxY=" + maxY +
+                ", width=" + width +
+                ", height=" + height +
+                ", imageType=" + imageType +
+                '}';
     }
 }

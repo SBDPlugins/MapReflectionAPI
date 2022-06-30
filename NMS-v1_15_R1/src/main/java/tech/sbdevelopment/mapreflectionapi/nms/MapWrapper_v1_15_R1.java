@@ -136,7 +136,7 @@ public class MapWrapper_v1_15_R1 extends MapWrapper {
             CraftPlayer craftPlayer = (CraftPlayer) player;
             int windowId = craftPlayer.getHandle().defaultContainer.windowId;
 
-            ItemStack stack = new ItemStack(Material.MAP, 1);
+            ItemStack stack = new ItemStack(Material.FILLED_MAP, 1);
             net.minecraft.server.v1_15_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
 
             PacketPlayOutSetSlot packet = new PacketPlayOutSetSlot(windowId, slot, nmsStack);
@@ -150,7 +150,7 @@ public class MapWrapper_v1_15_R1 extends MapWrapper {
 
         @Override
         public void showInHand(Player player, boolean force) {
-            if (player.getInventory().getItemInMainHand().getType() != Material.MAP && !force) return;
+            if (player.getInventory().getItemInMainHand().getType() != Material.FILLED_MAP && !force) return;
             showInInventory(player, player.getInventory().getHeldItemSlot(), force);
         }
 
@@ -166,7 +166,7 @@ public class MapWrapper_v1_15_R1 extends MapWrapper {
 
         @Override
         public void showInFrame(Player player, ItemFrame frame, boolean force) {
-            if (frame.getItem().getType() != Material.MAP && !force) return;
+            if (frame.getItem().getType() != Material.FILLED_MAP && !force) return;
             showInFrame(player, frame.getEntityId());
         }
 
@@ -179,7 +179,7 @@ public class MapWrapper_v1_15_R1 extends MapWrapper {
         public void showInFrame(Player player, int entityId, String debugInfo) {
             if (!isViewing(player)) return;
 
-            ItemStack stack = new ItemStack(Material.MAP, 1);
+            ItemStack stack = new ItemStack(Material.FILLED_MAP, 1);
             if (debugInfo != null) {
                 ItemMeta itemMeta = stack.getItemMeta();
                 itemMeta.setDisplayName(debugInfo);

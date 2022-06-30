@@ -80,6 +80,7 @@ public class MapManager {
             return wrapper;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
                  InvocationTargetException e) {
+            e.printStackTrace();
             return null;
         }
     }

@@ -55,7 +55,7 @@ public class PacketListener_v1_14_R1 extends PacketListener {
                     if (id < 0) {
                         //It's one of our maps, invert ID and let through!
                         int newId = -id;
-                        setField(packet, "a", newId); //mapId
+                        setField(packetPlayOutMap, "a", newId); //mapId
                     } else {
                         boolean async = !plugin.getServer().isPrimaryThread();
                         MapCancelEvent event = new MapCancelEvent(p, id, async);
