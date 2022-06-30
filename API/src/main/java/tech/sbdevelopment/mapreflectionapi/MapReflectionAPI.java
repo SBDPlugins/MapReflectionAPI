@@ -29,6 +29,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class MapReflectionAPI extends JavaPlugin {
     private static MapReflectionAPI instance;
     private static MapManager mapManager;
+    private static PacketListener packetListener;
 
     public static MapReflectionAPI getInstance() {
         if (instance == null) throw new IllegalStateException("The plugin is not enabled yet!");
@@ -50,6 +51,9 @@ public class MapReflectionAPI extends JavaPlugin {
             return;
         }
 
+        packetListener = PacketListener.construct();
+        packetListener.init(this);
+
         try {
             mapManager = new MapManager();
         } catch (IllegalStateException e) {
@@ -63,6 +67,7 @@ public class MapReflectionAPI extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Bukkit.getOnlinePlayers().forEach(p -> packetListener.removePlayer(p));
         instance = null;
     }
 }

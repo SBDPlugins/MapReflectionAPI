@@ -212,7 +212,8 @@ public class MapWrapper_v1_19_R1 implements MapWrapper {
 
         }
 
-        private ItemFrame getItemFrameById(World world, int entityId) {
+        @Override
+        public ItemFrame getItemFrameById(World world, int entityId) {
             CraftWorld craftWorld = (CraftWorld) world;
 
             Entity entity = craftWorld.getHandle().getEntity(entityId);
