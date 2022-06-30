@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>MapReflectionAPI</artifactId>
+        <groupId>tech.sbdevelopment</groupId>
+        <version>${revision}</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+
+    <artifactId>MapReflectionAPI-Dist</artifactId>
+
+    <build>
+        <directory>../target</directory>
+        <finalName>${project.parent.name}-${project.version}</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M2</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+
+                            <!-- Include all the dependencies required by the plugin -->
+                            <artifactSet>
+                                <includes>
+                                    <include>tech.sbdevelopment:MapReflectionAPI*</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-API</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-NMS-v1_19_R1</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-NMS-v1_18_R2</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-NMS-v1_16_R3</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-NMS-v1_17_R1</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-NMS-v1_15_R1</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-NMS-v1_14_R1</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-NMS-v1_13_R2</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>tech.sbdevelopment</groupId>
+            <artifactId>MapReflectionAPI-NMS-v1_12_R1</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
+</project>
