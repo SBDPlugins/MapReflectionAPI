@@ -24,7 +24,13 @@
 package tech.sbdevelopment.mapreflectionapi;
 
 import org.bukkit.Bukkit;
+import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
+import tech.sbdevelopment.mapreflectionapi.api.MapManager;
+import tech.sbdevelopment.mapreflectionapi.listeners.MapListener;
+import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
+
+import java.util.logging.Level;
 
 public class MapReflectionAPI extends JavaPlugin {
     private static MapReflectionAPI instance;
@@ -45,15 +51,21 @@ public class MapReflectionAPI extends JavaPlugin {
     public void onEnable() {
         instance = this;
 
+        getLogger().info("----------------");
+        getLogger().info("MapReflectionAPI v" + getDescription().getVersion() + "");
+        getLogger().info("Made by © Copyright SBDevelopment 2022");
+
         if (!Bukkit.getPluginManager().isPluginEnabled("BKCommonLib")) {
             getLogger().severe("MapReflectionAPI requires BKCommonLib to function!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
+        getLogger().info("Initializing the packet handler...");
         packetListener = PacketListener.construct();
         packetListener.init(this);
 
+        getLogger().info("Initializing the map manager...");
         try {
             mapManager = new MapManager();
         } catch (IllegalStateException e) {
@@ -62,12 +74,32 @@ public class MapReflectionAPI extends JavaPlugin {
             return;
         }
 
+        getLogger().info("Registering the events...");
+        Bukkit.getPluginManager().registerEvents(new MapListener(), this);
+
+        getLogger().info("Discovering occupied Map IDs...");
+        for (int s = 0; s < Short.MAX_VALUE; s++) {
+            try {
+                MapView view = Bukkit.getMap(s);
+                if (view != null) mapManager.registerOccupiedID(s);
+            } catch (Exception e) {
+                if (e.getMessage().toLowerCase().contains("invalid map dimension")) {
+                    getLogger().log(Level.WARNING, e.getMessage(), e);
+                }
+            }
+        }
+
         getLogger().info("MapReflectionAPI is enabled!");
+        getLogger().info("----------------");
     }
 
     @Override
     public void onDisable() {
-        Bukkit.getOnlinePlayers().forEach(p -> packetListener.removePlayer(p));
+        getLogger().info("Disabling the packet handler...");
+        if (packetListener != null) Bukkit.getOnlinePlayers().forEach(p -> packetListener.removePlayer(p));
+
+        getLogger().info("MapReflectionAPI is disabled!");
+
         instance = null;
     }
 }

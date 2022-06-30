@@ -36,10 +36,10 @@ import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
-import tech.sbdevelopment.mapreflectionapi.PacketListener;
-import tech.sbdevelopment.mapreflectionapi.events.CreateInventoryMapUpdateEvent;
-import tech.sbdevelopment.mapreflectionapi.events.MapCancelEvent;
-import tech.sbdevelopment.mapreflectionapi.events.MapInteractEvent;
+import tech.sbdevelopment.mapreflectionapi.api.events.CreateInventoryMapUpdateEvent;
+import tech.sbdevelopment.mapreflectionapi.api.events.MapCancelEvent;
+import tech.sbdevelopment.mapreflectionapi.api.events.MapInteractEvent;
+import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
 
 import java.util.concurrent.TimeUnit;
 
@@ -110,7 +110,7 @@ public class PacketListener_v1_19_R1 extends PacketListener {
     }
 
     @Override
-    protected void removePlayer(Player p) {
+    public void removePlayer(Player p) {
         Channel channel = ((CraftPlayer) p).getHandle().connection.connection.channel;
         channel.eventLoop().submit(() -> channel.pipeline().remove(p.getName()));
     }

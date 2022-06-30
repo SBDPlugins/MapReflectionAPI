@@ -21,36 +21,43 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.events;
+package tech.sbdevelopment.mapreflectionapi.api.events;
 
-import org.bukkit.Material;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
-import tech.sbdevelopment.mapreflectionapi.MapWrapper;
+import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 
-public class CreateInventoryMapUpdateEvent extends Event implements Cancellable {
+public class MapInteractEvent extends Event implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
     private final Player player;
-    private final int slot;
-    private final ItemStack item;
+    private final int entityID;
+    private final int action;
+    private final Vector vector;
+    private final int hand;
+    private ItemFrame frame;
     private MapWrapper mapWrapper;
     private boolean cancelled;
 
-    public CreateInventoryMapUpdateEvent(Player player, int slot, ItemStack item) {
+    public MapInteractEvent(Player player, int entityID, int action, Vector vector, int hand) {
         this.player = player;
-        this.slot = slot;
-        this.item = item;
+        this.entityID = entityID;
+        this.action = action;
+        this.vector = vector;
+        this.hand = hand;
     }
 
-    public CreateInventoryMapUpdateEvent(Player player, int slot, ItemStack item, boolean isAsync) {
+    public MapInteractEvent(Player player, int entityID, int action, Vector vector, int hand, boolean isAsync) {
         super(isAsync);
         this.player = player;
-        this.slot = slot;
-        this.item = item;
+        this.entityID = entityID;
+        this.action = action;
+        this.vector = vector;
+        this.hand = hand;
     }
 
     public static HandlerList getHandlerList() {
@@ -61,27 +68,35 @@ public class CreateInventoryMapUpdateEvent extends Event implements Cancellable 
         return player;
     }
 
-    public int getSlot() {
-        return slot;
+    public int getEntityID() {
+        return entityID;
     }
 
-    public ItemStack getItem() {
-        return item;
+    public int getAction() {
+        return action;
+    }
+
+    public Vector getVector() {
+        return vector;
+    }
+
+    public int getHand() {
+        return hand;
+    }
+
+    public ItemFrame getFrame() {
+        if (frame == null) {
+            frame = getMapWrapper().getController().getItemFrameById(player.getWorld(), entityID);
+        }
+        return frame;
     }
 
     public MapWrapper getMapWrapper() {
         if (mapWrapper == null) {
-            if (item == null) return null;
-            if (item.getType() != Material.MAP) return null;
-            MapReflectionAPI.getMapManager().getWrapperForId(player, item.getDurability());
+            mapWrapper = MapReflectionAPI.getMapManager().getWrapperForId(player, entityID);
         }
 
         return mapWrapper;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlerList;
     }
 
     @Override
@@ -92,5 +107,10 @@ public class CreateInventoryMapUpdateEvent extends Event implements Cancellable 
     @Override
     public void setCancelled(boolean b) {
         this.cancelled = b;
+    }
+
+    @Override
+    public HandlerList getHandlers() {
+        return handlerList;
     }
 }

@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi;
+package tech.sbdevelopment.mapreflectionapi.api;
 
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 

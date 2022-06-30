@@ -27,8 +27,8 @@ import net.minecraft.server.v1_16_R3.PacketPlayOutMap;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import tech.sbdevelopment.mapreflectionapi.ArrayImage;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
+import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
 
 import java.util.ArrayList;
 import java.util.List;

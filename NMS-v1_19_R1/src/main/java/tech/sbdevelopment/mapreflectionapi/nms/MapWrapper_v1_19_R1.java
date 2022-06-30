@@ -39,10 +39,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import tech.sbdevelopment.mapreflectionapi.ArrayImage;
-import tech.sbdevelopment.mapreflectionapi.MapController;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
-import tech.sbdevelopment.mapreflectionapi.MapWrapper;
+import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
+import tech.sbdevelopment.mapreflectionapi.api.MapController;
+import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 import tech.sbdevelopment.mapreflectionapi.exceptions.MapLimitExceededException;
 
 import java.util.HashMap;

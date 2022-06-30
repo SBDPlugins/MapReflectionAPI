@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi;
+package tech.sbdevelopment.mapreflectionapi.listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -31,13 +31,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
+import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 
 import java.lang.reflect.Field;
 
 public abstract class PacketListener implements Listener {
     protected JavaPlugin plugin;
 
-    protected static PacketListener construct() {
+    public static PacketListener construct() {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
@@ -70,7 +71,7 @@ public abstract class PacketListener implements Listener {
 
     protected abstract void injectPlayer(Player p);
 
-    protected abstract void removePlayer(Player p);
+    public abstract void removePlayer(Player p);
 
     protected abstract Vector vec3DToVector(Object vec3d);
 

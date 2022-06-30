@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.events;
+package tech.sbdevelopment.mapreflectionapi.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;

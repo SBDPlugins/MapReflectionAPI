@@ -21,10 +21,23 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi;
+package tech.sbdevelopment.mapreflectionapi.listeners;
 
-public interface MapWrapper {
-    MapController getController();
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.MapInitializeEvent;
+import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 
-    ArrayImage getContent();
+public class MapListener implements Listener {
+    @EventHandler
+    public void onQuit(PlayerQuitEvent e) {
+        MapReflectionAPI.getMapManager().clearAllMapsFor(e.getPlayer());
+    }
+
+    @EventHandler
+    public void onMapInitialize(MapInitializeEvent e) {
+        int id = e.getMap().getId();
+        if (id > 0) MapReflectionAPI.getMapManager().registerOccupiedID(id);
+    }
 }
