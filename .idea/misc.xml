@@ -15,8 +15,22 @@
         <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/API/pom.xml" />
+        <option value="$PROJECT_DIR$/Dist/pom.xml" />
+        <option value="$PROJECT_DIR$/NMS-v1_12_R1/pom.xml" />
+        <option value="$PROJECT_DIR$/NMS-v1_13_R2/pom.xml" />
+        <option value="$PROJECT_DIR$/NMS-v1_14_R1/pom.xml" />
+        <option value="$PROJECT_DIR$/NMS-v1_15_R1/pom.xml" />
+        <option value="$PROJECT_DIR$/NMS-v1_16_R3/pom.xml" />
+        <option value="$PROJECT_DIR$/NMS-v1_17_R1/pom.xml" />
+        <option value="$PROJECT_DIR$/NMS-v1_18_R2/pom.xml" />
+        <option value="$PROJECT_DIR$/NMS-v1_19_R1/pom.xml" />
+      </set>
+    </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
