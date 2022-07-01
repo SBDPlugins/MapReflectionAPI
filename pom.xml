@@ -38,6 +38,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.lombok.delombok-target>${project.build.directory}/javadoc-delombok</maven.lombok.delombok-target>
     </properties>
 
     <distributionManagement>
@@ -105,6 +106,38 @@
                     <serverId>nexus-releases</serverId>
                     <nexusUrl>https://repo.sbdevelopment.tech/</nexusUrl>
                     <skipStaging>true</skipStaging>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok-maven-plugin</artifactId>
+                <version>1.18.20.0</version>
+                <configuration>
+                    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                    <outputDirectory>${maven.lombok.delombok-target}</outputDirectory>
+                    <addOutputDirectory>false</addOutputDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>delombok</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <release>11</release>
+                    <sourcepath>${maven.lombok.delombok-target}</sourcepath>
+                    <sourceFileExcludes>
+                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/*.java</sourceFileExclude>
+                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/utils/*.java</sourceFileExclude>
+                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/listeners/*.java</sourceFileExclude>
+                    </sourceFileExcludes>
                 </configuration>
             </plugin>
         </plugins>

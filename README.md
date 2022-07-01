@@ -52,6 +52,8 @@ controller.showInFrame(p, frame, true);
 controller.showInHand(p, true);
 ```
 
+More information can be found on the [JavaDoc](https://sbdplugins.nl/javadoc/mapreflectionapi/).
+
 ## Credits:
 
 This is a fork of [MapManager](https://github.com/InventivetalentDev/MapManager). It updates the API to 1.19 and uses
