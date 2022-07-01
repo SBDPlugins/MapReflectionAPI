@@ -24,14 +24,21 @@
 package tech.sbdevelopment.mapreflectionapi.api;
 
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
-import java.util.Objects;
 
+/**
+ * This class contains an image converted to a Minecraft byte array
+ */
+@RequiredArgsConstructor
+@EqualsAndHashCode
+@ToString
 public class ArrayImage {
-    public byte[] array;
+    public final byte[] array;
     public int minX = 0;
     public int minY = 0;
     public int maxX = 128;
@@ -39,10 +46,6 @@ public class ArrayImage {
     private int width;
     private int height;
     private int imageType = BufferedImage.TYPE_4BYTE_ABGR;
-
-    public ArrayImage(byte[] data) {
-        this.array = data;
-    }
 
     /**
      * Convert a {@link BufferedImage} to an ArrayImage
@@ -71,6 +74,11 @@ public class ArrayImage {
         this.array = result;
     }
 
+    /**
+     * Get the {@link BufferedImage} of this ArrayImage
+     *
+     * @return The converted image
+     */
     public BufferedImage toBuffered() {
         BufferedImage img = new BufferedImage(width, height, this.imageType);
         for (int x = 0; x < width; x++) {
@@ -79,34 +87,5 @@ public class ArrayImage {
             }
         }
         return img;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ArrayImage)) return false;
-        ArrayImage that = (ArrayImage) o;
-        return width == that.width && height == that.height && imageType == that.imageType && Arrays.equals(array, that.array);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = Objects.hash(width, height, imageType);
-        result = 31 * result + Arrays.hashCode(array);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "ArrayImage{" +
-                "array=" + Arrays.toString(array) +
-                ", minX=" + minX +
-                ", minY=" + minY +
-                ", maxX=" + maxX +
-                ", maxY=" + maxY +
-                ", width=" + width +
-                ", height=" + height +
-                ", imageType=" + imageType +
-                '}';
     }
 }

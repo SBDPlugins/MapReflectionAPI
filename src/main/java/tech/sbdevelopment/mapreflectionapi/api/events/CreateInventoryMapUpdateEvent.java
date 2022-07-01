@@ -23,29 +23,42 @@
 
 package tech.sbdevelopment.mapreflectionapi.api.events;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 
+/**
+ * This event gets fired when a map in the creative inventory gets updated
+ */
+@RequiredArgsConstructor
+@Getter
 public class CreateInventoryMapUpdateEvent extends Event implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
+    @Setter
+    private boolean cancelled;
+
     private final Player player;
     private final int slot;
     private final ItemStack item;
     private MapWrapper mapWrapper;
-    private boolean cancelled;
 
-    public CreateInventoryMapUpdateEvent(Player player, int slot, ItemStack item) {
-        this.player = player;
-        this.slot = slot;
-        this.item = item;
-    }
-
+    /**
+     * Construct a new {@link CreateInventoryMapUpdateEvent}
+     *
+     * @param player  The player whose inventory is updated
+     * @param slot    The new slot
+     * @param item    The item in the new slot
+     * @param isAsync Is this event called async?
+     */
     public CreateInventoryMapUpdateEvent(Player player, int slot, ItemStack item, boolean isAsync) {
         super(isAsync);
         this.player = player;
@@ -53,44 +66,24 @@ public class CreateInventoryMapUpdateEvent extends Event implements Cancellable 
         this.item = item;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlerList;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public int getSlot() {
-        return slot;
-    }
-
-    public ItemStack getItem() {
-        return item;
-    }
-
-    public MapWrapper getMapWrapper() {
-        if (mapWrapper == null) {
-            if (item == null) return null;
-            if (item.getType() != Material.MAP) return null;
-            MapReflectionAPI.getMapManager().getWrapperForId(player, item.getDurability());
-        }
-
-        return mapWrapper;
-    }
-
     @Override
     public HandlerList getHandlers() {
         return handlerList;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
+    /**
+     * Get the {@link MapWrapper} of the map of this event
+     *
+     * @return The {@link MapWrapper}
+     */
+    @Nullable
+    public MapWrapper getMapWrapper() {
+        if (mapWrapper == null) {
+            if (item == null) return null;
+            if (item.getType() != Material.MAP) return null;
+            mapWrapper = MapReflectionAPI.getMapManager().getWrapperForId(player, item.getDurability());
+        }
 
-    @Override
-    public void setCancelled(boolean b) {
-        this.cancelled = b;
+        return mapWrapper;
     }
 }

@@ -23,17 +23,29 @@
 
 package tech.sbdevelopment.mapreflectionapi.api.events;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 
+/**
+ * This event gets fired when a player interact with a map
+ */
+@RequiredArgsConstructor
+@Getter
 public class MapInteractEvent extends Event implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
+    @Setter
+    private boolean cancelled;
+
     private final Player player;
     private final int entityID;
     private final int action;
@@ -41,16 +53,17 @@ public class MapInteractEvent extends Event implements Cancellable {
     private final int hand;
     private ItemFrame frame;
     private MapWrapper mapWrapper;
-    private boolean cancelled;
 
-    public MapInteractEvent(Player player, int entityID, int action, Vector vector, int hand) {
-        this.player = player;
-        this.entityID = entityID;
-        this.action = action;
-        this.vector = vector;
-        this.hand = hand;
-    }
-
+    /**
+     * Construct a new {@link MapInteractEvent}
+     *
+     * @param player   The player who interacted
+     * @param entityID The ID of the entity the map is in
+     * @param action   The interact action
+     * @param vector   The location of the entity
+     * @param hand     The hand the player clicked with
+     * @param isAsync  Is this event called async?
+     */
     public MapInteractEvent(Player player, int entityID, int action, Vector vector, int hand, boolean isAsync) {
         super(isAsync);
         this.player = player;
@@ -60,30 +73,17 @@ public class MapInteractEvent extends Event implements Cancellable {
         this.hand = hand;
     }
 
-    public static HandlerList getHandlerList() {
+    @Override
+    public HandlerList getHandlers() {
         return handlerList;
     }
 
-    public Player getPlayer() {
-        return player;
-    }
-
-    public int getEntityID() {
-        return entityID;
-    }
-
-    public int getAction() {
-        return action;
-    }
-
-    public Vector getVector() {
-        return vector;
-    }
-
-    public int getHand() {
-        return hand;
-    }
-
+    /**
+     * Get the {@link ItemFrame} the map is in
+     *
+     * @return The frame the map is in, or null if it's not a map
+     */
+    @Nullable
     public ItemFrame getFrame() {
         if (getMapWrapper() == null) return null;
 
@@ -93,26 +93,17 @@ public class MapInteractEvent extends Event implements Cancellable {
         return frame;
     }
 
+    /**
+     * Get the {@link MapWrapper} of the map
+     *
+     * @return The wrapper
+     */
+    @Nullable
     public MapWrapper getMapWrapper() {
         if (mapWrapper == null) {
             mapWrapper = MapReflectionAPI.getMapManager().getWrapperForId(player, entityID);
         }
 
         return mapWrapper;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean b) {
-        this.cancelled = b;
-    }
-
-    @Override
-    public HandlerList getHandlers() {
-        return handlerList;
     }
 }

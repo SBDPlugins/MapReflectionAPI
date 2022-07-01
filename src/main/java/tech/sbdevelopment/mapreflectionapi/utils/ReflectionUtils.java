@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package tech.sbdevelopment.mapreflectionapi.util;
+package tech.sbdevelopment.mapreflectionapi.utils;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;

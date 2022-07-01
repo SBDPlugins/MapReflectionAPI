@@ -23,52 +23,42 @@
 
 package tech.sbdevelopment.mapreflectionapi.api.events;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+/**
+ * This event gets fired when a map creation is cancelled
+ */
+@RequiredArgsConstructor
+@Getter
 public class MapCancelEvent extends Event implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
-    private final Player player;
-    private final int id;
+    @Setter
     private boolean cancelled;
 
-    public MapCancelEvent(Player player, int id) {
-        this.player = player;
-        this.id = id;
-    }
+    private final Player player;
+    private final int id;
 
+    /**
+     * Construct a new {@link MapCancelEvent}
+     *
+     * @param player  The player who tried to create the map
+     * @param id      The ID of the map
+     * @param isAsync Is this event called async?
+     */
     public MapCancelEvent(Player player, int id, boolean isAsync) {
         super(isAsync);
         this.player = player;
         this.id = id;
     }
 
-    public static HandlerList getHandlerList() {
-        return handlerList;
-    }
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public int getId() {
-        return id;
-    }
-
     @Override
     public HandlerList getHandlers() {
         return handlerList;
-    }
-
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean b) {
-        this.cancelled = b;
     }
 }

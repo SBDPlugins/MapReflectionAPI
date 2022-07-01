@@ -26,8 +26,8 @@ package tech.sbdevelopment.mapreflectionapi.api;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
-import tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil;
-import tech.sbdevelopment.mapreflectionapi.util.ReflectionUtils;
+import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
+import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +37,13 @@ public class MapSender {
     private static final List<QueuedMap> sendQueue = new ArrayList<>();
     private static int senderID = -1;
 
+    /**
+     * Add a map to the send queue
+     *
+     * @param id      The ID of the map
+     * @param content The {@link ArrayImage} to view on the map
+     * @param player  The {@link Player} to view for
+     */
     public static void addToQueue(final int id, final ArrayImage content, final Player player) {
         QueuedMap toSend = new QueuedMap(id, content, player);
         if (sendQueue.contains(toSend)) return;
@@ -45,6 +52,9 @@ public class MapSender {
         runSender();
     }
 
+    /**
+     * Run the sender task
+     */
     private static void runSender() {
         if (Bukkit.getScheduler().isQueued(senderID) || Bukkit.getScheduler().isCurrentlyRunning(senderID) || sendQueue.isEmpty())
             return;
@@ -66,6 +76,13 @@ public class MapSender {
     private static final Class<?> packetPlayOutMapClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutMap");
     private static final Class<?> worldMapData = ReflectionUtils.supports(17) ? ReflectionUtils.getNMSClass("world.level.saveddata.maps", "WorldMap") : null;
 
+    /**
+     * Send a map to a player
+     *
+     * @param id0     The ID of the map
+     * @param content The {@link ArrayImage} to view on the map
+     * @param player  The {@link Player} to view for
+     */
     public static void sendMap(final int id0, final ArrayImage content, final Player player) {
         if (player == null || !player.isOnline()) {
             List<QueuedMap> toRemove = new ArrayList<>();

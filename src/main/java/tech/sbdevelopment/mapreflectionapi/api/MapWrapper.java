@@ -30,15 +30,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
-import tech.sbdevelopment.mapreflectionapi.exceptions.MapLimitExceededException;
-import tech.sbdevelopment.mapreflectionapi.util.ReflectionUtil;
-import tech.sbdevelopment.mapreflectionapi.util.ReflectionUtils;
+import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
+import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
+import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils;
 
 import java.util.*;
 
 public class MapWrapper {
     protected ArrayImage content;
 
+    /**
+     * Construct a new {@link MapWrapper}
+     *
+     * @param image The {@link ArrayImage} to wrap
+     */
     public MapWrapper(ArrayImage image) {
         this.content = image;
     }
@@ -274,13 +279,21 @@ public class MapWrapper {
         }
     };
 
+    /**
+     * Get the content that is wrapped
+     *
+     * @return The {@link ArrayImage}
+     */
     public ArrayImage getContent() {
         return content;
     }
 
+    /**
+     * Get the controller of this wrapper
+     *
+     * @return The {@link MapController}
+     */
     public MapController getController() {
         return controller;
     }
-
-
 }

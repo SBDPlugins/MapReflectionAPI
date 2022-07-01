@@ -21,9 +21,17 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.exceptions;
+package tech.sbdevelopment.mapreflectionapi.api.exceptions;
 
+/**
+ * This exception gets thrown if no map IDs are available
+ */
 public class MapLimitExceededException extends Exception {
+    /**
+     * Construct a new {@link MapLimitExceededException}
+     *
+     * @param message The message in this exception
+     */
     public MapLimitExceededException(String message) {
         super(message);
     }

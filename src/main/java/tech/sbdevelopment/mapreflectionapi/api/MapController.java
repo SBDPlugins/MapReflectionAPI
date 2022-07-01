@@ -27,7 +27,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
-import tech.sbdevelopment.mapreflectionapi.exceptions.MapLimitExceededException;
+import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 
 public interface MapController {
     /**
@@ -72,6 +72,11 @@ public interface MapController {
      */
     void update(ArrayImage content);
 
+    /**
+     * Get the content of the controller
+     *
+     * @return The {@link ArrayImage}
+     */
     ArrayImage getContent();
 
     /**

@@ -23,12 +23,10 @@
 
 package tech.sbdevelopment.mapreflectionapi.api;
 
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
-import tech.sbdevelopment.mapreflectionapi.exceptions.MapLimitExceededException;
+import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
@@ -40,19 +38,22 @@ public class MapManager {
     protected final Set<Integer> OCCUPIED_IDS = new HashSet<>();
     private final List<MapWrapper> MANAGED_MAPS = new CopyOnWriteArrayList<>();
 
-    public MapManager(JavaPlugin plugin) throws IllegalStateException {
-        String packageName = Bukkit.getServer().getClass().getPackage().getName();
-        String version = packageName.substring(packageName.lastIndexOf('.') + 1);
-
-        plugin.getLogger().info("Initializing the map manager for Minecraft version " + version + "...");
-    }
-
-    @Nullable
+    /**
+     * Wrap a {@link BufferedImage} in a {@link MapWrapper}
+     *
+     * @param image The image to wrap
+     * @return The wrapper
+     */
     public MapWrapper wrapImage(BufferedImage image) {
         return wrapImage(new ArrayImage(image));
     }
 
-    @Nullable
+    /**
+     * Wrap a {@link ArrayImage} in a {@link MapWrapper}
+     *
+     * @param image The image to wrap
+     * @return The wrapper
+     */
     public MapWrapper wrapImage(ArrayImage image) {
         for (MapWrapper wrapper : MANAGED_MAPS) {
             if (wrapper.getContent().equals(image)) return wrapper;
@@ -60,12 +61,23 @@ public class MapManager {
         return wrapNewImage(image);
     }
 
+    /**
+     * Wrap a new image
+     *
+     * @param image The image to wrap
+     * @return The wrapper
+     */
     private MapWrapper wrapNewImage(ArrayImage image) {
         MapWrapper wrapper = new MapWrapper(image);
         MANAGED_MAPS.add(wrapper);
         return wrapper;
     }
 
+    /**
+     * Unwrap an image (will remove the wrapper)
+     *
+     * @param wrapper The {@link MapWrapper} to unwrap
+     */
     public void unwrapImage(MapWrapper wrapper) {
         //TODO Cancel IDs
 
@@ -73,6 +85,12 @@ public class MapManager {
         MANAGED_MAPS.remove(wrapper);
     }
 
+    /**
+     * Get the maps a player can see
+     *
+     * @param player The {@link Player} to check for
+     * @return A {@link Set} with the {@link MapWrapper}s
+     */
     public Set<MapWrapper> getMapsVisibleTo(OfflinePlayer player) {
         Set<MapWrapper> visible = new HashSet<>();
         for (MapWrapper wrapper : MANAGED_MAPS) {
@@ -83,6 +101,14 @@ public class MapManager {
         return visible;
     }
 
+    /**
+     * Get the wrapper by a player and map id
+     *
+     * @param player The {@link OfflinePlayer} to check for
+     * @param id     The ID of the map
+     * @return The {@link MapWrapper} for that map or null
+     */
+    @Nullable
     public MapWrapper getWrapperForId(OfflinePlayer player, int id) {
         for (MapWrapper wrapper : getMapsVisibleTo(player)) {
             if (wrapper.getController().getMapId(player) == id) {
@@ -92,14 +118,30 @@ public class MapManager {
         return null;
     }
 
+    /**
+     * Register an occupied map ID
+     *
+     * @param id The map ID to register
+     */
     public void registerOccupiedID(int id) {
         OCCUPIED_IDS.add(id);
     }
 
+    /**
+     * Unregister an occupied map ID
+     *
+     * @param id The map ID to unregister
+     */
     public void unregisterOccupiedID(int id) {
         OCCUPIED_IDS.remove(id);
     }
 
+    /**
+     * Get the occupied IDs for a player
+     *
+     * @param player The {@link OfflinePlayer} to check for
+     * @return A {@link Set} with the found map IDs
+     */
     public Set<Integer> getOccupiedIdsFor(OfflinePlayer player) {
         Set<Integer> ids = new HashSet<>();
         for (MapWrapper wrapper : MANAGED_MAPS) {
@@ -111,10 +153,24 @@ public class MapManager {
         return ids;
     }
 
+    /**
+     * Check if a player uses a map ID
+     *
+     * @param player The {@link OfflinePlayer} to check for
+     * @param id     The map ID to check for
+     * @return true/false
+     */
     public boolean isIdUsedBy(OfflinePlayer player, int id) {
         return id > 0 && getOccupiedIdsFor(player).contains(id);
     }
 
+    /**
+     * Get the next ID that can be used for this player
+     *
+     * @param player The {@link Player} to check for
+     * @return The next ID
+     * @throws MapLimitExceededException If no IDs are available
+     */
     public int getNextFreeIdFor(Player player) throws MapLimitExceededException {
         Set<Integer> occupied = getOccupiedIdsFor(player);
         //Add the 'default' occupied IDs
@@ -143,12 +199,26 @@ public class MapManager {
         throw new MapLimitExceededException("'" + player + "' reached the maximum amount of available Map-IDs");
     }
 
+    /**
+     * Clear all the maps of a player
+     * This makes them no longer viewable for this player
+     *
+     * @param player The {@link OfflinePlayer} to clear for
+     */
     public void clearAllMapsFor(OfflinePlayer player) {
         for (MapWrapper wrapper : getMapsVisibleTo(player)) {
             wrapper.getController().removeViewer(player);
         }
     }
 
+    /**
+     * Check if a MapWrapper exists for this image
+     * If so, the same MapWrapper can be used
+     *
+     * @param image The {@link ArrayImage} to check for
+     * @return A {@link MapWrapper} if duplicate, or null if not
+     */
+    @Nullable
     public MapWrapper getDuplicate(ArrayImage image) {
         for (MapWrapper wrapper : MANAGED_MAPS) {
             if (image.equals(wrapper.getContent())) {

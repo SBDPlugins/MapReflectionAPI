@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.util;
+package tech.sbdevelopment.mapreflectionapi.utils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -30,7 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import tech.sbdevelopment.mapreflectionapi.api.MapManager;
 import tech.sbdevelopment.mapreflectionapi.listeners.MapListener;
 import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
-import tech.sbdevelopment.mapreflectionapi.util.ReflectionUtils;
+import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils;
 
 import java.util.logging.Level;
 
@@ -38,11 +38,21 @@ public class MapReflectionAPI extends JavaPlugin {
     private static MapReflectionAPI instance;
     private static MapManager mapManager;
 
+    /**
+     * Get the plugin instance
+     *
+     * @return The {@link MapReflectionAPI} instance
+     */
     public static MapReflectionAPI getInstance() {
         if (instance == null) throw new IllegalStateException("The plugin is not enabled yet!");
         return instance;
     }
 
+    /**
+     * Get the {@link MapManager}
+     *
+     * @return The manager
+     */
     public static MapManager getMapManager() {
         if (mapManager == null) throw new IllegalStateException("The plugin is not enabled yet!");
         return mapManager;
@@ -74,18 +84,8 @@ public class MapReflectionAPI extends JavaPlugin {
             return;
         }
 
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListener(this));
-
-        try {
-            mapManager = new MapManager(this);
-        } catch (IllegalStateException e) {
-            getLogger().log(Level.SEVERE, e.getMessage(), e);
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
-
-        getLogger().info("Registering the events...");
-        Bukkit.getPluginManager().registerEvents(new MapListener(), this);
+        getLogger().info("Loading the map manager...");
+        mapManager = new MapManager();
 
         getLogger().info("Discovering occupied Map IDs...");
         for (int s = 0; s < Short.MAX_VALUE; s++) {
@@ -98,6 +98,10 @@ public class MapReflectionAPI extends JavaPlugin {
                 }
             }
         }
+
+        getLogger().info("Registering the listeners...");
+        Bukkit.getPluginManager().registerEvents(new MapListener(), this);
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListener(this));
 
         getLogger().info("MapReflectionAPI is enabled!");
         getLogger().info("----------------");
