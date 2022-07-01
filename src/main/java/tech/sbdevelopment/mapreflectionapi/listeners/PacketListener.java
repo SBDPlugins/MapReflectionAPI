@@ -69,12 +69,18 @@ public class PacketListener extends PacketAdapter {
         if (event.getPacketType() == PacketType.Play.Client.USE_ENTITY) {
             int entityId = event.getPacket().getIntegers().read(0); //entityId
             WrappedEnumEntityUseAction action = event.getPacket().getEnumEntityUseActions().read(0);
-            EnumWrappers.EntityUseAction actionEnum = action.getAction();
-            EnumWrappers.Hand hand = action.getHand();
-            Vector pos = action.getPosition();
+            EnumWrappers.EntityUseAction actionEnum = null;
+            EnumWrappers.Hand hand = null;
+            Vector pos = null;
+            try {
+                actionEnum = action.getAction();
+                hand = action.getHand();
+                pos = action.getPosition();
+            } catch (IllegalArgumentException ignored) {
+            }
 
             boolean async = !plugin.getServer().isPrimaryThread();
-            MapInteractEvent interactEvent = new MapInteractEvent(event.getPlayer(), entityId, actionEnum.ordinal(), pos, hand.ordinal(), async);
+            MapInteractEvent interactEvent = new MapInteractEvent(event.getPlayer(), entityId, actionEnum != null ? actionEnum.ordinal() : 0, pos, hand != null ? hand.ordinal() : 0, async);
             if (interactEvent.getFrame() != null && interactEvent.getMapWrapper() != null) {
                 Bukkit.getPluginManager().callEvent(interactEvent);
                 if (interactEvent.isCancelled()) event.setCancelled(true);

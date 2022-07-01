@@ -47,9 +47,9 @@ public class MapWrapper {
         this.content = image;
     }
 
-    private static final Class<?> craftStackClass = ReflectionUtil.getCraftClass("CraftItemStack");
+    private static final Class<?> craftStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
     private static final Class<?> setSlotPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
-    private static final Class<?> tagCompoundClass = ReflectionUtil.getCraftClass("NBTTagCompound");
+    private static final Class<?> tagCompoundClass = ReflectionUtil.getNMSClass("nbt", "NBTTagCompound");
     private static final Class<?> entityClass = ReflectionUtil.getNMSClass("world.entity", "Entity");
     private static final Class<?> dataWatcherClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher");
     private static final Class<?> entityMetadataPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
@@ -260,7 +260,7 @@ public class MapWrapper {
             }
 
             ReflectionUtil.callMethod(nbtObject, ReflectionUtil.supports(18) ? "a" : "setInt", "map", mapId);
-            Object dataWatcher = ReflectionUtil.callConstructor(dataWatcherClass, entityClass.cast(null));
+            Object dataWatcher = ReflectionUtil.callConstructorNull(dataWatcherClass, entityClass);
 
             Object packet = ReflectionUtil.callConstructor(entityMetadataPacketClass,
                     entityId,
@@ -268,9 +268,9 @@ public class MapWrapper {
                     true
             );
 
-            List<Object> list = new ArrayList<>();
+            List list = new ArrayList<>();
             Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, ReflectionUtil.supports(17) ? "ao" : ReflectionUtil.supports(14) ? "ITEM" : ReflectionUtil.supports(13) ? "e" : "c");
-            Object dataWatcherItem = ReflectionUtil.callConstructor(dataWatcherItemClass, dataWatcherObject, nmsStack);
+            Object dataWatcherItem = ReflectionUtil.callFirstConstructor(dataWatcherItemClass, dataWatcherObject, nmsStack);
             list.add(dataWatcherItem);
             ReflectionUtil.setDeclaredField(packet, "b", list);
 

@@ -36,7 +36,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
@@ -191,12 +193,13 @@ public class ReflectionUtil {
         if (clazz == Byte.class) return byte.class;
         if (clazz == Void.class) return void.class;
         if (clazz == Character.class) return char.class;
+        if (clazz == ArrayList.class) return Collection.class;
         return clazz;
     }
 
     private static Class<?>[] toParamTypes(Object... params) {
         return Arrays.stream(params)
-                .map(obj -> wrapperToPrimitive(obj.getClass()))
+                .map(obj -> obj != null ? wrapperToPrimitive(obj.getClass()) : null)
                 .toArray(Class<?>[]::new);
     }
 
@@ -205,6 +208,32 @@ public class ReflectionUtil {
         try {
             return Class.forName(name);
         } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    public static Object callConstructorNull(Class<?> clazz, Class<?> paramClass) {
+        try {
+            Constructor<?> con = clazz.getConstructor(paramClass);
+            con.setAccessible(true);
+            return con.newInstance(clazz.cast(null));
+        } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
+                 InvocationTargetException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    public static Object callFirstConstructor(Class<?> clazz, Object... params) {
+        try {
+            Constructor<?> con = clazz.getConstructors()[0];
+            con.setAccessible(true);
+            return con.newInstance(params);
+        } catch (IllegalAccessException | InstantiationException |
+                 InvocationTargetException ex) {
             ex.printStackTrace();
             return null;
         }
@@ -231,6 +260,18 @@ public class ReflectionUtil {
             return con.newInstance(params);
         } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
                  InvocationTargetException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    public static Object callMethod(Class<?> clazz, String method, Object... params) {
+        try {
+            Method m = clazz.getMethod(method, toParamTypes(params));
+            m.setAccessible(true);
+            return m.invoke(null, params);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             ex.printStackTrace();
             return null;
         }
@@ -273,6 +314,18 @@ public class ReflectionUtil {
     }
 
     @Nullable
+    public static Object getDeclaredField(Class<?> clazz, String field) {
+        try {
+            Field f = clazz.getDeclaredField(field);
+            f.setAccessible(true);
+            return f.get(null);
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
     public static Object getDeclaredField(Object object, String field) {
         try {
             Field f = object.getClass().getDeclaredField(field);
@@ -288,7 +341,7 @@ public class ReflectionUtil {
         try {
             Field f = object.getClass().getDeclaredField(field);
             f.setAccessible(true);
-            f.set(object, toParamTypes(value));
+            f.set(object, value);
         } catch (NoSuchFieldException | IllegalAccessException ex) {
             ex.printStackTrace();
         }

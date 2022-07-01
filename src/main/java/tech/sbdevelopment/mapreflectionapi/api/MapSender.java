@@ -73,7 +73,7 @@ public class MapSender {
     }
 
     private static final Class<?> packetPlayOutMapClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutMap");
-    private static final Class<?> worldMapData = ReflectionUtil.supports(17) ? ReflectionUtil.getNMSClass("world.level.saveddata.maps", "WorldMap") : null;
+    private static final Class<?> worldMapData = ReflectionUtil.supports(17) ? ReflectionUtil.getNMSClass("world.level.saveddata.maps", "WorldMap$b") : null;
 
     /**
      * Send a map to a player
