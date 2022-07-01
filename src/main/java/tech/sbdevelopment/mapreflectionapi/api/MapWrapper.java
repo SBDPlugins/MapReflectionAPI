@@ -32,7 +32,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
-import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils;
 
 import java.util.*;
 
@@ -48,14 +47,14 @@ public class MapWrapper {
         this.content = image;
     }
 
-    private static final Class<?> craftStackClass = ReflectionUtils.getCraftClass("CraftItemStack");
-    private static final Class<?> setSlotPacketClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
-    private static final Class<?> tagCompoundClass = ReflectionUtils.getCraftClass("NBTTagCompound");
-    private static final Class<?> entityClass = ReflectionUtils.getNMSClass("world.entity", "Entity");
-    private static final Class<?> dataWatcherClass = ReflectionUtils.getNMSClass("network.syncher", "DataWatcher");
-    private static final Class<?> entityMetadataPacketClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
-    private static final Class<?> entityItemFrameClass = ReflectionUtils.getNMSClass("world.entity.decoration", "EntityItemFrame");
-    private static final Class<?> dataWatcherItemClass = ReflectionUtils.getNMSClass("network.syncher", "DataWatcher$Item");
+    private static final Class<?> craftStackClass = ReflectionUtil.getCraftClass("CraftItemStack");
+    private static final Class<?> setSlotPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
+    private static final Class<?> tagCompoundClass = ReflectionUtil.getCraftClass("NBTTagCompound");
+    private static final Class<?> entityClass = ReflectionUtil.getNMSClass("world.entity", "Entity");
+    private static final Class<?> dataWatcherClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher");
+    private static final Class<?> entityMetadataPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
+    private static final Class<?> entityItemFrameClass = ReflectionUtil.getNMSClass("world.entity.decoration", "EntityItemFrame");
+    private static final Class<?> dataWatcherItemClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher$Item");
 
     protected MapController controller = new MapController() {
         private final Map<UUID, Integer> viewers = new HashMap<>();
@@ -142,17 +141,17 @@ public class MapWrapper {
                 slot = 8 - (slot - 36);
             }
 
-            Object playerHandle = ReflectionUtils.getHandle(player);
-            Object inventoryMenu = ReflectionUtil.getField(playerHandle, ReflectionUtils.supports(19) ? "bT" : ReflectionUtils.supports(17) ? "bU" : "defaultContainer");
-            int windowId = (int) ReflectionUtil.getField(inventoryMenu, ReflectionUtils.supports(17) ? "j" : "windowId");
+            Object playerHandle = ReflectionUtil.getHandle(player);
+            Object inventoryMenu = ReflectionUtil.getField(playerHandle, ReflectionUtil.supports(19) ? "bT" : ReflectionUtil.supports(17) ? "bU" : "defaultContainer");
+            int windowId = (int) ReflectionUtil.getField(inventoryMenu, ReflectionUtil.supports(17) ? "j" : "windowId");
 
-            ItemStack stack = new ItemStack(ReflectionUtils.supports(13) ? Material.FILLED_MAP : Material.MAP, 1);
+            ItemStack stack = new ItemStack(ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP, 1);
 
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
 
             Object packet;
-            if (ReflectionUtils.supports(17)) { //1.17+
-                int stateId = (int) ReflectionUtil.callMethod(inventoryMenu, ReflectionUtils.supports(18) ? "j" : "getStateId");
+            if (ReflectionUtil.supports(17)) { //1.17+
+                int stateId = (int) ReflectionUtil.callMethod(inventoryMenu, ReflectionUtil.supports(18) ? "j" : "getStateId");
 
                 packet = ReflectionUtil.callConstructor(setSlotPacketClass,
                         windowId,
@@ -168,7 +167,7 @@ public class MapWrapper {
                 );
             }
 
-            ReflectionUtils.sendPacket(player, packet);
+            ReflectionUtil.sendPacket(player, packet);
         }
 
         @Override
@@ -178,7 +177,7 @@ public class MapWrapper {
 
         @Override
         public void showInHand(Player player, boolean force) {
-            if (player.getInventory().getItemInMainHand().getType() != (ReflectionUtils.supports(13) ? Material.FILLED_MAP : Material.MAP) && !force)
+            if (player.getInventory().getItemInMainHand().getType() != (ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP) && !force)
                 return;
             showInInventory(player, player.getInventory().getHeldItemSlot(), force);
         }
@@ -195,7 +194,7 @@ public class MapWrapper {
 
         @Override
         public void showInFrame(Player player, ItemFrame frame, boolean force) {
-            if (frame.getItem().getType() != (ReflectionUtils.supports(13) ? Material.FILLED_MAP : Material.MAP) && !force)
+            if (frame.getItem().getType() != (ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP) && !force)
                 return;
             showInFrame(player, frame.getEntityId());
         }
@@ -209,7 +208,7 @@ public class MapWrapper {
         public void showInFrame(Player player, int entityId, String debugInfo) {
             if (!isViewing(player)) return;
 
-            ItemStack stack = new ItemStack(ReflectionUtils.supports(13) ? Material.FILLED_MAP : Material.MAP, 1);
+            ItemStack stack = new ItemStack(ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP, 1);
             if (debugInfo != null) {
                 ItemMeta itemMeta = stack.getItemMeta();
                 itemMeta.setDisplayName(debugInfo);
@@ -239,11 +238,11 @@ public class MapWrapper {
 
         @Override
         public ItemFrame getItemFrameById(World world, int entityId) {
-            Object worldHandle = ReflectionUtils.getHandle(world);
-            Object nmsEntity = ReflectionUtil.callMethod(worldHandle, ReflectionUtils.supports(18) ? "a" : "getEntity");
+            Object worldHandle = ReflectionUtil.getHandle(world);
+            Object nmsEntity = ReflectionUtil.callMethod(worldHandle, ReflectionUtil.supports(18) ? "a" : "getEntity");
             if (nmsEntity == null) return null;
 
-            if (!ReflectionUtils.supports(17)) {
+            if (!ReflectionUtil.supports(17)) {
                 nmsEntity = ReflectionUtil.callMethod(nmsEntity, "getBukkitEntity");
             }
 
@@ -253,14 +252,14 @@ public class MapWrapper {
 
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
-            Object nbtObject = ReflectionUtil.callMethod(nmsStack, ReflectionUtils.supports(19) ? "v" : ReflectionUtils.supports(18) ? "u" : ReflectionUtils.supports(13) ? "getOrCreateTag" : "getTag");
+            Object nbtObject = ReflectionUtil.callMethod(nmsStack, ReflectionUtil.supports(19) ? "v" : ReflectionUtil.supports(18) ? "u" : ReflectionUtil.supports(13) ? "getOrCreateTag" : "getTag");
 
-            if (!ReflectionUtils.supports(13) && nbtObject == null) { //1.12 has no getOrCreate, call create if null!
+            if (!ReflectionUtil.supports(13) && nbtObject == null) { //1.12 has no getOrCreate, call create if null!
                 Object tagCompound = ReflectionUtil.callConstructor(tagCompoundClass);
                 ReflectionUtil.callMethod(nbtObject, "setTag", tagCompound);
             }
 
-            ReflectionUtil.callMethod(nbtObject, ReflectionUtils.supports(18) ? "a" : "setInt", "map", mapId);
+            ReflectionUtil.callMethod(nbtObject, ReflectionUtil.supports(18) ? "a" : "setInt", "map", mapId);
             Object dataWatcher = ReflectionUtil.callConstructor(dataWatcherClass, entityClass.cast(null));
 
             Object packet = ReflectionUtil.callConstructor(entityMetadataPacketClass,
@@ -270,12 +269,12 @@ public class MapWrapper {
             );
 
             List<Object> list = new ArrayList<>();
-            Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, ReflectionUtils.supports(17) ? "ao" : ReflectionUtils.supports(14) ? "ITEM" : ReflectionUtils.supports(13) ? "e" : "c");
+            Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, ReflectionUtil.supports(17) ? "ao" : ReflectionUtil.supports(14) ? "ITEM" : ReflectionUtil.supports(13) ? "e" : "c");
             Object dataWatcherItem = ReflectionUtil.callConstructor(dataWatcherItemClass, dataWatcherObject, nmsStack);
             list.add(dataWatcherItem);
             ReflectionUtil.setDeclaredField(packet, "b", list);
 
-            ReflectionUtils.sendPacket(player, packet);
+            ReflectionUtil.sendPacket(player, packet);
         }
     };
 

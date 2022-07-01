@@ -27,7 +27,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
-import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,8 +72,8 @@ public class MapSender {
         }, 0, 2);
     }
 
-    private static final Class<?> packetPlayOutMapClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutMap");
-    private static final Class<?> worldMapData = ReflectionUtils.supports(17) ? ReflectionUtils.getNMSClass("world.level.saveddata.maps", "WorldMap") : null;
+    private static final Class<?> packetPlayOutMapClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutMap");
+    private static final Class<?> worldMapData = ReflectionUtil.supports(17) ? ReflectionUtil.getNMSClass("world.level.saveddata.maps", "WorldMap") : null;
 
     /**
      * Send a map to a player
@@ -101,7 +100,7 @@ public class MapSender {
 
         final int id = -id0;
         Object packet;
-        if (ReflectionUtils.supports(17)) { //1.17+
+        if (ReflectionUtil.supports(17)) { //1.17+
             Object updateData = ReflectionUtil.callConstructor(worldMapData,
                     content.minX, //X pos
                     content.minY, //Y pos
@@ -117,7 +116,7 @@ public class MapSender {
                     new ArrayList<>(), //Icons
                     updateData
             );
-        } else if (ReflectionUtils.supports(14)) { //1.16-1.14
+        } else if (ReflectionUtil.supports(14)) { //1.16-1.14
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     id, //ID
                     (byte) 0, //Scale
@@ -144,7 +143,7 @@ public class MapSender {
             );
         }
 
-        ReflectionUtils.sendPacket(player, packet);
+        ReflectionUtil.sendPacket(player, packet);
     }
     static final class QueuedMap {
         private final int id;

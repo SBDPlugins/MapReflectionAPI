@@ -30,7 +30,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import tech.sbdevelopment.mapreflectionapi.api.MapManager;
 import tech.sbdevelopment.mapreflectionapi.listeners.MapListener;
 import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
-import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils;
+import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.util.logging.Level;
 
@@ -66,7 +66,7 @@ public class MapReflectionAPI extends JavaPlugin {
         getLogger().info("MapReflectionAPI v" + getDescription().getVersion() + "");
         getLogger().info("Made by © Copyright SBDevelopment 2022");
 
-        if (!ReflectionUtils.supports(12)) {
+        if (!ReflectionUtil.supports(12)) {
             getLogger().severe("MapReflectionAPI only supports Minecraft 1.12 - 1.19!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
