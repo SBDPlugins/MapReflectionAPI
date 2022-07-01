@@ -24,20 +24,19 @@
 package tech.sbdevelopment.mapreflectionapi;
 
 import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 import tech.sbdevelopment.mapreflectionapi.api.MapManager;
 import tech.sbdevelopment.mapreflectionapi.listeners.MapListener;
 import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
+import tech.sbdevelopment.mapreflectionapi.util.ReflectionUtils;
 
 import java.util.logging.Level;
 
 public class MapReflectionAPI extends JavaPlugin {
     private static MapReflectionAPI instance;
     private static MapManager mapManager;
-    private ProtocolManager protocolManager;
 
     public static MapReflectionAPI getInstance() {
         if (instance == null) throw new IllegalStateException("The plugin is not enabled yet!");
@@ -57,14 +56,25 @@ public class MapReflectionAPI extends JavaPlugin {
         getLogger().info("MapReflectionAPI v" + getDescription().getVersion() + "");
         getLogger().info("Made by © Copyright SBDevelopment 2022");
 
+        if (!ReflectionUtils.supports(12)) {
+            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12 - 1.19!");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         if (!Bukkit.getPluginManager().isPluginEnabled("BKCommonLib")) {
             getLogger().severe("MapReflectionAPI requires BKCommonLib to function!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
 
-        protocolManager = ProtocolLibrary.getProtocolManager();
-        protocolManager.addPacketListener(new PacketListener(this));
+        if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
+            getLogger().severe("MapReflectionAPI requires ProtocolLib to function!");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListener(this));
 
         try {
             mapManager = new MapManager(this);

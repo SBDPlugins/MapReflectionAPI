@@ -62,6 +62,36 @@ public final class ReflectionUtils {
      * Performance is not a concern for these specific statically initialized values.
      */
     public static final String VERSION;
+
+    static { // This needs to be right below VERSION because of initialization order.
+        // This package loop is used to avoid implementation-dependant strings like Bukkit.getVersion() or Bukkit.getBukkitVersion()
+        // which allows easier testing as well.
+        String found = null;
+        for (Package pack : Package.getPackages()) {
+            String name = pack.getName();
+
+            // .v because there are other packages.
+            if (name.startsWith("org.bukkit.craftbukkit.v")) {
+                found = pack.getName().split("\\.")[3];
+
+                // Just a final guard to make sure it finds this important class.
+                // As a protection for forge+bukkit implementation that tend to mix versions.
+                // The real CraftPlayer should exist in the package.
+                // Note: Doesn't seem to function properly. Will need to separate the version
+                // handler for NMS and CraftBukkit for softwares like catmc.
+                try {
+                    Class.forName("org.bukkit.craftbukkit." + found + ".entity.CraftPlayer");
+                    break;
+                } catch (ClassNotFoundException e) {
+                    found = null;
+                }
+            }
+        }
+        if (found == null)
+            throw new IllegalArgumentException("Failed to parse server version. Could not find any package starting with name: 'org.bukkit.craftbukkit.v'");
+        VERSION = found;
+    }
+
     /**
      * The raw minor version number.
      * E.g. {@code v1_17_R1} to {@code 17}
@@ -94,35 +124,6 @@ public final class ReflectionUtils {
      * is where {@code ProtocolLib} controls packets by injecting channels!
      */
     private static final MethodHandle SEND_PACKET;
-
-    static { // This needs to be right below VERSION because of initialization order.
-        // This package loop is used to avoid implementation-dependant strings like Bukkit.getVersion() or Bukkit.getBukkitVersion()
-        // which allows easier testing as well.
-        String found = null;
-        for (Package pack : Package.getPackages()) {
-            String name = pack.getName();
-
-            // .v because there are other packages.
-            if (name.startsWith("org.bukkit.craftbukkit.v")) {
-                found = pack.getName().split("\\.")[3];
-
-                // Just a final guard to make sure it finds this important class.
-                // As a protection for forge+bukkit implementation that tend to mix versions.
-                // The real CraftPlayer should exist in the package.
-                // Note: Doesn't seem to function properly. Will need to separate the version
-                // handler for NMS and CraftBukkit for softwares like catmc.
-                try {
-                    Class.forName("org.bukkit.craftbukkit." + found + ".entity.CraftPlayer");
-                    break;
-                } catch (ClassNotFoundException e) {
-                    found = null;
-                }
-            }
-        }
-        if (found == null)
-            throw new IllegalArgumentException("Failed to parse server version. Could not find any package starting with name: 'org.bukkit.craftbukkit.v'");
-        VERSION = found;
-    }
 
     static {
         Class<?> entityPlayer = getNMSClass("server.level", "EntityPlayer");

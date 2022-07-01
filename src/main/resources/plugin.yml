@@ -5,4 +5,4 @@ api-version: 1.13
 authors: [ inventivetalent, SBDeveloper ]
 description: This API helps developer with viewing images on maps.
 website: https://sbdevelopment.tech
-softdepend: [ BKCommonLib ]
+softdepend: [ BKCommonLib, ProtocolLib ]
