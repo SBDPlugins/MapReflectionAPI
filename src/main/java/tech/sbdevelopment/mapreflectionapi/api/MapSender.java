@@ -63,6 +63,9 @@ public class MapSender {
         }, 0, 2);
     }
 
+    private static final Class<?> packetPlayOutMapClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutMap");
+    private static final Class<?> worldMapData = ReflectionUtils.supports(17) ? ReflectionUtils.getNMSClass("world.level.saveddata.maps", "WorldMap") : null;
+
     public static void sendMap(final int id0, final ArrayImage content, final Player player) {
         if (player == null || !player.isOnline()) {
             List<QueuedMap> toRemove = new ArrayList<>();
@@ -79,12 +82,10 @@ public class MapSender {
             return;
         }
 
-        Class<?> packetClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutMap");
         final int id = -id0;
         Object packet;
         if (ReflectionUtils.supports(17)) { //1.17+
-            Class<?> worldMapClass = ReflectionUtils.getNMSClass("world.level.saveddata.maps", "WorldMap");
-            Object updateData = ReflectionUtil.callConstructor(worldMapClass,
+            Object updateData = ReflectionUtil.callConstructor(worldMapData,
                     content.minX, //X pos
                     content.minY, //Y pos
                     content.maxX, //X size (2nd X pos)
@@ -92,7 +93,7 @@ public class MapSender {
                     content.array //Data
             );
 
-            packet = ReflectionUtil.callConstructor(packetClass,
+            packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     id, //ID
                     (byte) 0, //Scale
                     false, //Show icons
@@ -100,7 +101,7 @@ public class MapSender {
                     updateData
             );
         } else if (ReflectionUtils.supports(14)) { //1.16-1.14
-            packet = ReflectionUtil.callConstructor(packetClass,
+            packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     id, //ID
                     (byte) 0, //Scale
                     false, //Tracking position
@@ -113,7 +114,7 @@ public class MapSender {
                     content.maxY //Y size (2nd Y pos)
             );
         } else { //1.13-
-            packet = ReflectionUtil.callConstructor(packetClass,
+            packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     id, //ID
                     (byte) 0, //Scale
                     false, //???

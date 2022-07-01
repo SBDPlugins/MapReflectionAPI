@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.exceptions.MapLimitExceededException;
 
 import java.awt.image.BufferedImage;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,24 +39,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MapManager {
     protected final Set<Integer> OCCUPIED_IDS = new HashSet<>();
     private final List<MapWrapper> MANAGED_MAPS = new CopyOnWriteArrayList<>();
-    private final Class<?> wrapperClass;
 
     public MapManager(JavaPlugin plugin) throws IllegalStateException {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
         plugin.getLogger().info("Initializing the map manager for Minecraft version " + version + "...");
-
-        try {
-            final Class<?> clazz = Class.forName("tech.sbdevelopment.mapreflectionapi.nms.MapWrapper_" + version);
-            if (MapWrapper.class.isAssignableFrom(clazz)) {
-                wrapperClass = clazz;
-            } else {
-                throw new IllegalStateException("Plugin corrupted! Detected invalid MapWrapper class.");
-            }
-        } catch (Exception ex) {
-            throw new IllegalStateException("This Spigot version (" + version + ") is not supported! Contact the developer to get support.");
-        }
     }
 
     @Nullable
@@ -74,15 +61,9 @@ public class MapManager {
     }
 
     private MapWrapper wrapNewImage(ArrayImage image) {
-        try {
-            MapWrapper wrapper = (MapWrapper) wrapperClass.getDeclaredConstructor(ArrayImage.class).newInstance(image);
-            MANAGED_MAPS.add(wrapper);
-            return wrapper;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
-                 InvocationTargetException e) {
-            e.printStackTrace();
-            return null;
-        }
+        MapWrapper wrapper = new MapWrapper(image);
+        MANAGED_MAPS.add(wrapper);
+        return wrapper;
     }
 
     public void unwrapImage(MapWrapper wrapper) {

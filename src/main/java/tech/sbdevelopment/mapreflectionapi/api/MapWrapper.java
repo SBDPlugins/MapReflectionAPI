@@ -43,6 +43,15 @@ public class MapWrapper {
         this.content = image;
     }
 
+    private static final Class<?> craftStackClass = ReflectionUtils.getCraftClass("CraftItemStack");
+    private static final Class<?> setSlotPacketClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
+    private static final Class<?> tagCompoundClass = ReflectionUtils.getCraftClass("NBTTagCompound");
+    private static final Class<?> entityClass = ReflectionUtils.getNMSClass("world.entity", "Entity");
+    private static final Class<?> dataWatcherClass = ReflectionUtils.getNMSClass("network.syncher", "DataWatcher");
+    private static final Class<?> entityMetadataPacketClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
+    private static final Class<?> entityItemFrameClass = ReflectionUtils.getNMSClass("world.entity.decoration", "EntityItemFrame");
+    private static final Class<?> dataWatcherItemClass = ReflectionUtils.getNMSClass("network.syncher", "DataWatcher$Item");
+
     protected MapController controller = new MapController() {
         private final Map<UUID, Integer> viewers = new HashMap<>();
 
@@ -134,10 +143,8 @@ public class MapWrapper {
 
             ItemStack stack = new ItemStack(ReflectionUtils.supports(13) ? Material.FILLED_MAP : Material.MAP, 1);
 
-            Class<?> craftStackClass = ReflectionUtils.getCraftClass("CraftItemStack");
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
 
-            Class<?> setSlotPacketClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
             Object packet;
             if (ReflectionUtils.supports(17)) { //1.17+
                 int stateId = (int) ReflectionUtil.callMethod(inventoryMenu, ReflectionUtils.supports(18) ? "j" : "getStateId");
@@ -240,26 +247,17 @@ public class MapWrapper {
         }
 
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
-            Class<?> craftStackClass = ReflectionUtils.getCraftClass("CraftItemStack");
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
-
             Object nbtObject = ReflectionUtil.callMethod(nmsStack, ReflectionUtils.supports(19) ? "v" : ReflectionUtils.supports(18) ? "u" : ReflectionUtils.supports(13) ? "getOrCreateTag" : "getTag");
 
             if (!ReflectionUtils.supports(13) && nbtObject == null) { //1.12 has no getOrCreate, call create if null!
-                Class<?> tagCompoundClass = ReflectionUtils.getCraftClass("NBTTagCompound");
                 Object tagCompound = ReflectionUtil.callConstructor(tagCompoundClass);
-
                 ReflectionUtil.callMethod(nbtObject, "setTag", tagCompound);
             }
 
             ReflectionUtil.callMethod(nbtObject, ReflectionUtils.supports(18) ? "a" : "setInt", "map", mapId);
-
-            Class<?> entityClass = ReflectionUtils.getNMSClass("world.entity", "Entity");
-
-            Class<?> dataWatcherClass = ReflectionUtils.getNMSClass("network.syncher", "DataWatcher");
             Object dataWatcher = ReflectionUtil.callConstructor(dataWatcherClass, entityClass.cast(null));
 
-            Class<?> entityMetadataPacketClass = ReflectionUtils.getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
             Object packet = ReflectionUtil.callConstructor(entityMetadataPacketClass,
                     entityId,
                     dataWatcher, //dummy watcher!
@@ -267,9 +265,7 @@ public class MapWrapper {
             );
 
             List<Object> list = new ArrayList<>();
-            Class<?> entityItemFrameClass = ReflectionUtils.getNMSClass("world.entity.decoration", "EntityItemFrame");
             Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, ReflectionUtils.supports(17) ? "ao" : ReflectionUtils.supports(14) ? "ITEM" : ReflectionUtils.supports(13) ? "e" : "c");
-            Class<?> dataWatcherItemClass = ReflectionUtils.getNMSClass("network.syncher", "DataWatcher$Item");
             Object dataWatcherItem = ReflectionUtil.callConstructor(dataWatcherItemClass, dataWatcherObject, nmsStack);
             list.add(dataWatcherItem);
             ReflectionUtil.setDeclaredField(packet, "b", list);
