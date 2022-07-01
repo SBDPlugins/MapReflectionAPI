@@ -6,14 +6,53 @@ It currently has **no** support for GIFs.
 ## Dependencies:
 
 - [BKCommonLib](https://www.spigotmc.org/resources/bkcommonlib.39590/)
+- [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
 
-## Building:
+## Usage:
 
-To build MapReflectionAPI yourself, you need to run BuildTools for 1.12.2, 1.13.2, 1.14.4, 1.15.2, 1.16.5, 1.17.1,
-1.18.2 and 1.19.
-Then run `mvn clean package`.
+First, include the API using Maven:
+
+```xml
+<repository>
+    <id>sbdevelopment-repo</id>
+    <url>https://repo.sbdevelopment.tech/repository/maven-releases/</url>
+</repository>
+
+<dependency>
+    <groupId>tech.sbdevelopment</groupId>
+    <artifactId>MapReflectionAPI</artifactId>
+    <version>1.1</version>
+    <scope>provided</scope>
+</dependency>
+```
+
+Then, use our API. Below is an example.
+
+```java
+//Wrap image
+MapWrapper wrapper = MapReflectionAPI.getMapManager().wrapImage(ImageIO.read(new File("image.png")));
+MapController controller = wrapper.getController();
+
+final Player p = Bukkit.getPlayer("SBDeveloper");
+
+//Add viewer
+try {
+   controller.addViewer(p);
+} catch (MapLimitExceededException e) {
+   e.printStackTrace();
+   return;
+}
+controller.sendContent(p);
+
+//Show in frame
+ItemFrame frame = ...; //This is your ItemFrame.
+controller.showInFrame(p, frame, true);
+
+//Or show in hand
+controller.showInHand(p, true);
+```
 
 ## Credits:
 
-The source is based on [MapManager](https://github.com/InventivetalentDev/MapManager). It removes the PacketListenerAPI
-dependency and uses NMS with submodules instead of reflection to make the code easier to edit.
+This is a fork of [MapManager](https://github.com/InventivetalentDev/MapManager). It updates the API to 1.19 and uses
+other dependencies.
