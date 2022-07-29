@@ -21,29 +21,42 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.listeners;
+package tech.sbdevelopment.mapreflectionapi.api.events;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.server.MapInitializeEvent;
-import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
-import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
+import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 
-public class MapListener implements Listener {
-    @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        MapReflectionAPI.getMapManager().clearAllMapsFor(e.getPlayer());
+/**
+ * This event gets fired when the content of a {@link MapWrapper} is updated
+ */
+@RequiredArgsConstructor
+@Getter
+public class MapContentUpdateEvent extends Event {
+    private static final HandlerList handlerList = new HandlerList();
+
+    private final MapWrapper wrapper;
+    private final ArrayImage content;
+    private final boolean sendContent = true;
+
+    /**
+     * Construct a new {@link MapContentUpdateEvent}
+     *
+     * @param wrapper The wrapper that will be updated
+     * @param content The content that will be shown
+     * @param isAsync Is this event called async?
+     */
+    public MapContentUpdateEvent(MapWrapper wrapper, ArrayImage content, boolean isAsync) {
+        super(isAsync);
+        this.wrapper = wrapper;
+        this.content = content;
     }
 
-    @EventHandler
-    public void onMapInitialize(MapInitializeEvent e) {
-        if (Configuration.getInstance().isAllowVanilla()) {
-            int id = e.getMap().getId();
-            if (id > 0) {
-                MapReflectionAPI.getInstance().getLogger().info("Detected that the Map ID " + id + " got occupied. It will now not be used.");
-                MapReflectionAPI.getMapManager().registerOccupiedID(id);
-            }
-        }
+    @Override
+    public HandlerList getHandlers() {
+        return handlerList;
     }
 }

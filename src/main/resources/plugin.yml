@@ -6,3 +6,10 @@ authors: [ inventivetalent, SBDeveloper ]
 description: This API helps developer with viewing images on maps.
 website: https://sbdevelopment.tech
 softdepend: [ BKCommonLib, ProtocolLib ]
+commands:
+  mapmanager:
+    description: The main command of MapManager.
+permissions:
+  mapmanager.reload:
+    description: Access to /mapmanager reload
+    default: op

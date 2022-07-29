@@ -27,6 +27,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 
 public interface MapController {
@@ -70,7 +71,7 @@ public interface MapController {
      *
      * @param content new {@link ArrayImage} content
      */
-    void update(ArrayImage content);
+    void update(@NotNull ArrayImage content);
 
     /**
      * Get the content of the controller
@@ -93,6 +94,11 @@ public interface MapController {
      * @param withoutQueue if <code>true</code>, the content will be sent immediately
      */
     void sendContent(Player player, boolean withoutQueue);
+
+    /**
+     * Cancels the 'send events' in the queue
+     */
+    void cancelSend();
 
     /**
      * Show in a player's inventory

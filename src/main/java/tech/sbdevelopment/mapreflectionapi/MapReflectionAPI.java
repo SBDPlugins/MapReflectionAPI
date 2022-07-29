@@ -28,8 +28,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 import tech.sbdevelopment.mapreflectionapi.api.MapManager;
+import tech.sbdevelopment.mapreflectionapi.cmd.MapManagerCMD;
 import tech.sbdevelopment.mapreflectionapi.listeners.MapListener;
 import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
+import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.util.logging.Level;
@@ -67,7 +69,7 @@ public class MapReflectionAPI extends JavaPlugin {
         getLogger().info("Made by © Copyright SBDevelopment 2022");
 
         if (!ReflectionUtil.supports(12)) {
-            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12 - 1.19!");
+            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12.x - 1.19.x!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -84,19 +86,32 @@ public class MapReflectionAPI extends JavaPlugin {
             return;
         }
 
+        getLogger().info("Loading the configuration...");
+        Configuration.init(this);
+
+        getLogger().info("Loading the commands...");
+        getCommand("mapmanager").setExecutor(new MapManagerCMD());
+
         getLogger().info("Loading the map manager...");
         mapManager = new MapManager();
 
-        getLogger().info("Discovering occupied Map IDs...");
-        for (int s = 0; s < Short.MAX_VALUE; s++) {
-            try {
-                MapView view = Bukkit.getMap(s);
-                if (view != null) mapManager.registerOccupiedID(s);
-            } catch (Exception e) {
-                if (e.getMessage().toLowerCase().contains("invalid map dimension")) {
-                    getLogger().log(Level.WARNING, e.getMessage(), e);
+        if (Configuration.getInstance().isAllowVanilla()) {
+            getLogger().info("Vanilla Maps are allowed. Discovering occupied Map IDs...");
+            int occupiedIDs = 0;
+            for (int s = 0; s < Short.MAX_VALUE; s++) {
+                try {
+                    MapView view = Bukkit.getMap(s);
+                    if (view != null) {
+                        mapManager.registerOccupiedID(s);
+                        occupiedIDs++;
+                    }
+                } catch (Exception e) {
+                    if (!e.getMessage().toLowerCase().contains("invalid map dimension")) {
+                        getLogger().log(Level.WARNING, e.getMessage(), e);
+                    }
                 }
             }
+            getLogger().info("Found " + occupiedIDs + " occupied Map IDs. These will not be used.");
         }
 
         getLogger().info("Registering the listeners...");

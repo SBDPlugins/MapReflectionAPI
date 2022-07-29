@@ -1,0 +1,7 @@
+# Is it allowed to use vanilla maps?
+# Less efficient, but gives more available map IDs.
+allowVanilla: true
+
+# Should the plugin cache images? If so, it will check if the images is already used.
+# Less efficient for the first image, but more efficient for the next ones.
+imageCache: true

@@ -27,6 +27,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
+import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
 
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
@@ -55,8 +56,10 @@ public class MapManager {
      * @return The wrapper
      */
     public MapWrapper wrapImage(ArrayImage image) {
-        for (MapWrapper wrapper : MANAGED_MAPS) {
-            if (wrapper.getContent().equals(image)) return wrapper;
+        if (Configuration.getInstance().isImageCache()) {
+            for (MapWrapper wrapper : MANAGED_MAPS) {
+                if (wrapper.getContent().equals(image)) return wrapper;
+            }
         }
         return wrapNewImage(image);
     }
@@ -79,8 +82,7 @@ public class MapManager {
      * @param wrapper The {@link MapWrapper} to unwrap
      */
     public void unwrapImage(MapWrapper wrapper) {
-        //TODO Cancel IDs
-
+        wrapper.controller.cancelSend();
         wrapper.getController().clearViewers();
         MANAGED_MAPS.remove(wrapper);
     }

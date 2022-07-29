@@ -29,8 +29,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.jetbrains.annotations.NotNull;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
+import tech.sbdevelopment.mapreflectionapi.api.events.MapContentUpdateEvent;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
+import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.util.*;
@@ -93,17 +96,24 @@ public class MapWrapper {
         }
 
         @Override
-        public void update(ArrayImage content) {
-            MapWrapper duplicate = MapReflectionAPI.getMapManager().getDuplicate(content);
-            if (duplicate != null) {
-                MapWrapper.this.content = duplicate.getContent();
-                return;
+        public void update(@NotNull ArrayImage content) {
+            MapContentUpdateEvent event = new MapContentUpdateEvent(MapWrapper.this, content);
+            Bukkit.getPluginManager().callEvent(event);
+
+            if (Configuration.getInstance().isImageCache()) {
+                MapWrapper duplicate = MapReflectionAPI.getMapManager().getDuplicate(content);
+                if (duplicate != null) {
+                    MapWrapper.this.content = duplicate.getContent();
+                    return;
+                }
             }
 
             MapWrapper.this.content = content;
 
-            for (UUID id : viewers.keySet()) {
-                sendContent(Bukkit.getPlayer(id));
+            if (event.isSendContent()) {
+                for (UUID id : viewers.keySet()) {
+                    sendContent(Bukkit.getPlayer(id));
+                }
             }
         }
 
@@ -126,6 +136,13 @@ public class MapWrapper {
                 MapSender.sendMap(id, MapWrapper.this.content, player);
             } else {
                 MapSender.addToQueue(id, MapWrapper.this.content, player);
+            }
+        }
+
+        @Override
+        public void cancelSend() {
+            for (int s : viewers.values()) {
+                MapSender.cancelID(s);
             }
         }
 

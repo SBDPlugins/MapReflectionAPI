@@ -52,6 +52,15 @@ public class MapSender {
     }
 
     /**
+     * Cancels a senderID in the sender queue
+     *
+     * @param s The senderID to cancel
+     */
+    public static void cancelID(int s) {
+        sendQueue.removeIf(queuedMap -> queuedMap.id == s);
+    }
+
+    /**
      * Run the sender task
      */
     private static void runSender() {
@@ -145,6 +154,7 @@ public class MapSender {
 
         ReflectionUtil.sendPacket(player, packet);
     }
+
     static final class QueuedMap {
         private final int id;
         private final ArrayImage image;

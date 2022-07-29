@@ -21,29 +21,37 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.listeners;
+package tech.sbdevelopment.mapreflectionapi.managers;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.server.MapInitializeEvent;
-import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
-import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
+import lombok.Getter;
+import org.bukkit.plugin.java.JavaPlugin;
+import tech.sbdevelopment.mapreflectionapi.utils.YamlFile;
 
-public class MapListener implements Listener {
-    @EventHandler
-    public void onQuit(PlayerQuitEvent e) {
-        MapReflectionAPI.getMapManager().clearAllMapsFor(e.getPlayer());
+public class Configuration {
+    private static Configuration instance;
+    private final YamlFile file;
+
+    @Getter
+    private boolean allowVanilla = true;
+    @Getter
+    private boolean imageCache = true;
+
+    private Configuration(JavaPlugin plugin) {
+        this.file = new YamlFile(plugin, "config");
+        reload();
     }
 
-    @EventHandler
-    public void onMapInitialize(MapInitializeEvent e) {
-        if (Configuration.getInstance().isAllowVanilla()) {
-            int id = e.getMap().getId();
-            if (id > 0) {
-                MapReflectionAPI.getInstance().getLogger().info("Detected that the Map ID " + id + " got occupied. It will now not be used.");
-                MapReflectionAPI.getMapManager().registerOccupiedID(id);
-            }
-        }
+    public static void init(JavaPlugin plugin) {
+        instance = new Configuration(plugin);
+    }
+
+    public static Configuration getInstance() {
+        if (instance == null) throw new IllegalStateException("The plugin is not enabled yet!");
+        return instance;
+    }
+
+    public void reload() {
+        allowVanilla = this.file.getFile().getBoolean("allowVanilla");
+        imageCache = this.file.getFile().getBoolean("imageCache");
     }
 }
