@@ -239,14 +239,17 @@ public class MapWrapper {
         @Override
         public ItemFrame getItemFrameById(World world, int entityId) {
             Object worldHandle = ReflectionUtil.getHandle(world);
-            Object nmsEntity = ReflectionUtil.callMethod(worldHandle, ReflectionUtil.supports(18) ? "a" : "getEntity");
+            Object nmsEntity = ReflectionUtil.callMethod(worldHandle, ReflectionUtil.supports(18) ? "a" : "getEntity", entityId);
             if (nmsEntity == null) return null;
 
-            if (!ReflectionUtil.supports(17)) {
-                nmsEntity = ReflectionUtil.callMethod(nmsEntity, "getBukkitEntity");
-            }
+            Object craftEntity = ReflectionUtil.callMethod(nmsEntity, "getBukkitEntity");
+            if (craftEntity == null) return null;
 
-            if (nmsEntity instanceof ItemFrame) return (ItemFrame) nmsEntity;
+            Class<?> itemFrameClass = ReflectionUtil.getNMSClass("world.entity.decoration", "EntityItemFrame");
+            if (itemFrameClass == null) return null;
+
+            if (craftEntity.getClass().isAssignableFrom(itemFrameClass))
+                return (ItemFrame) itemFrameClass.cast(craftEntity);
             return null;
         }
 
