@@ -255,7 +255,18 @@ public class MapWrapper {
 
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
-            Object nbtObject = ReflectionUtil.callMethod(nmsStack, ReflectionUtil.supports(19) ? "v" : ReflectionUtil.supports(18) ? "u" : ReflectionUtil.supports(13) ? "getOrCreateTag" : "getTag");
+
+            String nbtObjectName;
+            if (ReflectionUtil.supports(19)) { //1.19
+                nbtObjectName = "v";
+            } else if (ReflectionUtil.supports(18)) { //1.18
+                nbtObjectName = ReflectionUtil.VER_MINOR == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
+            } else if (ReflectionUtil.supports(13)) { //1.13 - 1.17
+                nbtObjectName = "getOrCreateTag";
+            } else { //1.12
+                nbtObjectName = "getTag";
+            }
+            Object nbtObject = ReflectionUtil.callMethod(nmsStack, nbtObjectName);
 
             if (!ReflectionUtil.supports(13) && nbtObject == null) { //1.12 has no getOrCreate, call create if null!
                 Object tagCompound = ReflectionUtil.callConstructor(tagCompoundClass);
@@ -271,9 +282,23 @@ public class MapWrapper {
                     true
             );
 
-            List list = new ArrayList<>();
-            Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, ReflectionUtil.supports(17) ? "ao" : ReflectionUtil.supports(14) ? "ITEM" : ReflectionUtil.supports(13) ? "e" : "c");
+            String dataWatcherObjectName;
+            if (ReflectionUtil.supports(19)) { //1.19, same as 1.17 and 1.18(.2)
+                dataWatcherObjectName = "ao";
+            } else if (ReflectionUtil.supports(18)) { //1.18
+                dataWatcherObjectName = ReflectionUtil.VER_MINOR == 1 ? "ap" : "ao"; //1.18.1 = ap, 1.18(.2) = ao
+            } else if (ReflectionUtil.supports(17)) { //1.17
+                dataWatcherObjectName = "ao";
+            } else if (ReflectionUtil.supports(14)) { //1.14 - 1.16
+                dataWatcherObjectName = "ITEM";
+            } else if (ReflectionUtil.supports(13)) { //1.13
+                dataWatcherObjectName = "e";
+            } else { //1.12
+                dataWatcherObjectName = "c";
+            }
+            Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, dataWatcherObjectName);
             Object dataWatcherItem = ReflectionUtil.callFirstConstructor(dataWatcherItemClass, dataWatcherObject, nmsStack);
+            List list = new ArrayList<>();
             list.add(dataWatcherItem);
             ReflectionUtil.setDeclaredField(packet, "b", list);
 

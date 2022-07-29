@@ -106,6 +106,13 @@ public class ReflectionUtil {
      */
     public static final int VER = Integer.parseInt(VERSION.substring(1).split("_")[1]);
     /**
+     * The raw minor version number.
+     * E.g. {@code v1_18_R2} to {@code 2}
+     *
+     * @since 4.0.0
+     */
+    public static final int VER_MINOR = toInt(VERSION.substring(1).split("_")[2].substring(1), 0);
+    /**
      * Mojang remapped their NMS in 1.17 https://www.spigotmc.org/threads/spigot-bungeecord-1-17.510208/#post-4184317
      */
     public static final String
@@ -181,6 +188,18 @@ public class ReflectionUtil {
      */
     public static boolean supports(int version) {
         return VER >= version;
+    }
+
+    /**
+     * Checks whether the server version is equal or greater than the given version.
+     *
+     * @param major the major version to compare the server version with.
+     * @param minor the minor version to compare the server version with.
+     * @return true if the version is equal or newer, otherwise false.
+     * @since 4.0.0
+     */
+    public static boolean supports(int major, int minor) {
+        return VER >= major && VER_MINOR >= minor;
     }
 
     private static Class<?> wrapperToPrimitive(Class<?> clazz) {
@@ -482,5 +501,9 @@ public class ReflectionUtil {
         public T orElse(T handle) {
             return this.version == 0 ? handle : this.handle;
         }
+    }
+
+    private static int toInt(String string, int def) {
+        return string.isBlank() ? def : Integer.parseInt(string);
     }
 }
