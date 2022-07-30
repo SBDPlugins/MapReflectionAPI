@@ -159,7 +159,18 @@ public class MapWrapper {
             }
 
             Object playerHandle = ReflectionUtil.getHandle(player);
-            Object inventoryMenu = ReflectionUtil.getField(playerHandle, ReflectionUtil.supports(19) ? "bT" : ReflectionUtil.supports(17) ? "bU" : "defaultContainer");
+
+            String inventoryMenuName;
+            if (ReflectionUtil.supports(19)) { //1.19
+                inventoryMenuName = "bT";
+            } else if (ReflectionUtil.supports(18)) { //1.18
+                inventoryMenuName = ReflectionUtil.VER_MINOR == 1 ? "bV" : "bU"; //1.18.1 = ap, 1.18(.2) = ao
+            } else if (ReflectionUtil.supports(17)) { //1.17, same as 1.18(.2)
+                inventoryMenuName = "bU";
+            } else { //1.12-1.16
+                inventoryMenuName = "defaultContainer";
+            }
+            Object inventoryMenu = ReflectionUtil.getField(playerHandle, inventoryMenuName);
             int windowId = (int) ReflectionUtil.getField(inventoryMenu, ReflectionUtil.supports(17) ? "j" : "windowId");
 
             ItemStack stack = new ItemStack(ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP, 1);

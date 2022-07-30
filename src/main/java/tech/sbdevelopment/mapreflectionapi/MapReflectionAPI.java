@@ -111,7 +111,7 @@ public class MapReflectionAPI extends JavaPlugin {
                     }
                 }
             }
-            getLogger().info("Found " + occupiedIDs + " occupied Map IDs. These will not be used.");
+            getLogger().info("Found " + occupiedIDs + " occupied Map IDs." + (occupiedIDs > 0 ? " These will not be used." : ""));
         }
 
         getLogger().info("Registering the listeners...");

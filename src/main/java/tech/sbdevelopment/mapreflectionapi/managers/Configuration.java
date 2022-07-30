@@ -38,6 +38,7 @@ public class Configuration {
 
     private Configuration(JavaPlugin plugin) {
         this.file = new YamlFile(plugin, "config");
+        this.file.loadDefaults();
         reload();
     }
 
