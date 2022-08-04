@@ -25,8 +25,10 @@ package tech.sbdevelopment.mapreflectionapi.api.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 
@@ -40,7 +42,8 @@ public class MapContentUpdateEvent extends Event {
 
     private final MapWrapper wrapper;
     private final ArrayImage content;
-    private final boolean sendContent = true;
+    @Setter
+    private boolean sendContent = true;
 
     /**
      * Construct a new {@link MapContentUpdateEvent}
@@ -56,7 +59,7 @@ public class MapContentUpdateEvent extends Event {
     }
 
     @Override
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return handlerList;
     }
 }

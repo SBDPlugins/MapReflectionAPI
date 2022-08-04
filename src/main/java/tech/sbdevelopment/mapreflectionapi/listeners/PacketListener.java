@@ -45,8 +45,21 @@ public class PacketListener extends PacketAdapter {
 
     @Override
     public void onPacketSending(PacketEvent event) {
-        if (event.getPacketType() != PacketType.Play.Server.MAP) return; //Make sure it's the right packet!
+        if (event.getPacketType() == PacketType.Play.Server.MAP) {
+            handleOUTMapPacket(event);
+        }
+    }
 
+    @Override
+    public void onPacketReceiving(PacketEvent event) {
+        if (event.getPacketType() == PacketType.Play.Client.USE_ENTITY) {
+            handleINUseEntityPacket(event);
+        } else if (event.getPacketType() == PacketType.Play.Client.SET_CREATIVE_SLOT) {
+            handleINSetCreativeSlotPacket(event);
+        }
+    }
+
+    private void handleOUTMapPacket(PacketEvent event) {
         int id = event.getPacket().getIntegers().read(0); //Read first int (a); that's the MAP id
 
         if (id < 0) {
@@ -64,37 +77,36 @@ public class PacketListener extends PacketAdapter {
         }
     }
 
-    @Override
-    public void onPacketReceiving(PacketEvent event) {
-        if (event.getPacketType() == PacketType.Play.Client.USE_ENTITY) {
-            int entityId = event.getPacket().getIntegers().read(0); //entityId
-            WrappedEnumEntityUseAction action = event.getPacket().getEnumEntityUseActions().read(0);
-            EnumWrappers.EntityUseAction actionEnum = null;
-            EnumWrappers.Hand hand = null;
-            Vector pos = null;
-            try {
-                actionEnum = action.getAction();
-                hand = action.getHand();
-                pos = action.getPosition();
-            } catch (IllegalArgumentException ignored) {
-            }
+    private void handleINUseEntityPacket(PacketEvent event) {
+        int entityId = event.getPacket().getIntegers().read(0); //entityId
+        WrappedEnumEntityUseAction action = event.getPacket().getEnumEntityUseActions().read(0);
+        EnumWrappers.EntityUseAction actionEnum = null;
+        EnumWrappers.Hand hand = null;
+        Vector pos = null;
+        try {
+            actionEnum = action.getAction();
+            hand = action.getHand();
+            pos = action.getPosition();
+        } catch (IllegalArgumentException ignored) {
+        }
 
-            boolean async = !plugin.getServer().isPrimaryThread();
-            MapInteractEvent interactEvent = new MapInteractEvent(event.getPlayer(), entityId, actionEnum != null ? actionEnum.ordinal() : 0, pos, hand != null ? hand.ordinal() : 0, async);
-            if (interactEvent.getFrame() != null && interactEvent.getMapWrapper() != null) {
-                Bukkit.getPluginManager().callEvent(interactEvent);
-                if (interactEvent.isCancelled()) event.setCancelled(true);
-            }
-        } else if (event.getPacketType() == PacketType.Play.Client.SET_CREATIVE_SLOT) {
-            int slot = event.getPacket().getIntegers().read(0);
-            ItemStack item = event.getPacket().getItemModifier().read(0);
+        boolean async = !plugin.getServer().isPrimaryThread();
+        MapInteractEvent interactEvent = new MapInteractEvent(event.getPlayer(), entityId, actionEnum != null ? actionEnum.ordinal() : 0, pos, hand != null ? hand.ordinal() : 0, async);
+        if (interactEvent.getFrame() != null && interactEvent.getMapWrapper() != null) {
+            Bukkit.getPluginManager().callEvent(interactEvent);
+            if (interactEvent.isCancelled()) event.setCancelled(true);
+        }
+    }
 
-            boolean async = !plugin.getServer().isPrimaryThread();
-            CreateInventoryMapUpdateEvent updateEvent = new CreateInventoryMapUpdateEvent(event.getPlayer(), slot, item, async);
-            if (updateEvent.getMapWrapper() != null) {
-                Bukkit.getPluginManager().callEvent(updateEvent);
-                if (updateEvent.isCancelled()) event.setCancelled(true);
-            }
+    private void handleINSetCreativeSlotPacket(PacketEvent event) {
+        int slot = event.getPacket().getIntegers().read(0);
+        ItemStack item = event.getPacket().getItemModifier().read(0);
+
+        boolean async = !plugin.getServer().isPrimaryThread();
+        CreateInventoryMapUpdateEvent updateEvent = new CreateInventoryMapUpdateEvent(event.getPlayer(), slot, item, async);
+        if (updateEvent.getMapWrapper() != null) {
+            Bukkit.getPluginManager().callEvent(updateEvent);
+            if (updateEvent.isCancelled()) event.setCancelled(true);
         }
     }
 }

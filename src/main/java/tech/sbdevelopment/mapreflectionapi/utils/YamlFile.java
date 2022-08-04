@@ -40,11 +40,9 @@ public class YamlFile {
         this.plugin = plugin;
         this.name = name;
 
-        if (!plugin.getDataFolder().exists()) {
-            if (!plugin.getDataFolder().mkdir()) {
-                plugin.getLogger().severe("Couldn't generate the pluginfolder!");
-                return;
-            }
+        if (!plugin.getDataFolder().exists() && !plugin.getDataFolder().mkdir()) {
+            plugin.getLogger().severe("Couldn't generate the pluginfolder!");
+            return;
         }
 
         this.file = new File(plugin.getDataFolder(), name + ".yml");

@@ -36,8 +36,8 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MapManager {
-    protected final Set<Integer> OCCUPIED_IDS = new HashSet<>();
-    private final List<MapWrapper> MANAGED_MAPS = new CopyOnWriteArrayList<>();
+    protected final Set<Integer> occupiedIds = new HashSet<>();
+    private final List<MapWrapper> managedMaps = new CopyOnWriteArrayList<>();
 
     /**
      * Wrap a {@link BufferedImage} in a {@link MapWrapper}
@@ -57,7 +57,7 @@ public class MapManager {
      */
     public MapWrapper wrapImage(ArrayImage image) {
         if (Configuration.getInstance().isImageCache()) {
-            for (MapWrapper wrapper : MANAGED_MAPS) {
+            for (MapWrapper wrapper : managedMaps) {
                 if (wrapper.getContent().equals(image)) return wrapper;
             }
         }
@@ -72,7 +72,7 @@ public class MapManager {
      */
     private MapWrapper wrapNewImage(ArrayImage image) {
         MapWrapper wrapper = new MapWrapper(image);
-        MANAGED_MAPS.add(wrapper);
+        managedMaps.add(wrapper);
         return wrapper;
     }
 
@@ -84,7 +84,7 @@ public class MapManager {
     public void unwrapImage(MapWrapper wrapper) {
         wrapper.controller.cancelSend();
         wrapper.getController().clearViewers();
-        MANAGED_MAPS.remove(wrapper);
+        managedMaps.remove(wrapper);
     }
 
     /**
@@ -95,7 +95,7 @@ public class MapManager {
      */
     public Set<MapWrapper> getMapsVisibleTo(OfflinePlayer player) {
         Set<MapWrapper> visible = new HashSet<>();
-        for (MapWrapper wrapper : MANAGED_MAPS) {
+        for (MapWrapper wrapper : managedMaps) {
             if (wrapper.getController().isViewing(player)) {
                 visible.add(wrapper);
             }
@@ -126,7 +126,7 @@ public class MapManager {
      * @param id The map ID to register
      */
     public void registerOccupiedID(int id) {
-        OCCUPIED_IDS.add(id);
+        occupiedIds.add(id);
     }
 
     /**
@@ -135,7 +135,7 @@ public class MapManager {
      * @param id The map ID to unregister
      */
     public void unregisterOccupiedID(int id) {
-        OCCUPIED_IDS.remove(id);
+        occupiedIds.remove(id);
     }
 
     /**
@@ -146,7 +146,7 @@ public class MapManager {
      */
     public Set<Integer> getOccupiedIdsFor(OfflinePlayer player) {
         Set<Integer> ids = new HashSet<>();
-        for (MapWrapper wrapper : MANAGED_MAPS) {
+        for (MapWrapper wrapper : managedMaps) {
             int s = wrapper.getController().getMapId(player);
             if (s >= 0) {
                 ids.add(s);
@@ -176,7 +176,7 @@ public class MapManager {
     public int getNextFreeIdFor(Player player) throws MapLimitExceededException {
         Set<Integer> occupied = getOccupiedIdsFor(player);
         //Add the 'default' occupied IDs
-        occupied.addAll(OCCUPIED_IDS);
+        occupied.addAll(occupiedIds);
 
         int largest = 0;
         for (Integer s : occupied) {
@@ -222,7 +222,7 @@ public class MapManager {
      */
     @Nullable
     public MapWrapper getDuplicate(ArrayImage image) {
-        for (MapWrapper wrapper : MANAGED_MAPS) {
+        for (MapWrapper wrapper : managedMaps) {
             if (image.equals(wrapper.getContent())) {
                 return wrapper;
             }

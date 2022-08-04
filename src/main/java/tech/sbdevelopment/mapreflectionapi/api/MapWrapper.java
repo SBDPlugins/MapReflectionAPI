@@ -39,6 +39,7 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import java.util.*;
 
 public class MapWrapper {
+    private static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
     protected ArrayImage content;
 
     /**
@@ -246,8 +247,8 @@ public class MapWrapper {
             Bukkit.getScheduler().runTask(MapReflectionAPI.getInstance(), () -> {
                 ItemFrame frame = getItemFrameById(player.getWorld(), entityId);
                 if (frame != null) {
-                    frame.removeMetadata("MAP_WRAPPER_REF", MapReflectionAPI.getInstance());
-                    frame.setMetadata("MAP_WRAPPER_REF", new FixedMetadataValue(MapReflectionAPI.getInstance(), MapWrapper.this));
+                    frame.removeMetadata(REFERENCE_METADATA, MapReflectionAPI.getInstance());
+                    frame.setMetadata(REFERENCE_METADATA, new FixedMetadataValue(MapReflectionAPI.getInstance(), MapWrapper.this));
                 }
 
                 sendItemFramePacket(player, entityId, stack, getMapId(player));
@@ -256,12 +257,16 @@ public class MapWrapper {
 
         @Override
         public void clearFrame(Player player, int entityId) {
-
+            sendItemFramePacket(player, entityId, null, -1);
+            Bukkit.getScheduler().runTask(MapReflectionAPI.getInstance(), () -> {
+                ItemFrame frame = getItemFrameById(player.getWorld(), entityId);
+                if (frame != null) frame.removeMetadata(REFERENCE_METADATA, MapReflectionAPI.getInstance());
+            });
         }
 
         @Override
         public void clearFrame(Player player, ItemFrame frame) {
-
+            clearFrame(player, frame.getEntityId());
         }
 
         @Override

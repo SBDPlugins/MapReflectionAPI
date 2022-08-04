@@ -36,6 +36,9 @@ public class MapSender {
     private static final List<QueuedMap> sendQueue = new ArrayList<>();
     private static int senderID = -1;
 
+    private MapSender() {
+    }
+
     /**
      * Add a map to the send queue
      *

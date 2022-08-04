@@ -146,7 +146,10 @@ public class ReflectionUtil {
         Class<?> playerConnection = getNMSClass("server.network", "PlayerConnection");
 
         MethodHandles.Lookup lookup = MethodHandles.lookup();
-        MethodHandle sendPacket = null, getHandle = null, getHandleWorld = null, connection = null;
+        MethodHandle sendPacket = null;
+        MethodHandle getHandle = null;
+        MethodHandle getHandleWorld = null;
+        MethodHandle connection = null;
 
         try {
             connection = lookup.findGetter(entityPlayer,

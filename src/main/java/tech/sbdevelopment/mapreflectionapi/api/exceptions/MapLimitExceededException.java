@@ -23,16 +23,11 @@
 
 package tech.sbdevelopment.mapreflectionapi.api.exceptions;
 
+import lombok.experimental.StandardException;
+
 /**
  * This exception gets thrown if no map IDs are available
  */
+@StandardException
 public class MapLimitExceededException extends Exception {
-    /**
-     * Construct a new {@link MapLimitExceededException}
-     *
-     * @param message The message in this exception
-     */
-    public MapLimitExceededException(String message) {
-        super(message);
-    }
 }
