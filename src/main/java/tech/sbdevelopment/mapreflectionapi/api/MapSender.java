@@ -23,6 +23,7 @@
 
 package tech.sbdevelopment.mapreflectionapi.api;
 
+import lombok.Data;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
@@ -30,7 +31,6 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class MapSender {
     private static final List<QueuedMap> sendQueue = new ArrayList<>();
@@ -123,7 +123,7 @@ public class MapSender {
 
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     id, //ID
-                    (byte) 0, //Scale
+                    (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //Show icons
                     new ArrayList<>(), //Icons
                     updateData
@@ -131,7 +131,7 @@ public class MapSender {
         } else if (ReflectionUtil.supports(14)) { //1.16-1.14
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     id, //ID
-                    (byte) 0, //Scale
+                    (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //Tracking position
                     false, //Locked
                     new ArrayList<>(), //Icons
@@ -144,7 +144,7 @@ public class MapSender {
         } else { //1.13-
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     id, //ID
-                    (byte) 0, //Scale
+                    (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //???
                     new ArrayList<>(), //Icons
                     content.array, //Data
@@ -158,38 +158,10 @@ public class MapSender {
         ReflectionUtil.sendPacket(player, packet);
     }
 
+    @Data
     static final class QueuedMap {
         private final int id;
         private final ArrayImage image;
         private final Player player;
-
-        QueuedMap(int id, ArrayImage image, Player player) {
-            this.id = id;
-            this.image = image;
-            this.player = player;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) return true;
-            if (obj == null || obj.getClass() != this.getClass()) return false;
-            QueuedMap that = (QueuedMap) obj;
-            return this.id == that.id &&
-                    Objects.equals(this.image, that.image) &&
-                    Objects.equals(this.player, that.player);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(id, image, player);
-        }
-
-        @Override
-        public String toString() {
-            return "QueuedMap[" +
-                    "id=" + id + ", " +
-                    "image=" + image + ", " +
-                    "player=" + player + ']';
-        }
     }
 }

@@ -28,7 +28,6 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
@@ -43,7 +42,7 @@ public class MapWrapper {
     private static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
     protected ArrayImage content;
 
-    public static Material MAP_MATERIAL;
+    private static final Material MAP_MATERIAL;
 
     static {
         MAP_MATERIAL = ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP;
@@ -60,7 +59,7 @@ public class MapWrapper {
 
     private static final Class<?> craftStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
     private static final Class<?> setSlotPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
-    private static final Class<?> tagCompoundClass = ReflectionUtil.getNMSClass("nbt", "NBTTagCompound");
+    //private static final Class<?> tagCompoundClass = ReflectionUtil.getNMSClass("nbt", "NBTTagCompound");
     private static final Class<?> entityClass = ReflectionUtil.getNMSClass("world.entity", "Entity");
     private static final Class<?> dataWatcherClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher");
     private static final Class<?> entityMetadataPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
@@ -166,8 +165,6 @@ public class MapWrapper {
                 slot = 8 - (slot - 36);
             }
 
-            Object playerHandle = ReflectionUtil.getHandle(player);
-
             String inventoryMenuName;
             if (ReflectionUtil.supports(19)) { //1.19
                 inventoryMenuName = "bT";
@@ -178,7 +175,7 @@ public class MapWrapper {
             } else { //1.12-1.16
                 inventoryMenuName = "defaultContainer";
             }
-            Object inventoryMenu = ReflectionUtil.getField(playerHandle, inventoryMenuName);
+            Object inventoryMenu = ReflectionUtil.getField(ReflectionUtil.getHandle(player), inventoryMenuName);
 //            int windowId = (int) ReflectionUtil.getField(inventoryMenu, ReflectionUtil.supports(17) ? "j" : "windowId");
 
             ItemStack stack;
@@ -208,7 +205,7 @@ public class MapWrapper {
                 );
             }
 
-            ReflectionUtil.sendPacket(player, packet);
+            ReflectionUtil.sendPacketSync(player, packet);
         }
 
         @Override
@@ -218,8 +215,9 @@ public class MapWrapper {
 
         @Override
         public void showInHand(Player player, boolean force) {
-            if (player.getInventory().getItemInMainHand().getType() != (ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP) && !force)
+            if (player.getInventory().getItemInMainHand().getType() != MAP_MATERIAL && !force)
                 return;
+
             showInInventory(player, player.getInventory().getHeldItemSlot(), force);
         }
 
@@ -235,8 +233,9 @@ public class MapWrapper {
 
         @Override
         public void showInFrame(Player player, ItemFrame frame, boolean force) {
-            if (frame.getItem().getType() != (ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP) && !force)
+            if (frame.getItem().getType() != MAP_MATERIAL && !force)
                 return;
+
             showInFrame(player, frame.getEntityId());
         }
 
@@ -249,7 +248,7 @@ public class MapWrapper {
         public void showInFrame(Player player, int entityId, String debugInfo) {
             if (!isViewing(player)) return;
 
-            ItemStack stack = new ItemStack(ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP, 1);
+            ItemStack stack = new ItemStack(MAP_MATERIAL, 1);
             if (debugInfo != null) {
                 ItemMeta itemMeta = stack.getItemMeta();
                 itemMeta.setDisplayName(debugInfo);
@@ -295,36 +294,26 @@ public class MapWrapper {
 
             if (craftEntity.getClass().isAssignableFrom(itemFrameClass))
                 return (ItemFrame) itemFrameClass.cast(craftEntity);
+
             return null;
         }
 
-        private Object createCraftItemStack(ItemStack stack, int mapId) {
-            Object nmsStack;
-            if (ReflectionUtil.supports(16)) { //TODO Check why 1.16+ can use this, and 1.15- requires NMS
-                MapMeta meta = (MapMeta) stack.getItemMeta();
-                meta.setMapId(mapId);
-                stack.setItemMeta(meta);
-                nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
-            } else {
-                nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
+        private Object createCraftItemStack(@NotNull ItemStack stack, int mapId) {
+            if (mapId < 0) return null;
 
-                if (ReflectionUtil.supports(13)) {
-//                    String nbtObjectName;
-//                    if (ReflectionUtil.supports(19)) { //1.19
-//                        nbtObjectName = "v";
-//                    } else if (ReflectionUtil.supports(18)) { //1.18
-//                        nbtObjectName = ReflectionUtil.VER_MINOR == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
-//                    } else { //1.13 - 1.17
-//                        nbtObjectName = "getOrCreateTag";
-//                    }
-                    Object nbtObject = ReflectionUtil.callMethod(nmsStack,
-                            //nbtObjectName
-                            "getOrCreateTag");
+            Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
 
-                    ReflectionUtil.callMethod(nbtObject,
-                            //ReflectionUtil.supports(18) ? "a" :
-                            "setInt", "map", mapId);
+            if (ReflectionUtil.supports(13)) {
+                String nbtObjectName;
+                if (ReflectionUtil.supports(19)) { //1.19
+                    nbtObjectName = "v";
+                } else if (ReflectionUtil.supports(18)) { //1.18
+                    nbtObjectName = ReflectionUtil.VER_MINOR == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
+                } else { //1.13 - 1.17
+                    nbtObjectName = "getOrCreateTag";
                 }
+                Object nbtObject = ReflectionUtil.callMethod(nmsStack, nbtObjectName);
+                ReflectionUtil.callMethod(nbtObject, ReflectionUtil.supports(18) ? "a" : "setInt", "map", mapId);
             }
             return nmsStack;
         }
@@ -360,7 +349,7 @@ public class MapWrapper {
             list.add(dataWatcherItem);
             ReflectionUtil.setDeclaredField(packet, "b", list);
 
-            ReflectionUtil.sendPacket(player, packet);
+            ReflectionUtil.sendPacketSync(player, packet);
         }
     };
 
