@@ -5,3 +5,9 @@ allowVanilla: true
 # Should the plugin cache images? If so, it will check if the images is already used.
 # Less efficient for the first image, but more efficient for the next ones.
 imageCache: true
+
+# Do you want to check for updates?
+# If download is set to true, the plugin tries to download a new update which gets applied after a restart.
+updater:
+  check: true
+  download: true

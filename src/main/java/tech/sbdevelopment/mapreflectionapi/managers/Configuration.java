@@ -35,6 +35,10 @@ public class Configuration {
     private boolean allowVanilla = true;
     @Getter
     private boolean imageCache = true;
+    @Getter
+    private boolean updaterCheck = true;
+    @Getter
+    private boolean updaterDownload = true;
 
     private Configuration(JavaPlugin plugin) {
         this.file = new YamlFile(plugin, "config");
@@ -54,5 +58,7 @@ public class Configuration {
     public void reload() {
         allowVanilla = this.file.getFile().getBoolean("allowVanilla");
         imageCache = this.file.getFile().getBoolean("imageCache");
+        updaterCheck = this.file.getFile().getBoolean("updater.check");
+        updaterDownload = this.file.getFile().getBoolean("updater.download");
     }
 }

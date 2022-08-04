@@ -28,6 +28,7 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.jetbrains.annotations.NotNull;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
@@ -41,6 +42,12 @@ import java.util.*;
 public class MapWrapper {
     private static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
     protected ArrayImage content;
+
+    public static Material MAP_MATERIAL;
+
+    static {
+        MAP_MATERIAL = ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP;
+    }
 
     /**
      * Construct a new {@link MapWrapper}
@@ -172,25 +179,30 @@ public class MapWrapper {
                 inventoryMenuName = "defaultContainer";
             }
             Object inventoryMenu = ReflectionUtil.getField(playerHandle, inventoryMenuName);
-            int windowId = (int) ReflectionUtil.getField(inventoryMenu, ReflectionUtil.supports(17) ? "j" : "windowId");
+//            int windowId = (int) ReflectionUtil.getField(inventoryMenu, ReflectionUtil.supports(17) ? "j" : "windowId");
 
-            ItemStack stack = new ItemStack(ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP, 1);
+            ItemStack stack;
+            if (ReflectionUtil.supports(13)) {
+                stack = new ItemStack(MAP_MATERIAL, 1);
+            } else {
+                stack = new ItemStack(MAP_MATERIAL, 1, (short) getMapId(player));
+            }
 
-            Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
+            Object nmsStack = createCraftItemStack(stack, (short) getMapId(player));
 
             Object packet;
             if (ReflectionUtil.supports(17)) { //1.17+
                 int stateId = (int) ReflectionUtil.callMethod(inventoryMenu, ReflectionUtil.supports(18) ? "j" : "getStateId");
 
                 packet = ReflectionUtil.callConstructor(setSlotPacketClass,
-                        windowId,
+                        0, //0 = Player inventory
                         stateId,
                         slot,
                         nmsStack
                 );
             } else { //1.16-
                 packet = ReflectionUtil.callConstructor(setSlotPacketClass,
-                        windowId,
+                        0, //0 = Player inventory
                         slot,
                         nmsStack
                 );
@@ -286,27 +298,40 @@ public class MapWrapper {
             return null;
         }
 
+        private Object createCraftItemStack(ItemStack stack, int mapId) {
+            Object nmsStack;
+            if (ReflectionUtil.supports(16)) { //TODO Check why 1.16+ can use this, and 1.15- requires NMS
+                MapMeta meta = (MapMeta) stack.getItemMeta();
+                meta.setMapId(mapId);
+                stack.setItemMeta(meta);
+                nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
+            } else {
+                nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
+
+                if (ReflectionUtil.supports(13)) {
+//                    String nbtObjectName;
+//                    if (ReflectionUtil.supports(19)) { //1.19
+//                        nbtObjectName = "v";
+//                    } else if (ReflectionUtil.supports(18)) { //1.18
+//                        nbtObjectName = ReflectionUtil.VER_MINOR == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
+//                    } else { //1.13 - 1.17
+//                        nbtObjectName = "getOrCreateTag";
+//                    }
+                    Object nbtObject = ReflectionUtil.callMethod(nmsStack,
+                            //nbtObjectName
+                            "getOrCreateTag");
+
+                    ReflectionUtil.callMethod(nbtObject,
+                            //ReflectionUtil.supports(18) ? "a" :
+                            "setInt", "map", mapId);
+                }
+            }
+            return nmsStack;
+        }
+
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
-            Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
+            Object nmsStack = createCraftItemStack(stack, mapId);
 
-            String nbtObjectName;
-            if (ReflectionUtil.supports(19)) { //1.19
-                nbtObjectName = "v";
-            } else if (ReflectionUtil.supports(18)) { //1.18
-                nbtObjectName = ReflectionUtil.VER_MINOR == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
-            } else if (ReflectionUtil.supports(13)) { //1.13 - 1.17
-                nbtObjectName = "getOrCreateTag";
-            } else { //1.12
-                nbtObjectName = "getTag";
-            }
-            Object nbtObject = ReflectionUtil.callMethod(nmsStack, nbtObjectName);
-
-            if (!ReflectionUtil.supports(13) && nbtObject == null) { //1.12 has no getOrCreate, call create if null!
-                Object tagCompound = ReflectionUtil.callConstructor(tagCompoundClass);
-                ReflectionUtil.callMethod(nbtObject, "setTag", tagCompound);
-            }
-
-            ReflectionUtil.callMethod(nbtObject, ReflectionUtil.supports(18) ? "a" : "setInt", "map", mapId);
             Object dataWatcher = ReflectionUtil.callConstructorNull(dataWatcherClass, entityClass);
 
             Object packet = ReflectionUtil.callConstructor(entityMetadataPacketClass,
