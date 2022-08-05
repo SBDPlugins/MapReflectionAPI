@@ -38,7 +38,7 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.util.*;
 
-public class MapWrapper {
+public class MapWrapper extends AbstractMapWrapper {
     private static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
     protected ArrayImage content;
 
@@ -59,7 +59,6 @@ public class MapWrapper {
 
     private static final Class<?> craftStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
     private static final Class<?> setSlotPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
-    //private static final Class<?> tagCompoundClass = ReflectionUtil.getNMSClass("nbt", "NBTTagCompound");
     private static final Class<?> entityClass = ReflectionUtil.getNMSClass("world.entity", "Entity");
     private static final Class<?> dataWatcherClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher");
     private static final Class<?> entityMetadataPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
@@ -176,7 +175,6 @@ public class MapWrapper {
                 inventoryMenuName = "defaultContainer";
             }
             Object inventoryMenu = ReflectionUtil.getField(ReflectionUtil.getHandle(player), inventoryMenuName);
-//            int windowId = (int) ReflectionUtil.getField(inventoryMenu, ReflectionUtil.supports(17) ? "j" : "windowId");
 
             ItemStack stack;
             if (ReflectionUtil.supports(13)) {
@@ -353,20 +351,11 @@ public class MapWrapper {
         }
     };
 
-    /**
-     * Get the content that is wrapped
-     *
-     * @return The {@link ArrayImage}
-     */
     public ArrayImage getContent() {
         return content;
     }
 
-    /**
-     * Get the controller of this wrapper
-     *
-     * @return The {@link MapController}
-     */
+    @Override
     public MapController getController() {
         return controller;
     }

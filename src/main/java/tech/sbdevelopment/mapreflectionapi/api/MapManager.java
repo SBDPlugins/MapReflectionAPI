@@ -37,7 +37,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MapManager {
     protected final Set<Integer> occupiedIds = new HashSet<>();
-    private final List<MapWrapper> managedMaps = new CopyOnWriteArrayList<>();
+    protected final List<MapWrapper> managedMaps = new CopyOnWriteArrayList<>();
 
     /**
      * Wrap a {@link BufferedImage} in a {@link MapWrapper}
@@ -65,6 +65,52 @@ public class MapManager {
     }
 
     /**
+     * Wrap a {@link BufferedImage} and split it into multiple maps
+     *
+     * @param image   The image to wrap
+     * @param rows    Rows of the split (i.e. height)
+     * @param columns Columns of the split (i.e. width)
+     * @return The wrapper
+     */
+    public MultiMapWrapper wrapMultiImage(BufferedImage image, int rows, int columns) {
+        //Don't add to managedMaps, because the MultiMapWrapper will do that for us
+        return new MultiMapWrapper(image, rows, columns);
+    }
+
+    /**
+     * Wrap an {@link ArrayImage} and split it into multiple maps
+     *
+     * @param image   The image to wrap
+     * @param rows    Rows of the split (i.e. height)
+     * @param columns Columns of the split (i.e. width)
+     * @return The wrapper
+     */
+    public MultiMapWrapper wrapMultiImage(ArrayImage image, int rows, int columns) {
+        //Don't add to managedMaps, because the MultiMapWrapper will do that for us
+        return new MultiMapWrapper(image, rows, columns);
+    }
+
+    /**
+     * Wrap multiple {@link BufferedImage}s
+     *
+     * @param images The images to wrap
+     * @return The wrapper
+     */
+    public MultiMapWrapper wrapMultiImage(BufferedImage[][] images) {
+        return new MultiMapWrapper(images);
+    }
+
+    /**
+     * Wrap multiple {@link ArrayImage}s
+     *
+     * @param images The images to wrap
+     * @return The wrapper
+     */
+    public MultiMapWrapper wrapMultiImage(ArrayImage[][] images) {
+        return new MultiMapWrapper(images);
+    }
+
+    /**
      * Wrap a new image
      *
      * @param image The image to wrap
@@ -82,8 +128,7 @@ public class MapManager {
      * @param wrapper The {@link MapWrapper} to unwrap
      */
     public void unwrapImage(MapWrapper wrapper) {
-        wrapper.controller.cancelSend();
-        wrapper.getController().clearViewers();
+        wrapper.unwrap();
         managedMaps.remove(wrapper);
     }
 
