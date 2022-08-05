@@ -77,6 +77,12 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.bergerkiller.bukkit.common</pattern>
+                                    <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.bkcommonlib</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -135,6 +141,9 @@
                     <release>11</release>
                     <sourcepath>${maven.lombok.delombok-target}</sourcepath>
                     <sourceFileExcludes>
+                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/io/*.java</sourceFileExclude>
+                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/map/*.java</sourceFileExclude>
+                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/map/color/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/utils/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/listeners/*.java</sourceFileExclude>
@@ -173,12 +182,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.bergerkiller.bukkit</groupId>
-            <artifactId>BKCommonLib</artifactId>
-            <version>1.19-v2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>5.0.0-SNAPSHOT</version>
@@ -188,6 +191,14 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.24</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Annotations provided by Spigot -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations-java5</artifactId>
+            <version>23.0.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
