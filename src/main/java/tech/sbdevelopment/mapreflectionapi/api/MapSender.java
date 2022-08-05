@@ -32,6 +32,9 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The {@link MapSender} sends the Map packets to players.
+ */
 public class MapSender {
     private static final List<QueuedMap> sendQueue = new ArrayList<>();
     private static int senderID = -1;

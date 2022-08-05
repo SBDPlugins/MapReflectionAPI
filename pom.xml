@@ -149,6 +149,8 @@
                         <sourceFileExclude>**/com/bergerkiller/bukkit/common/map/*.java</sourceFileExclude>
                         <sourceFileExclude>**/com/bergerkiller/bukkit/common/map/color/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/*.java</sourceFileExclude>
+                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/cmd/*.java</sourceFileExclude>
+                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/managers/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/utils/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/listeners/*.java</sourceFileExclude>
                     </sourceFileExcludes>

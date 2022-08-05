@@ -29,6 +29,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 
+/**
+ * A {@link MultiMapController} controls multiple {@link MapWrapper}s (a.k.a. the {@link MultiMapWrapper}).
+ */
 public interface MultiMapController extends IMapController {
     /**
      * Add a viewer

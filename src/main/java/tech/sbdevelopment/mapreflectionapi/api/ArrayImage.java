@@ -32,7 +32,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * This class contains an image converted to a Minecraft byte array
+ * An {@link ArrayImage} contains an image converted to a Minecraft byte array.
  */
 @RequiredArgsConstructor
 @EqualsAndHashCode

@@ -21,21 +21,7 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.api;
-
 /**
- * The abstract class of a wrapped map.
+ * The Events package contains all the custom events the API fires.
  */
-public abstract class AbstractMapWrapper {
-    /**
-     * Get the controller of this wrapper
-     *
-     * @return The {@link MapController}
-     */
-    public abstract IMapController getController();
-
-    protected void unwrap() {
-        getController().cancelSend();
-        getController().clearViewers();
-    }
-}
+package tech.sbdevelopment.mapreflectionapi.api.events;

@@ -35,6 +35,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * The {@link MapManager} manages all the maps. It also contains functions for wrapping.
+ */
 public class MapManager {
     protected final Set<Integer> occupiedIds = new HashSet<>();
     protected final List<MapWrapper> managedMaps = new CopyOnWriteArrayList<>();

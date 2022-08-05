@@ -38,6 +38,9 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.util.*;
 
+/**
+ * A {@link MapWrapper} wraps one image.
+ */
 public class MapWrapper extends AbstractMapWrapper {
     private static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
     protected ArrayImage content;

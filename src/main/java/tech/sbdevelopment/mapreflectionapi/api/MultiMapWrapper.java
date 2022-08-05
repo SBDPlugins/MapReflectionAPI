@@ -36,6 +36,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * A {@link MultiMapWrapper} wraps one image split in pieces.
+ */
 public class MultiMapWrapper extends AbstractMapWrapper {
     private final MapWrapper[][] wrapperMatrix;
 

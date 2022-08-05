@@ -28,6 +28,9 @@ import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
+/**
+ * A {@link MapController} controls one {@link MapWrapper}.
+ */
 public interface MapController extends IMapController {
     /**
      * @deprecated Please use {@link MapWrapper#getContent()}

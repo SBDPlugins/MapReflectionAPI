@@ -21,21 +21,7 @@
  * SOFTWARE.
  */
 
-package tech.sbdevelopment.mapreflectionapi.api;
-
 /**
- * The abstract class of a wrapped map.
+ * The API package contains all the API you can interact with.
  */
-public abstract class AbstractMapWrapper {
-    /**
-     * Get the controller of this wrapper
-     *
-     * @return The {@link MapController}
-     */
-    public abstract IMapController getController();
-
-    protected void unwrap() {
-        getController().cancelSend();
-        getController().clearViewers();
-    }
-}
+package tech.sbdevelopment.mapreflectionapi.api;
