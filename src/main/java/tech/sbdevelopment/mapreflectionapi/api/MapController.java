@@ -27,36 +27,13 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
-import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 
-public interface MapController {
+public interface MapController extends IMapController {
     /**
-     * Add a viewer
-     *
-     * @param player {@link Player} to add
+     * @deprecated Please use {@link MapWrapper#getContent()}
      */
-    void addViewer(Player player) throws MapLimitExceededException;
-
-    /**
-     * Remove a viewer
-     *
-     * @param player {@link OfflinePlayer} to remove
-     */
-    void removeViewer(OfflinePlayer player);
-
-    /**
-     * Remove all viewers
-     */
-    void clearViewers();
-
-    /**
-     * Check if a player is viewing
-     *
-     * @param player {@link OfflinePlayer} to check
-     * @return <code>true</code> if the player is viewing
-     */
-    boolean isViewing(OfflinePlayer player);
+    @Deprecated(since = "1.3", forRemoval = true)
+    ArrayImage getContent();
 
     /**
      * Get the map ID for a player
@@ -65,40 +42,6 @@ public interface MapController {
      * @return the ID, or <code>-1</code> if no ID exists (i.e. the player is not viewing)
      */
     int getMapId(OfflinePlayer player);
-
-    /**
-     * Update the image
-     *
-     * @param content new {@link ArrayImage} content
-     */
-    void update(@NotNull ArrayImage content);
-
-    /**
-     * Get the content of the controller
-     *
-     * @return The {@link ArrayImage}
-     */
-    ArrayImage getContent();
-
-    /**
-     * Send the content to a player
-     *
-     * @param player {@link Player} receiver of the content
-     */
-    void sendContent(Player player);
-
-    /**
-     * Send the content to a player
-     *
-     * @param player       {@link Player} receiver of the content
-     * @param withoutQueue if <code>true</code>, the content will be sent immediately
-     */
-    void sendContent(Player player, boolean withoutQueue);
-
-    /**
-     * Cancels the 'send events' in the queue
-     */
-    void cancelSend();
 
     /**
      * Show in a player's inventory

@@ -29,7 +29,7 @@
 
     <groupId>tech.sbdevelopment</groupId>
     <artifactId>MapReflectionAPI</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <packaging>jar</packaging>
 
     <name>MapReflectionAPI</name>
@@ -77,6 +77,16 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>com.bergerkiller.bukkit.common</pattern>
+                                    <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.bkcommonlib</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.bstats</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -135,6 +145,9 @@
                     <release>11</release>
                     <sourcepath>${maven.lombok.delombok-target}</sourcepath>
                     <sourceFileExcludes>
+                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/io/*.java</sourceFileExclude>
+                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/map/*.java</sourceFileExclude>
+                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/map/color/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/utils/*.java</sourceFileExclude>
                         <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/listeners/*.java</sourceFileExclude>
@@ -146,6 +159,15 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
+                <includes>
+                    <include>plugin.yml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>plugin.yml</exclude>
+                </excludes>
             </resource>
         </resources>
     </build>
@@ -173,12 +195,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.bergerkiller.bukkit</groupId>
-            <artifactId>BKCommonLib</artifactId>
-            <version>1.19-v2</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
             <version>5.0.0-SNAPSHOT</version>
@@ -189,6 +205,21 @@
             <artifactId>lombok</artifactId>
             <version>1.18.24</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Annotations provided by Spigot -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations-java5</artifactId>
+            <version>23.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

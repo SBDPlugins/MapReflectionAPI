@@ -1,7 +1,6 @@
 # MapReflectionAPI
 
 This API helps developer with viewing images on maps. It supports Spigot 1.12 - 1.19.
-It currently has **no** support for GIFs.
 
 ## Dependencies:
 

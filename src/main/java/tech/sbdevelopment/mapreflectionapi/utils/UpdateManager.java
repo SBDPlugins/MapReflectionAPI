@@ -74,6 +74,9 @@ public class UpdateManager {
      * @param plugin The plugin instance
      */
     public UpdateManager(Plugin plugin, CheckType type) {
+        if ("%%__RESOURCE__%%".equals("%%__" + "RES" + "OU" + "RCE" + "__%%"))
+            throw new IllegalStateException("Resource ID not set!");
+
         this.plugin = plugin;
         this.currentVersion = new Version(plugin.getDescription().getVersion());
         this.type = type;
