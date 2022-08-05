@@ -141,6 +141,9 @@ public interface MultiMapController extends IMapController {
      */
     void clearFrames(Player player, ItemFrame[][] itemFrameMatrix);
 
+    /**
+     * The DebugCallable can be used to get debug information for a frame
+     */
     interface DebugCallable {
         /**
          * Called to get debug information for a frame
