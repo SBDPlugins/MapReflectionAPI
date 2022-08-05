@@ -40,6 +40,15 @@ public class MapManager {
     protected final List<MapWrapper> managedMaps = new CopyOnWriteArrayList<>();
 
     /**
+     * Get the amount of maps managed by the plugin
+     *
+     * @return The managed maps amount
+     */
+    public int getManagedMapsCount() {
+        return managedMaps.size();
+    }
+
+    /**
      * Wrap a {@link BufferedImage} in a {@link MapWrapper}
      *
      * @param image The image to wrap

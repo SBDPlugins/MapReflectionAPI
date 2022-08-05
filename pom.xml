@@ -82,6 +82,10 @@
                                     <pattern>com.bergerkiller.bukkit.common</pattern>
                                     <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.bkcommonlib</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>org.bstats</pattern>
+                                    <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.bstats</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -200,6 +204,13 @@
             <artifactId>annotations-java5</artifactId>
             <version>23.0.0</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.bstats</groupId>
+            <artifactId>bstats-bukkit</artifactId>
+            <version>3.0.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

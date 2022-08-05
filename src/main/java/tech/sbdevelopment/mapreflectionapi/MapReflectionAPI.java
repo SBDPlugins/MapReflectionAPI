@@ -24,6 +24,8 @@
 package tech.sbdevelopment.mapreflectionapi;
 
 import com.comphenix.protocol.ProtocolLibrary;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -118,6 +120,10 @@ public class MapReflectionAPI extends JavaPlugin {
         getLogger().info("Registering the listeners...");
         Bukkit.getPluginManager().registerEvents(new MapListener(), this);
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListener(this));
+
+        getLogger().info("Loading metrics...");
+        Metrics metrics = new Metrics(this, 16033);
+        metrics.addCustomChart(new SingleLineChart("managed_maps", () -> mapManager.getManagedMapsCount()));
 
         if (Configuration.getInstance().isUpdaterCheck()) {
             UpdateManager updateManager = new UpdateManager(this, UpdateManager.CheckType.SPIGOT);
