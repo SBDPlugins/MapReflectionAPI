@@ -20,7 +20,7 @@ First, include the API using Maven:
 <dependency>
     <groupId>tech.sbdevelopment</groupId>
     <artifactId>MapReflectionAPI</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
     <scope>provided</scope>
 </dependency>
 ```
