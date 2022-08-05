@@ -26,7 +26,6 @@ package com.bergerkiller.bukkit.common.map;
 import com.bergerkiller.bukkit.common.map.color.MCSDBubbleFormat;
 import com.bergerkiller.bukkit.common.map.color.MCSDGenBukkit;
 import com.bergerkiller.bukkit.common.map.color.MapColorSpaceData;
-import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.awt.*;
@@ -47,16 +46,6 @@ public class MapColorPalette {
     public static final byte COLOR_TRANSPARENT = 0;
 
     static {
-        // We NEED java awt or all will just fail to work anyway.
-        try {
-            Class.forName("java.awt.Color");
-        } catch (ClassNotFoundException e) {
-            MapReflectionAPI.getInstance().getLogger().severe("The Java AWT runtime library is not available");
-            MapReflectionAPI.getInstance().getLogger().severe("This is usually because a headless JVM is used for the server");
-            MapReflectionAPI.getInstance().getLogger().severe("Please install and configure a non-headless JVM to have Map Displays work");
-            throw new UnsupportedOperationException("Map Displays require a non-headless JVM (Uses AWT)");
-        }
-
         // Now we know java.awt exists we can initialize this one
         COLOR_MAP_DATA = new MapColorSpaceData();
 

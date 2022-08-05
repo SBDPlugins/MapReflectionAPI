@@ -23,6 +23,7 @@
 
 package tech.sbdevelopment.mapreflectionapi;
 
+import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.comphenix.protocol.ProtocolLibrary;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SingleLineChart;
@@ -34,6 +35,7 @@ import tech.sbdevelopment.mapreflectionapi.cmd.MapManagerCMD;
 import tech.sbdevelopment.mapreflectionapi.listeners.MapListener;
 import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
 import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
+import tech.sbdevelopment.mapreflectionapi.utils.MainUtil;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import tech.sbdevelopment.mapreflectionapi.utils.UpdateManager;
 
@@ -77,11 +79,15 @@ public class MapReflectionAPI extends JavaPlugin {
             return;
         }
 
-        if (!Bukkit.getPluginManager().isPluginEnabled("BKCommonLib")) {
-            getLogger().severe("MapReflectionAPI requires BKCommonLib to function!");
+        getLogger().info("Loading Java AWT runtime library support...");
+        if (MainUtil.isHeadlessJDK()) {
+            getLogger().severe("MapReflectionAPI requires the Java AWT runtime library, but is not available!");
+            getLogger().severe("This is usually because a headless JVM is used for the server.");
+            getLogger().severe("Please install and configure a non-headless JVM to make this plugin work.");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+        MapColorPalette.getColor(0, 0, 0); //Initializes the class
 
         if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
             getLogger().severe("MapReflectionAPI requires ProtocolLib to function!");
@@ -126,41 +132,45 @@ public class MapReflectionAPI extends JavaPlugin {
         metrics.addCustomChart(new SingleLineChart("managed_maps", () -> mapManager.getManagedMapsCount()));
 
         if (Configuration.getInstance().isUpdaterCheck()) {
-            UpdateManager updateManager = new UpdateManager(this, UpdateManager.CheckType.SPIGOT);
+            try {
+                UpdateManager updateManager = new UpdateManager(this, UpdateManager.CheckType.SPIGOT);
 
-            updateManager.handleResponse((versionResponse, version) -> {
-                switch (versionResponse) {
-                    case FOUND_NEW:
-                        getLogger().warning("There is a new version available! Current: " + getDescription().getVersion() + " New: " + version.get());
-                        if (Configuration.getInstance().isUpdaterDownload()) {
-                            getLogger().info("Trying to download the update. This could take some time...");
+                updateManager.handleResponse((versionResponse, version) -> {
+                    switch (versionResponse) {
+                        case FOUND_NEW:
+                            getLogger().warning("There is a new version available! Current: " + getDescription().getVersion() + " New: " + version.get());
+                            if (Configuration.getInstance().isUpdaterDownload()) {
+                                getLogger().info("Trying to download the update. This could take some time...");
 
-                            updateManager.handleDownloadResponse((downloadResponse, fileName) -> {
-                                switch (downloadResponse) {
-                                    case DONE:
-                                        getLogger().info("Update downloaded! If you restart your server, it will be loaded. Filename: " + fileName);
-                                        break;
-                                    case ERROR:
-                                        getLogger().severe("Something went wrong when trying downloading the latest version.");
-                                        break;
-                                    case UNAVAILABLE:
-                                        getLogger().warning("Unable to download the latest version.");
-                                        break;
-                                }
-                            }).runUpdate();
-                        }
-                        break;
-                    case LATEST:
-                        getLogger().info("You are running the latest version [" + getDescription().getVersion() + "]!");
-                        break;
-                    case THIS_NEWER:
-                        getLogger().info("You are running a newer version [" + getDescription().getVersion() + "]! This is probably fine.");
-                        break;
-                    case UNAVAILABLE:
-                        getLogger().severe("Unable to perform an update check.");
-                        break;
-                }
-            }).check();
+                                updateManager.handleDownloadResponse((downloadResponse, fileName) -> {
+                                    switch (downloadResponse) {
+                                        case DONE:
+                                            getLogger().info("Update downloaded! If you restart your server, it will be loaded. Filename: " + fileName);
+                                            break;
+                                        case ERROR:
+                                            getLogger().severe("Something went wrong when trying downloading the latest version.");
+                                            break;
+                                        case UNAVAILABLE:
+                                            getLogger().warning("Unable to download the latest version.");
+                                            break;
+                                    }
+                                }).runUpdate();
+                            }
+                            break;
+                        case LATEST:
+                            getLogger().info("You are running the latest version [" + getDescription().getVersion() + "]!");
+                            break;
+                        case THIS_NEWER:
+                            getLogger().info("You are running a newer version [" + getDescription().getVersion() + "]! This is probably fine.");
+                            break;
+                        case UNAVAILABLE:
+                            getLogger().severe("Unable to perform an update check.");
+                            break;
+                    }
+                }).check();
+            } catch (IllegalStateException ex) {
+                ex.printStackTrace();
+            }
         }
 
         getLogger().info("MapReflectionAPI is enabled!");
