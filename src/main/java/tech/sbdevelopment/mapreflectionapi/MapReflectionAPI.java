@@ -121,7 +121,7 @@ public class MapReflectionAPI extends JavaPlugin {
 
         if (Configuration.getInstance().isUpdaterCheck()) {
             try {
-                UpdateManager updateManager = new UpdateManager(this, UpdateManager.CheckType.SPIGOT);
+                UpdateManager updateManager = new UpdateManager(this, 103011);
 
                 updateManager.handleResponse((versionResponse, version) -> {
                     switch (versionResponse) {
