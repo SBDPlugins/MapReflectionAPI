@@ -2,23 +2,18 @@
  * This file is part of MapReflectionAPI.
  * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package tech.sbdevelopment.mapreflectionapi.utils;
@@ -40,7 +35,7 @@ import java.util.function.BiConsumer;
  * Update checker class
  *
  * @author Stijn [SBDeveloper]
- * @version 2.2 [17-04-2022] - Added Polymart support
+ * @version 2.3 [27-09-2022] - Added Polymart support ; fixed Spigot support
  * @since 05-03-2020
  */
 public class UpdateManager {
@@ -73,22 +68,24 @@ public class UpdateManager {
      *
      * @param plugin The plugin instance
      */
-    public UpdateManager(Plugin plugin, CheckType type) {
-        if ("%%__RESOURCE__%%".equals("%%__" + "RES" + "OU" + "RCE" + "__%%"))
-            throw new IllegalStateException("Resource ID not set!");
-
+    public UpdateManager(Plugin plugin) {
         this.plugin = plugin;
         this.currentVersion = new Version(plugin.getDescription().getVersion());
-        this.type = type;
+        this.type = CheckType.POLYMART_PAID;
         this.resourceID = Integer.parseInt("%%__RESOURCE__%%");
-        if (type == CheckType.POLYMART_PAID) {
-            this.injector_version = Integer.parseInt("%%__INJECT_VER__%%");
-            this.user_id = Integer.parseInt("%%__USER__%%");
-            this.nonce = Integer.parseInt("%%__NONCE__%%");
-            this.download_agent = Integer.parseInt("%%__AGENT__%%");
-            this.download_time = Integer.parseInt("%%__TIMESTAMP__%%");
-            this.download_token = "%%__VERIFY_TOKEN__%%";
-        }
+        this.injector_version = Integer.parseInt("%%__INJECT_VER__%%");
+        this.user_id = Integer.parseInt("%%__USER__%%");
+        this.nonce = Integer.parseInt("%%__NONCE__%%");
+        this.download_agent = Integer.parseInt("%%__AGENT__%%");
+        this.download_time = Integer.parseInt("%%__TIMESTAMP__%%");
+        this.download_token = "%%__VERIFY_TOKEN__%%";
+    }
+
+    public UpdateManager(Plugin plugin, int resourceID) {
+        this.plugin = plugin;
+        this.currentVersion = new Version(plugin.getDescription().getVersion());
+        this.type = CheckType.SPIGOT;
+        this.resourceID = resourceID;
     }
 
     /**

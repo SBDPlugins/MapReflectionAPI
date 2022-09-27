@@ -16,13 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package tech.sbdevelopment.mapreflectionapi.api.exceptions;
-
-import lombok.experimental.StandardException;
-
 /**
- * This exception gets thrown if no map IDs are available
+ * The API package contains all the API you can interact with.
  */
-@StandardException
-public class MapLimitExceededException extends Exception {
-}
+package tech.sbdevelopment.mapreflectionapi.api;

@@ -3,9 +3,8 @@ version: '${project.version}'
 main: tech.sbdevelopment.mapreflectionapi.MapReflectionAPI
 api-version: 1.13
 authors: [ inventivetalent, SBDeveloper ]
-description: This API helps developer with viewing images on maps.
+description: This API helps developer with viewing images on maps or in inventories.
 website: https://sbdevelopment.tech
-softdepend: [ ProtocolLib ]
 commands:
   mapmanager:
     description: The main command of MapManager.

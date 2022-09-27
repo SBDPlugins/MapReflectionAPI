@@ -4,7 +4,6 @@ This API helps developer with viewing images on maps. It supports Spigot 1.12 - 
 
 ## Dependencies:
 
-- [BKCommonLib](https://www.spigotmc.org/resources/bkcommonlib.39590/)
 - [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
 
 ## Usage:
@@ -20,7 +19,7 @@ First, include the API using Maven:
 <dependency>
     <groupId>tech.sbdevelopment</groupId>
     <artifactId>MapReflectionAPI</artifactId>
-    <version>1.1</version>
+    <version>1.3</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -51,9 +50,11 @@ controller.showInFrame(p, frame, true);
 controller.showInHand(p, true);
 ```
 
-More information can be found on the [JavaDoc](https://sbdplugins.nl/javadoc/mapreflectionapi/).
+More information can be found on the [JavaDoc](https://sbdevelopment.tech/javadoc/mapreflectionapi/).
 
 ## Credits:
 
 This is a fork of [MapManager](https://github.com/InventivetalentDev/MapManager). It updates the API to 1.19 and uses
 other dependencies.
+
+This plugin includes classes from BKCommonLib. Please checkout the README in that package for more information.

@@ -2,29 +2,23 @@
  * This file is part of MapReflectionAPI.
  * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package tech.sbdevelopment.mapreflectionapi;
 
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
-import com.comphenix.protocol.ProtocolLibrary;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
@@ -89,12 +83,6 @@ public class MapReflectionAPI extends JavaPlugin {
         }
         MapColorPalette.getColor(0, 0, 0); //Initializes the class
 
-        if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-            getLogger().severe("MapReflectionAPI requires ProtocolLib to function!");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
-
         getLogger().info("Loading the configuration...");
         Configuration.init(this);
 
@@ -125,7 +113,7 @@ public class MapReflectionAPI extends JavaPlugin {
 
         getLogger().info("Registering the listeners...");
         Bukkit.getPluginManager().registerEvents(new MapListener(), this);
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListener(this));
+        Bukkit.getPluginManager().registerEvents(new PacketListener(), this);
 
         getLogger().info("Loading metrics...");
         Metrics metrics = new Metrics(this, 16033);
@@ -133,7 +121,7 @@ public class MapReflectionAPI extends JavaPlugin {
 
         if (Configuration.getInstance().isUpdaterCheck()) {
             try {
-                UpdateManager updateManager = new UpdateManager(this, UpdateManager.CheckType.SPIGOT);
+                UpdateManager updateManager = new UpdateManager(this, 103011);
 
                 updateManager.handleResponse((versionResponse, version) -> {
                     switch (versionResponse) {
