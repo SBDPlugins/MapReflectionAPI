@@ -318,6 +318,15 @@ public class ReflectionUtil {
         }
     }
 
+    public static boolean hasField(Object packet, String field) {
+        try {
+            packet.getClass().getDeclaredField(field);
+            return true;
+        } catch (NoSuchFieldException ex) {
+            return false;
+        }
+    }
+
     @Nullable
     public static Object getField(Object object, String field) {
         try {

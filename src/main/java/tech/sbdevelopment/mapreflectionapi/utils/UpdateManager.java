@@ -35,7 +35,7 @@ import java.util.function.BiConsumer;
  * Update checker class
  *
  * @author Stijn [SBDeveloper]
- * @version 2.2 [17-04-2022] - Added Polymart support
+ * @version 2.3 [27-09-2022] - Added Polymart support ; fixed Spigot support
  * @since 05-03-2020
  */
 public class UpdateManager {
@@ -68,22 +68,24 @@ public class UpdateManager {
      *
      * @param plugin The plugin instance
      */
-    public UpdateManager(Plugin plugin, CheckType type) {
-        if ("%%__RESOURCE__%%".equals("%%__" + "RES" + "OU" + "RCE" + "__%%"))
-            throw new IllegalStateException("Resource ID not set!");
-
+    public UpdateManager(Plugin plugin) {
         this.plugin = plugin;
         this.currentVersion = new Version(plugin.getDescription().getVersion());
-        this.type = type;
+        this.type = CheckType.POLYMART_PAID;
         this.resourceID = Integer.parseInt("%%__RESOURCE__%%");
-        if (type == CheckType.POLYMART_PAID) {
-            this.injector_version = Integer.parseInt("%%__INJECT_VER__%%");
-            this.user_id = Integer.parseInt("%%__USER__%%");
-            this.nonce = Integer.parseInt("%%__NONCE__%%");
-            this.download_agent = Integer.parseInt("%%__AGENT__%%");
-            this.download_time = Integer.parseInt("%%__TIMESTAMP__%%");
-            this.download_token = "%%__VERIFY_TOKEN__%%";
-        }
+        this.injector_version = Integer.parseInt("%%__INJECT_VER__%%");
+        this.user_id = Integer.parseInt("%%__USER__%%");
+        this.nonce = Integer.parseInt("%%__NONCE__%%");
+        this.download_agent = Integer.parseInt("%%__AGENT__%%");
+        this.download_time = Integer.parseInt("%%__TIMESTAMP__%%");
+        this.download_token = "%%__VERIFY_TOKEN__%%";
+    }
+
+    public UpdateManager(Plugin plugin, int resourceID) {
+        this.plugin = plugin;
+        this.currentVersion = new Version(plugin.getDescription().getVersion());
+        this.type = CheckType.SPIGOT;
+        this.resourceID = resourceID;
     }
 
     /**
