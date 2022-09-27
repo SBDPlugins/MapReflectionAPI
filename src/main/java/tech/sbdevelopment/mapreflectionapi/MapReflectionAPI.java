@@ -19,7 +19,6 @@
 package tech.sbdevelopment.mapreflectionapi;
 
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
-import com.comphenix.protocol.ProtocolLibrary;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
@@ -84,12 +83,6 @@ public class MapReflectionAPI extends JavaPlugin {
         }
         MapColorPalette.getColor(0, 0, 0); //Initializes the class
 
-        if (!Bukkit.getPluginManager().isPluginEnabled("ProtocolLib")) {
-            getLogger().severe("MapReflectionAPI requires ProtocolLib to function!");
-            Bukkit.getPluginManager().disablePlugin(this);
-            return;
-        }
-
         getLogger().info("Loading the configuration...");
         Configuration.init(this);
 
@@ -120,7 +113,7 @@ public class MapReflectionAPI extends JavaPlugin {
 
         getLogger().info("Registering the listeners...");
         Bukkit.getPluginManager().registerEvents(new MapListener(), this);
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListener(this));
+        Bukkit.getPluginManager().registerEvents(new PacketListener(), this);
 
         getLogger().info("Loading metrics...");
         Metrics metrics = new Metrics(this, 16033);
