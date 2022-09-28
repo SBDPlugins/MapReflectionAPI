@@ -2,10 +2,6 @@
 
 This API helps developer with viewing images on maps. It supports Spigot 1.12 - 1.19.
 
-## Dependencies:
-
-- [ProtocolLib](https://www.spigotmc.org/resources/protocollib.1997/)
-
 ## Usage:
 
 First, include the API using Maven:
