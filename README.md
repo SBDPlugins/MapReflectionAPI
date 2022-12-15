@@ -23,13 +23,13 @@ First, include the API using Maven:
 Then, use our API. Below is an example.
 
 ```java
-//Wrap image
+//--- Wrap image ---
 MapWrapper wrapper = MapReflectionAPI.getMapManager().wrapImage(ImageIO.read(new File("image.png")));
 MapController controller = wrapper.getController();
 
 final Player p = Bukkit.getPlayer("SBDeveloper");
 
-//Add viewer
+//--- Add viewer ---
 try {
    controller.addViewer(p);
 } catch (MapLimitExceededException e) {
@@ -38,12 +38,43 @@ try {
 }
 controller.sendContent(p);
 
-//Show in frame
+//--- Show in frame ---
 ItemFrame frame = ...; //This is your ItemFrame.
 controller.showInFrame(p, frame, true);
 
-//Or show in hand
+//--- Or show in hand ---
 controller.showInHand(p, true);
+```
+
+It's also possible to split one image onto multiple itemframes. For example using the following code.
+
+```java
+//--- Wrap image ---
+MapWrapper wrapper = MapReflectionAPI.getMapManager().wrapImage(ImageIO.read(new File("image.png")));
+MapController controller = wrapper.getController();
+
+final Player p = Bukkit.getPlayer("SBDeveloper");
+
+//--- Add viewer ---
+try {
+   controller.addViewer(p);
+} catch (MapLimitExceededException e) {
+   e.printStackTrace();
+   return;
+}
+controller.sendContent(p);
+
+//--- Show in frames ---
+//These are your itemframes
+ItemFrame leftTopFrame = ...;
+ItemFrame leftBottomFrame = ...;
+ItemFrame rightTopFrame = ...;
+ItemFrame rightBottomFrame = ...;
+ItemFrame[][] frames = {
+    {leftBottomFrame, leftTopFrame},
+    {rightBottomFrame, rightTopFrame}
+};
+controller.showInFrames(p, frames, true);
 ```
 
 More information can be found on the [JavaDoc](https://sbdevelopment.tech/javadoc/mapreflectionapi/).
