@@ -18,12 +18,15 @@
 
 package tech.sbdevelopment.mapreflectionapi.utils;
 
-import com.google.common.io.ByteStreams;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.logging.Level;
 
 public class YamlFile {
     private final JavaPlugin plugin;
@@ -35,56 +38,45 @@ public class YamlFile {
         this.plugin = plugin;
         this.name = name;
 
-        if (!plugin.getDataFolder().exists() && !plugin.getDataFolder().mkdir()) {
-            plugin.getLogger().severe("Couldn't generate the pluginfolder!");
-            return;
-        }
-
-        this.file = new File(plugin.getDataFolder(), name + ".yml");
-        if (!this.file.exists()) {
-            try {
-                if (!this.file.createNewFile()) {
-                    plugin.getLogger().severe("Couldn't generate the " + name + ".yml!");
-                    return;
-                }
-                plugin.getLogger().info("Generating the " + name + ".yml...");
-            } catch (IOException e) {
-                plugin.getLogger().severe("Couldn't generate the " + name + ".yml!");
-                return;
-            }
-        }
-        this.fileConfiguration = YamlConfiguration.loadConfiguration(this.file);
+        saveDefaultFile();
     }
 
-    public void loadDefaults() {
-        try {
-            InputStream in = plugin.getResource(name + ".yml");
-            if (in == null) {
-                plugin.getLogger().severe("Expected the resource " + name + ".yml, but it was not found in the plugin JAR!");
-                return;
-            }
+    public void reloadFile() {
+        if (this.file == null)
+            this.file = new File(this.plugin.getDataFolder(), name + ".yml");
 
-            OutputStream out = new FileOutputStream(this.file);
-            ByteStreams.copy(in, out);
-            reload();
-        } catch (IOException e) {
-            plugin.getLogger().severe("Couldn't load the default " + name + ".yml!");
+        this.fileConfiguration = YamlConfiguration.loadConfiguration(this.file);
+
+        InputStream defaultStream = this.plugin.getResource(name + ".yml");
+        if (defaultStream != null) {
+            YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
+            this.fileConfiguration.setDefaults(defaultConfig);
         }
     }
 
     public FileConfiguration getFile() {
+        if (this.fileConfiguration == null)
+            reloadFile();
+
         return this.fileConfiguration;
     }
 
-    public void save() {
+    public void saveFile() {
+        if (this.fileConfiguration == null || this.file == null)
+            return;
+
         try {
             this.fileConfiguration.save(this.file);
         } catch (IOException e) {
-            plugin.getLogger().severe("Couldn't save the " + name + ".yml!");
+            plugin.getLogger().log(Level.SEVERE, "Couldn't save the file " + this.name + ".yml.", e);
         }
     }
 
-    public void reload() {
-        this.fileConfiguration = YamlConfiguration.loadConfiguration(this.file);
+    public void saveDefaultFile() {
+        if (this.file == null)
+            this.file = new File(this.plugin.getDataFolder(), name + ".yml");
+
+        if (!this.file.exists())
+            this.plugin.saveResource(name + ".yml", false);
     }
 }
