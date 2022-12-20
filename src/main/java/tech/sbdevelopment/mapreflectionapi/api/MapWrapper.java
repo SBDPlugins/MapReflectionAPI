@@ -317,14 +317,6 @@ public class MapWrapper extends AbstractMapWrapper {
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
             Object nmsStack = createCraftItemStack(stack, mapId);
 
-            Object dataWatcher = ReflectionUtil.callConstructorNull(dataWatcherClass, entityClass);
-
-            Object packet = ReflectionUtil.callConstructor(entityMetadataPacketClass,
-                    entityId,
-                    dataWatcher, //dummy watcher!
-                    true
-            );
-
             String dataWatcherObjectName;
             if (ReflectionUtil.supports(19)) { //1.19, same as 1.17 and 1.18(.2)
                 dataWatcherObjectName = "ao";
@@ -340,10 +332,32 @@ public class MapWrapper extends AbstractMapWrapper {
                 dataWatcherObjectName = "c";
             }
             Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, dataWatcherObjectName);
-            Object dataWatcherItem = ReflectionUtil.callFirstConstructor(dataWatcherItemClass, dataWatcherObject, nmsStack);
+
             List list = new ArrayList<>();
-            list.add(dataWatcherItem);
-            ReflectionUtil.setDeclaredField(packet, "b", list);
+
+            Object packet;
+            if (ReflectionUtil.supports(19, 3)) { //1.19.3
+                Object dataWatcherField = ReflectionUtil.getDeclaredField(dataWatcherClass, "b");
+                Object dataWatcherItem = ReflectionUtil.callDeclaredMethod(dataWatcherField, "a", dataWatcherObject, nmsStack);
+                list.add(dataWatcherItem);
+
+                packet = ReflectionUtil.callConstructor(entityMetadataPacketClass,
+                        entityId,
+                        list
+                );
+            } else { //1.19.2 or lower
+                Object dataWatcher = ReflectionUtil.callConstructorNull(dataWatcherClass, entityClass);
+
+                packet = ReflectionUtil.callConstructor(entityMetadataPacketClass,
+                        entityId,
+                        dataWatcher, //dummy watcher!
+                        true
+                );
+
+                Object dataWatcherItem = ReflectionUtil.callFirstConstructor(dataWatcherItemClass, dataWatcherObject, nmsStack);
+                list.add(dataWatcherItem);
+                ReflectionUtil.setDeclaredField(packet, "b", list);
+            }
 
             ReflectionUtil.sendPacketSync(player, packet);
         }
