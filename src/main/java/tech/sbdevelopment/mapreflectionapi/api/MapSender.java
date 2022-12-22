@@ -123,7 +123,7 @@ public class MapSender {
                     id, //ID
                     (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //Show icons
-                    new ArrayList<>(), //Icons
+                    new ReflectionUtil.CollectionParam<>(), //Icons
                     updateData
             );
         } else if (ReflectionUtil.supports(14)) { //1.16-1.14
@@ -132,7 +132,7 @@ public class MapSender {
                     (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //Tracking position
                     false, //Locked
-                    new ArrayList<>(), //Icons
+                    new ReflectionUtil.CollectionParam<>(), //Icons
                     content.array, //Data
                     content.minX, //X pos
                     content.minY, //Y pos
@@ -144,7 +144,7 @@ public class MapSender {
                     id, //ID
                     (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //???
-                    new ArrayList<>(), //Icons
+                    new ReflectionUtil.CollectionParam<>(), //Icons
                     content.array, //Data
                     content.minX, //X pos
                     content.minY, //Y pos

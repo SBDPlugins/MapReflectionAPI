@@ -31,10 +31,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -200,6 +197,24 @@ public class ReflectionUtil {
         return VER >= major && VER_MINOR >= minor;
     }
 
+    /**
+     * Helper class converted to {@link List}
+     *
+     * @param <E> The storage type
+     */
+    public static class ListParam<E> extends ArrayList<E> {
+
+    }
+
+    /**
+     * Helper class converted to {@link Collection}
+     *
+     * @param <E> The storage type
+     */
+    public static class CollectionParam<E> extends ArrayList<E> {
+
+    }
+
     private static Class<?> wrapperToPrimitive(Class<?> clazz) {
         if (clazz == Boolean.class) return boolean.class;
         if (clazz == Integer.class) return int.class;
@@ -210,7 +225,10 @@ public class ReflectionUtil {
         if (clazz == Byte.class) return byte.class;
         if (clazz == Void.class) return void.class;
         if (clazz == Character.class) return char.class;
-        if (clazz == ArrayList.class) return Collection.class;
+        if (clazz == CollectionParam.class) return Collection.class;
+        if (clazz == ListParam.class) return List.class;
+        if (clazz == ArrayList.class) return Collection.class; //LEGACY!
+        if (clazz == HashMap.class) return Map.class;
         return clazz;
     }
 

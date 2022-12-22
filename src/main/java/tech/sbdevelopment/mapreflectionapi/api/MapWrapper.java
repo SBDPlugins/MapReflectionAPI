@@ -31,7 +31,11 @@ import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededExcept
 import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
-import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * A {@link MapWrapper} wraps one image.
@@ -333,12 +337,21 @@ public class MapWrapper extends AbstractMapWrapper {
             }
             Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, dataWatcherObjectName);
 
-            List list = new ArrayList<>();
+            ReflectionUtil.ListParam list = new ReflectionUtil.ListParam<>();
 
             Object packet;
-            if (ReflectionUtil.supports(19, 3)) { //1.19.3
-                Object dataWatcherField = ReflectionUtil.getDeclaredField(dataWatcherClass, "b");
-                Object dataWatcherItem = ReflectionUtil.callDeclaredMethod(dataWatcherField, "a", dataWatcherObject, nmsStack);
+            if (ReflectionUtil.supports(19, 2)) { //1.19.3
+                Class<?> dataWatcherRecordClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher$b");
+                // Sadly not possible to use ReflectionUtil (in its current state), because of the Object parameter
+                Object dataWatcherItem;
+                try {
+                    Method m = dataWatcherRecordClass.getMethod("a", dataWatcherObject.getClass(), Object.class);
+                    m.setAccessible(true);
+                    dataWatcherItem = m.invoke(null, dataWatcherObject, nmsStack);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                    ex.printStackTrace();
+                    return;
+                }
                 list.add(dataWatcherItem);
 
                 packet = ReflectionUtil.callConstructor(entityMetadataPacketClass,
