@@ -24,7 +24,7 @@
 
     <groupId>tech.sbdevelopment</groupId>
     <artifactId>MapReflectionAPI</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2</version>
     <packaging>jar</packaging>
 
     <name>MapReflectionAPI</name>
@@ -38,8 +38,8 @@
 
     <distributionManagement>
         <repository>
-            <id>nexus-releases</id>
-            <url>https://repo.sbdevelopment.tech/repository/maven-releases/</url>
+            <id>sbdevelopment-repo</id>
+            <url>https://repo.sbdevelopment.tech/releases</url>
         </repository>
     </distributionManagement>
 
@@ -85,33 +85,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>3.0.0</version>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
-                <executions>
-                    <execution>
-                        <id>default-deploy</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <serverId>nexus-releases</serverId>
-                    <nexusUrl>https://repo.sbdevelopment.tech/</nexusUrl>
-                    <skipStaging>true</skipStaging>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.projectlombok</groupId>
@@ -188,7 +161,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.2-R0.1-SNAPSHOT</version>
+            <version>1.19.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

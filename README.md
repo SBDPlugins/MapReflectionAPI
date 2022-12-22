@@ -8,8 +8,9 @@ First, include the API using Maven:
 
 ```xml
 <repository>
-    <id>sbdevelopment-repo</id>
-    <url>https://repo.sbdevelopment.tech/repository/maven-releases/</url>
+    <id>sbdevelopment-releases</id>
+    <name>SBDevelopment Repository</name>
+    <url>https://repo.sbdevelopment.tech/releases</url>
 </repository>
 
 <dependency>
