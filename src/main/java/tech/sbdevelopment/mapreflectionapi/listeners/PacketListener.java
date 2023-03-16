@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -144,7 +144,7 @@ public class PacketListener implements Listener {
         Object playerHandle = getHandle(player);
         Object playerConnection = getDeclaredField(playerHandle, ReflectionUtil.supports(17) ? "b" : "playerConnection"); //1.17 = b, 1.16 = playerConnection
         Object networkManager = getDeclaredField(playerConnection, ReflectionUtil.supports(19) ? "b" : ReflectionUtil.supports(17) ? "a" : "networkManager"); //1.19 = b, 1.18 = a, 1.16 = networkManager
-        return (Channel) getDeclaredField(networkManager, ReflectionUtil.supports(18) ? "m" : ReflectionUtil.supports(17) ? "k" : "channel"); //1.18 = m, 1.17 = k, 1.16 = channel
+        return (Channel) getDeclaredField(networkManager, ReflectionUtil.supports(19, 4) ? "h" : ReflectionUtil.supports(18) ? "m" : ReflectionUtil.supports(17) ? "k" : "channel"); //1.19.4 = h, >= 1.19.3 & 1.18 = m, 1.17 = k, 1.16 = channel
     }
 
     private Vector vec3DToVector(Object vec3d) {

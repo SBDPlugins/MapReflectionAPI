@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,11 +64,11 @@ public class MapReflectionAPI extends JavaPlugin {
         instance = this;
 
         getLogger().info("----------------");
-        getLogger().info("MapReflectionAPI v" + getDescription().getVersion() + "");
-        getLogger().info("Made by © Copyright SBDevelopment 2022");
+        getLogger().info("MapReflectionAPI v" + getDescription().getVersion());
+        getLogger().info("Made by © Copyright SBDevelopment 2023");
 
         if (!ReflectionUtil.supports(12)) {
-            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12.x - 1.19.x!");
+            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12 - 1.19.4!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
