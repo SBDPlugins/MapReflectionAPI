@@ -8,16 +8,16 @@ First, include the API using Maven:
 
 ```xml
 <repository>
-    <id>sbdevelopment-releases</id>
-    <name>SBDevelopment Repository</name>
-    <url>https://repo.sbdevelopment.tech/releases</url>
+  <id>sbdevelopment-repo-releases</id>
+  <name>SBDevelopment Repository</name>
+  <url>https://repo.sbdevelopment.tech/releases</url>
 </repository>
 
 <dependency>
-    <groupId>tech.sbdevelopment</groupId>
-    <artifactId>MapReflectionAPI</artifactId>
-    <version>1.4.1</version>
-    <scope>provided</scope>
+  <groupId>tech.sbdevelopment</groupId>
+  <artifactId>MapReflectionAPI</artifactId>
+  <version>1.4.3</version>
+  <scope>provided</scope>
 </dependency>
 ```
 
