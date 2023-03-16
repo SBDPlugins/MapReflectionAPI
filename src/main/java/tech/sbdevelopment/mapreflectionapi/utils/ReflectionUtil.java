@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -187,6 +187,9 @@ public class ReflectionUtil {
 
     /**
      * Checks whether the server version is equal or greater than the given version.
+     * <p>
+     * PAY ATTENTION! The minor version is based on the NMS version.
+     * This means that v1_19_R3 has major version 19 and minor version 3.
      *
      * @param major the major version to compare the server version with.
      * @param minor the minor version to compare the server version with.
