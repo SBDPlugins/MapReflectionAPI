@@ -168,7 +168,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
             String inventoryMenuName;
             if (ReflectionUtil.supports(19)) { //1.19
-                inventoryMenuName = ReflectionUtil.VER_MINOR == 4 ? "bO" : "bT"; //1.19.4 = bO, >= 1.19.3 = bT
+                inventoryMenuName = ReflectionUtil.VER_MINOR == 3 ? "bO" : "bT"; //1.19.4 = bO, >= 1.19.3 = bT
             } else if (ReflectionUtil.supports(18)) { //1.18
                 inventoryMenuName = ReflectionUtil.VER_MINOR == 1 ? "bV" : "bU"; //1.18.1 = ap, 1.18(.2) = ao
             } else if (ReflectionUtil.supports(17)) { //1.17, same as 1.18(.2)
@@ -323,7 +323,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
             String dataWatcherObjectName;
             if (ReflectionUtil.supports(19)) { //1.19
-                dataWatcherObjectName = ReflectionUtil.VER_MINOR == 4 ? "g" : "ao"; //1.19.4 = g, >= 1.19.3 = ao
+                dataWatcherObjectName = ReflectionUtil.VER_MINOR == 3 ? "g" : "ao"; //1.19.4 = g, >= 1.19.3 = ao
             } else if (ReflectionUtil.supports(18)) { //1.18
                 dataWatcherObjectName = ReflectionUtil.VER_MINOR == 1 ? "ap" : "ao"; //1.18.1 = ap, 1.18(.2) = ao
             } else if (ReflectionUtil.supports(17)) { //1.17

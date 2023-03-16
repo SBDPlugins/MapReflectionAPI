@@ -115,7 +115,7 @@ public class PacketListener implements Listener {
                 } else if (packet.getClass().isAssignableFrom(packetPlayInSetCreativeSlotClass)) {
                     Object packetPlayInSetCreativeSlot = packetPlayInSetCreativeSlotClass.cast(packet);
 
-                    int slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, ReflectionUtil.supports(13) ? "b" : "a"); //1.13 = b, 1.12 = a
+                    int slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, ReflectionUtil.supports(19, 3) ? "a" : ReflectionUtil.supports(13) ? "b" : "a"); //1.19.4 = a, 1.19.3 - 1.13 = b, 1.12 = a
                     Object nmsStack = ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, ReflectionUtil.supports(18) ? "c" : "getItemStack"); //1.18 = c, 1.17 = getItemStack
                     ItemStack craftStack = (ItemStack) ReflectionUtil.callMethod(craftStackClass, "asBukkitCopy", nmsStack);
 
@@ -143,8 +143,8 @@ public class PacketListener implements Listener {
     private Channel getChannel(Player player) {
         Object playerHandle = getHandle(player);
         Object playerConnection = getDeclaredField(playerHandle, ReflectionUtil.supports(17) ? "b" : "playerConnection"); //1.17 = b, 1.16 = playerConnection
-        Object networkManager = getDeclaredField(playerConnection, ReflectionUtil.supports(19) ? "b" : ReflectionUtil.supports(17) ? "a" : "networkManager"); //1.19 = b, 1.18 = a, 1.16 = networkManager
-        return (Channel) getDeclaredField(networkManager, ReflectionUtil.supports(19, 4) ? "h" : ReflectionUtil.supports(18) ? "m" : ReflectionUtil.supports(17) ? "k" : "channel"); //1.19.4 = h, >= 1.19.3 & 1.18 = m, 1.17 = k, 1.16 = channel
+        Object networkManager = getDeclaredField(playerConnection, ReflectionUtil.supports(19, 3) ? "h" : ReflectionUtil.supports(19) ? "b" : ReflectionUtil.supports(17) ? "a" : "networkManager"); //1.19.4 = h, >= 1.19.3 = b, 1.18 = a, 1.16 = networkManager
+        return (Channel) getDeclaredField(networkManager, ReflectionUtil.supports(18) ? "m" : ReflectionUtil.supports(17) ? "k" : "channel"); //1.19 & 1.18 = m, 1.17 = k, 1.16 = channel
     }
 
     private Vector vec3DToVector(Object vec3d) {
