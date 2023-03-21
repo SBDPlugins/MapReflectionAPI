@@ -50,9 +50,18 @@ controller.showInHand(p, true);
 It's also possible to split one image onto multiple itemframes. For example using the following code.
 
 ```java
+BufferedImage leftTopFrame = ...;
+BufferedImage leftBottomFrame = ...;
+BufferedImage rightTopFrame = ...;
+BufferedImage rightBottomFrame = ...;
+BufferedImage[][] images = {
+    {leftBottomFrame, leftTopFrame},
+    {rightBottomFrame, rightTopFrame}
+};
+
 //--- Wrap image ---
-MapWrapper wrapper = MapReflectionAPI.getMapManager().wrapImage(ImageIO.read(new File("image.png")));
-MapController controller = wrapper.getController();
+MultiMapWrapper wrapper = MapReflectionAPI.getMapManager().wrapMultiImage(images);
+MultiMapController controller = wrapper.getController();
 
 final Player p = Bukkit.getPlayer("SBDeveloper");
 
