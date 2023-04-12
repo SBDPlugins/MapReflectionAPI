@@ -1,6 +1,6 @@
 # MapReflectionAPI
 
-This API helps developer with viewing images on maps. It supports Spigot 1.12 - 1.19.
+This plugin helps developer with viewing images on maps. It supports Spigot 1.12 - 1.19.
 
 ## Usage:
 
