@@ -145,7 +145,7 @@ public class ReflectionUtil {
 
         try {
             connection = lookup.findGetter(entityPlayer,
-                    v(17, "b").orElse("playerConnection"), playerConnection);
+                    supports(20) ? "c" : supports(17) ? "b" : "playerConnection", playerConnection);
             getHandle = lookup.findVirtual(craftPlayer, "getHandle", MethodType.methodType(entityPlayer));
             getHandleWorld = lookup.findVirtual(craftWorld, "getHandle", MethodType.methodType(worldServer));
             sendPacket = lookup.findVirtual(playerConnection,

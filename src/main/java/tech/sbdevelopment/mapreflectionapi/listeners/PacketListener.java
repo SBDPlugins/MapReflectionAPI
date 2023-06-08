@@ -142,7 +142,7 @@ public class PacketListener implements Listener {
 
     private Channel getChannel(Player player) {
         Object playerHandle = getHandle(player);
-        Object playerConnection = getDeclaredField(playerHandle, ReflectionUtil.supports(17) ? "b" : "playerConnection"); //1.17 = b, 1.16 = playerConnection
+        Object playerConnection = getDeclaredField(playerHandle, ReflectionUtil.supports(20) ? "c" : ReflectionUtil.supports(17) ? "b" : "playerConnection"); //1.20 = c, 1.17-1.19 = b, 1.16 = playerConnection
         Object networkManager = getDeclaredField(playerConnection, ReflectionUtil.supports(19, 3) ? "h" : ReflectionUtil.supports(19) ? "b" : ReflectionUtil.supports(17) ? "a" : "networkManager"); //1.19.4 = h, >= 1.19.3 = b, 1.18 = a, 1.16 = networkManager
         return (Channel) getDeclaredField(networkManager, ReflectionUtil.supports(18) ? "m" : ReflectionUtil.supports(17) ? "k" : "channel"); //1.19 & 1.18 = m, 1.17 = k, 1.16 = channel
     }
