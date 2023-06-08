@@ -162,7 +162,9 @@ public class MapWrapper extends AbstractMapWrapper {
             }
 
             String inventoryMenuName;
-            if (ReflectionUtil.supports(19)) { //1.19
+            if (ReflectionUtil.supports(20)) { //1.20
+                inventoryMenuName = "bQ";
+            } else if (ReflectionUtil.supports(19)) { //1.19
                 inventoryMenuName = ReflectionUtil.VER_MINOR == 3 ? "bO" : "bT"; //1.19.4 = bO, >= 1.19.3 = bT
             } else if (ReflectionUtil.supports(18)) { //1.18
                 inventoryMenuName = ReflectionUtil.VER_MINOR == 1 ? "bV" : "bU"; //1.18.1 = ap, 1.18(.2) = ao
