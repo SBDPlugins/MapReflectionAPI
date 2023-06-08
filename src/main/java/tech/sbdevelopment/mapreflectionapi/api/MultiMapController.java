@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ public interface MultiMapController extends IMapController {
      * @param entityIdMatrix 2D-Array of entity-IDs of the {@link ItemFrame}s (<code>int[width][height]</code>)
      * @see MapController#showInFrame(Player, int)
      */
-    void showInFrames(Player player, int[][] entityIdMatrix);
+    void showInFrames(Player player, Integer[][] entityIdMatrix);
 
     /**
      * Show this {@link MultiMapController} in {@link ItemFrame}s
@@ -99,7 +99,7 @@ public interface MultiMapController extends IMapController {
      * @param callable       {@link DebugCallable} which will be called to display debug information, or <code>null</code>
      * @see MapController#showInFrame(Player, int, String)
      */
-    void showInFrames(Player player, int[][] entityIdMatrix, DebugCallable callable);
+    void showInFrames(Player player, Integer[][] entityIdMatrix, DebugCallable callable);
 
     /**
      * Show this {@link MultiMapController} in {@link ItemFrame}s
@@ -126,7 +126,7 @@ public interface MultiMapController extends IMapController {
      * @param player         {@link Player} that will be able to see the cleared frames
      * @param entityIdMatrix 2D-Array of entity-IDs of the {@link ItemFrame}s (<code>int[width][height]</code>)
      */
-    void clearFrames(Player player, int[][] entityIdMatrix);
+    void clearFrames(Player player, Integer[][] entityIdMatrix);
 
     /**
      * Clear the frames

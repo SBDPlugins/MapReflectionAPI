@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@ import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import static tech.sbdevelopment.mapreflectionapi.utils.MainUtil.validateArrayDimensions;
 
 /**
  * A {@link MultiMapWrapper} wraps one image split in pieces.
@@ -147,7 +149,9 @@ public class MultiMapWrapper extends AbstractMapWrapper {
         }
 
         @Override
-        public void showInFrames(Player player, int[][] entityIdMatrix) {
+        public void showInFrames(Player player, Integer[][] entityIdMatrix) {
+            validateArrayDimensions(wrapperMatrix, entityIdMatrix);
+
             for (int x = 0; x < entityIdMatrix.length; x++) {
                 for (int y = 0; y < entityIdMatrix[x].length; y++) {
                     wrapperMatrix[y][x].getController().showInFrame(player, entityIdMatrix[x][wrapperMatrix.length - 1 - y]);
@@ -156,7 +160,9 @@ public class MultiMapWrapper extends AbstractMapWrapper {
         }
 
         @Override
-        public void showInFrames(Player player, int[][] entityIdMatrix, DebugCallable callable) {
+        public void showInFrames(Player player, Integer[][] entityIdMatrix, DebugCallable callable) {
+            validateArrayDimensions(wrapperMatrix, entityIdMatrix);
+
             for (int x = 0; x < entityIdMatrix.length; x++) {
                 for (int y = 0; y < entityIdMatrix[x].length; y++) {
                     wrapperMatrix[y][x].getController().showInFrame(player, entityIdMatrix[x][wrapperMatrix.length - 1 - y], callable.call(wrapperMatrix[y][x].getController(), x, y));
@@ -166,6 +172,8 @@ public class MultiMapWrapper extends AbstractMapWrapper {
 
         @Override
         public void showInFrames(Player player, ItemFrame[][] itemFrameMatrix, boolean force) {
+            validateArrayDimensions(wrapperMatrix, itemFrameMatrix);
+
             for (int x = 0; x < itemFrameMatrix.length; x++) {
                 for (int y = 0; y < itemFrameMatrix[x].length; y++) {
                     wrapperMatrix[y][x].getController().showInFrame(player, itemFrameMatrix[x][wrapperMatrix.length - 1 - y], force);
@@ -179,7 +187,9 @@ public class MultiMapWrapper extends AbstractMapWrapper {
         }
 
         @Override
-        public void clearFrames(Player player, int[][] entityIdMatrix) {
+        public void clearFrames(Player player, Integer[][] entityIdMatrix) {
+            validateArrayDimensions(wrapperMatrix, entityIdMatrix);
+
             for (int x = 0; x < entityIdMatrix.length; x++) {
                 for (int y = 0; y < entityIdMatrix[x].length; y++) {
                     wrapperMatrix[y][x].getController().clearFrame(player, entityIdMatrix[x][y]);
@@ -189,6 +199,8 @@ public class MultiMapWrapper extends AbstractMapWrapper {
 
         @Override
         public void clearFrames(Player player, ItemFrame[][] itemFrameMatrix) {
+            validateArrayDimensions(wrapperMatrix, itemFrameMatrix);
+
             for (int x = 0; x < itemFrameMatrix.length; x++) {
                 for (int y = 0; y < itemFrameMatrix[x].length; y++) {
                     wrapperMatrix[y][x].getController().clearFrame(player, itemFrameMatrix[x][y]);

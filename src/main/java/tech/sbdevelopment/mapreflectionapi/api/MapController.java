@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,12 +27,6 @@ import org.bukkit.entity.Player;
  * A {@link MapController} controls one {@link MapWrapper}.
  */
 public interface MapController extends IMapController {
-    /**
-     * @deprecated Please use {@link MapWrapper#getContent()}
-     */
-    @Deprecated(since = "1.3", forRemoval = true)
-    ArrayImage getContent();
-
     /**
      * Get the map ID for a player
      *

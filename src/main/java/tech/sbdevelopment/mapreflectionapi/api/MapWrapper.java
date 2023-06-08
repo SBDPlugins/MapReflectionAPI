@@ -126,11 +126,6 @@ public class MapWrapper extends AbstractMapWrapper {
         }
 
         @Override
-        public ArrayImage getContent() {
-            return MapWrapper.this.getContent();
-        }
-
-        @Override
         public void sendContent(Player player) {
             sendContent(player, false);
         }
