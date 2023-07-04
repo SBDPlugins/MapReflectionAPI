@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,8 @@ import lombok.Setter;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
+import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 
 /**
  * This event gets fired when the content of a {@link MapWrapper} is updated
