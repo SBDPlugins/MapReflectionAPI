@@ -24,18 +24,33 @@
 
     <groupId>tech.sbdevelopment</groupId>
     <artifactId>MapReflectionAPI</artifactId>
-    <version>1.4.4</version>
-    <packaging>jar</packaging>
-
+    <packaging>pom</packaging>
+    <version>${revision}</version>
+    
     <name>MapReflectionAPI</name>
     <description>This API helps developer with viewing images on maps.</description>
     <url>https://sbdplugins.nl</url>
 
     <properties>
+        <revision>1.4.4</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.lombok.delombok-target>${project.build.directory}/javadoc-delombok</maven.lombok.delombok-target>
+        <jdk.version>11</jdk.version>
     </properties>
 
+    <modules>
+        <module>API</module>
+        <module>Dist</module>
+        <module>NMS-v1_20_R1</module>
+        <module>NMS-v1_19_R3</module>
+        <module>NMS-v1_18_R2</module>
+        <module>NMS-v1_17_R1</module>
+        <module>NMS-v1_16_R3</module>
+        <module>NMS-v1_15_R1</module>
+        <module>NMS-v1_14_R1</module>
+        <module>NMS-v1_13_R2</module>
+        <module>NMS-v1_12_R1</module>
+    </modules>
+    
     <distributionManagement>
         <repository>
             <id>sbdevelopment-repo</id>
@@ -44,102 +59,46 @@
     </distributionManagement>
 
     <build>
+        <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <release>11</release>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.24</version>
-                        </path>
-                    </annotationProcessorPaths>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.3.0</version>
+                <artifactId>maven-toolchains-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <relocations>
-                                <relocation>
-                                    <pattern>com.bergerkiller.bukkit.common</pattern>
-                                    <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.bkcommonlib</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.bstats</pattern>
-                                    <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.bstats</shadedPattern>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok-maven-plugin</artifactId>
-                <version>1.18.20.0</version>
-                <configuration>
-                    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-                    <outputDirectory>${maven.lombok.delombok-target}</outputDirectory>
-                    <addOutputDirectory>false</addOutputDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>delombok</goal>
+                            <goal>toolchain</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <toolchains>
+                        <jdk>
+                            <version>${jdk.version}</version>
+                        </jdk>
+                    </toolchains>
+                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
-                    <release>11</release>
-                    <sourcepath>${maven.lombok.delombok-target}</sourcepath>
-                    <sourceFileExcludes>
-                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/io/*.java</sourceFileExclude>
-                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/map/*.java</sourceFileExclude>
-                        <sourceFileExclude>**/com/bergerkiller/bukkit/common/map/color/*.java</sourceFileExclude>
-                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/*.java</sourceFileExclude>
-                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/cmd/*.java</sourceFileExclude>
-                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/managers/*.java</sourceFileExclude>
-                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/utils/*.java</sourceFileExclude>
-                        <sourceFileExclude>**/tech/sbdevelopment/mapreflectionapi/listeners/*.java</sourceFileExclude>
-                    </sourceFileExcludes>
+                    <release>${jdk.version}</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <skip>true</skip>
                 </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>plugin.yml</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>plugin.yml</exclude>
-                </excludes>
-            </resource>
-        </resources>
     </build>
 
     <repositories>
@@ -147,49 +106,13 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        <repository>
-            <id>MG-Dev Jenkins CI Maven Repository</id>
-            <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
-        </repository>
-        <repository>
-            <id>dmulloy2-repo</id>
-            <url>https://repo.dmulloy2.net/repository/public/</url>
-        </repository>
     </repositories>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.19.4-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>3.0.0</version>
-            <scope>compile</scope>
-        </dependency>
-
-        <!-- Libraries below are provided by Spigot -->
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations-java5</artifactId>
-            <version>23.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-transport</artifactId>
-            <version>4.1.77.Final</version>
-            <scope>provided</scope>
+            <version>1.20.1-R0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 </project>
