@@ -18,9 +18,17 @@
 
 package tech.sbdevelopment.mapreflectionapi.api;
 
+/**
+ * A {@link MapWrapper} wraps one image.
+ */
 public abstract class MapWrapper extends AbstractMapWrapper {
     protected ArrayImage content;
 
+    /**
+     * Construct a new {@link MapWrapper}
+     *
+     * @param image The {@link ArrayImage} to wrap
+     */
     public MapWrapper(ArrayImage image) {
         this.content = image;
     }

@@ -29,6 +29,9 @@ import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The {@link MapSender_v1_18_R2} sends the Map packets to players.
+ */
 public class MapSender_v1_18_R2 {
     private static final List<QueuedMap> sendQueue = new ArrayList<>();
     private static int senderID = -1;
@@ -36,6 +39,13 @@ public class MapSender_v1_18_R2 {
     private MapSender_v1_18_R2() {
     }
 
+    /**
+     * Add a map to the send queue
+     *
+     * @param id      The ID of the map
+     * @param content The {@link ArrayImage} to view on the map
+     * @param player  The {@link Player} to view for
+     */
     public static void addToQueue(final int id, final ArrayImage content, final Player player) {
         QueuedMap toSend = new QueuedMap(id, content, player);
         if (sendQueue.contains(toSend)) return;
@@ -53,6 +63,9 @@ public class MapSender_v1_18_R2 {
         sendQueue.removeIf(queuedMap -> queuedMap.id == s);
     }
 
+    /**
+     * Run the sender task
+     */
     private static void runSender() {
         if (Bukkit.getScheduler().isQueued(senderID) || Bukkit.getScheduler().isCurrentlyRunning(senderID) || sendQueue.isEmpty())
             return;
@@ -71,6 +84,13 @@ public class MapSender_v1_18_R2 {
         }, 0, 2);
     }
 
+    /**
+     * Send a map to a player
+     *
+     * @param id0     The ID of the map
+     * @param content The {@link ArrayImage} to view on the map
+     * @param player  The {@link Player} to view for
+     */
     public static void sendMap(final int id0, final ArrayImage content, final Player player) {
         if (player == null || !player.isOnline()) {
             List<QueuedMap> toRemove = new ArrayList<>();
