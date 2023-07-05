@@ -302,7 +302,9 @@ public class MapWrapper extends AbstractMapWrapper {
 
             if (ReflectionUtil.supports(13)) {
                 String nbtObjectName;
-                if (ReflectionUtil.supports(19)) { //1.19
+                if (ReflectionUtil.supports(20)) { //1.20
+                    nbtObjectName = "w";
+                } else if (ReflectionUtil.supports(19)) { //1.19
                     nbtObjectName = "v";
                 } else if (ReflectionUtil.supports(18)) { //1.18
                     nbtObjectName = ReflectionUtil.VER_MINOR == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
