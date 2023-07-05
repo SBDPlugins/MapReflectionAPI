@@ -217,7 +217,7 @@ public class MapWrapper_v1_20_R1 extends MapWrapper {
 
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
-            nmsStack.v().a("map", mapId); //getOrCreateTag putInt
+            nmsStack.w().a("map", mapId); //getOrCreateTag putInt
 
             List<DataWatcher.b<?>> list = new ArrayList<>();
             DataWatcher.b<?> dataWatcherItem = DataWatcher.b.a(EntityItemFrame.g, nmsStack);

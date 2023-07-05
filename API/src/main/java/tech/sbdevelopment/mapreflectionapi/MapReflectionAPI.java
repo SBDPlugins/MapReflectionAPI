@@ -90,7 +90,6 @@ public class MapReflectionAPI extends JavaPlugin {
         getLogger().info("Loading the commands...");
         getCommand("mapmanager").setExecutor(new MapManagerCMD());
 
-        getLogger().info("Loading the packet listener...");
         try {
             packetListener = PacketListener.construct(this);
         } catch (IllegalStateException e) {
@@ -100,7 +99,6 @@ public class MapReflectionAPI extends JavaPlugin {
         }
         packetListener.init(this);
 
-        getLogger().info("Loading the map manager...");
         try {
             mapManager = new MapManager(this);
         } catch (IllegalStateException e) {
@@ -110,7 +108,8 @@ public class MapReflectionAPI extends JavaPlugin {
         }
 
         if (Configuration.getInstance().isAllowVanilla()) {
-            getLogger().info("Vanilla Maps are allowed. Discovering occupied Map IDs...");
+            getLogger().info("Vanilla Maps are allowed!");
+            getLogger().info("Discovering occupied Map IDs...");
             int occupiedIDs = 0;
             for (int s = 0; s < Short.MAX_VALUE; s++) {
                 try {
@@ -131,7 +130,7 @@ public class MapReflectionAPI extends JavaPlugin {
         getLogger().info("Registering the listeners...");
         Bukkit.getPluginManager().registerEvents(new MapListener(), this);
 
-        getLogger().info("Loading metrics...");
+        getLogger().info("Enabling metrics...");
         Metrics metrics = new Metrics(this, 16033);
         metrics.addCustomChart(new SingleLineChart("managed_maps", () -> mapManager.getManagedMapsCount()));
 

@@ -46,7 +46,7 @@ public class MapManager {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
-        MapReflectionAPI.getInstance().getLogger().info("Initializing the map manager for Minecraft version " + version + "...");
+        plugin.getLogger().info("Enabling MapManager for " + version + "...");
 
         try {
             final Class<?> clazz = Class.forName("tech.sbdevelopment.mapreflectionapi.nms.MapWrapper_" + version);

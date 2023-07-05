@@ -34,7 +34,7 @@ public abstract class PacketListener implements Listener {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
-        plugin.getLogger().info("Initializing the packet handler for Minecraft version " + version + "...");
+        plugin.getLogger().info("Enabling PacketListener for " + version + "...");
 
         try {
             final Class<?> clazz = Class.forName("tech.sbdevelopment.mapreflectionapi.nms.PacketListener_" + version);
