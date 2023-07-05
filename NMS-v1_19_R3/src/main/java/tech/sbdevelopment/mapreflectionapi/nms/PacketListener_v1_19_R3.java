@@ -49,8 +49,7 @@ public class PacketListener_v1_19_R3 extends PacketListener {
             //On send packet
             public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
                 if (packet instanceof PacketPlayOutMap packetPlayOutMap) {
-                    int id = (int) getDeclaredField(packetPlayOutMap, "a");
-
+                    int id = packetPlayOutMap.a(); //mapId
                     if (id < 0) {
                         //It's one of our maps, invert ID and let through!
                         int newId = -id;
