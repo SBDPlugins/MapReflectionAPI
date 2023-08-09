@@ -197,7 +197,7 @@ public class ReflectionUtil {
      * @since 4.0.0
      */
     public static boolean supports(int major, int minor) {
-        return VER >= major && VER_MINOR >= minor;
+        return (VER == major && VER_MINOR >= minor) || VER > major;
     }
 
     /**
