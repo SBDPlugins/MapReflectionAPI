@@ -86,7 +86,7 @@ public interface MultiMapController extends IMapController {
      * Show this {@link MultiMapController} in {@link ItemFrame}s
      *
      * @param player         {@link Player} that will be able to see the maps
-     * @param entityIdMatrix 2D-Array of entity-IDs of the {@link ItemFrame}s (<code>int[width][height]</code>)
+     * @param entityIdMatrix 2D-Array of entity-IDs of the {@link ItemFrame}s (<code>int[rows][columns]</code>)
      * @see MapController#showInFrame(Player, int)
      */
     void showInFrames(Player player, Integer[][] entityIdMatrix);
@@ -95,7 +95,7 @@ public interface MultiMapController extends IMapController {
      * Show this {@link MultiMapController} in {@link ItemFrame}s
      *
      * @param player         {@link Player} that will be able to see the maps
-     * @param entityIdMatrix 2D-Array of entity-IDs of the {@link ItemFrame}s (<code>int[width][height]</code>)
+     * @param entityIdMatrix 2D-Array of entity-IDs of the {@link ItemFrame}s (<code>int[rows][columns]</code>)
      * @param callable       {@link DebugCallable} which will be called to display debug information, or <code>null</code>
      * @see MapController#showInFrame(Player, int, String)
      */
@@ -105,7 +105,7 @@ public interface MultiMapController extends IMapController {
      * Show this {@link MultiMapController} in {@link ItemFrame}s
      *
      * @param player          {@link Player} that will be able to see the maps
-     * @param itemFrameMatrix 2D-Array of {@link ItemFrame}s (<code>ItemFrame[width][height]</code>)
+     * @param itemFrameMatrix 2D-Array of {@link ItemFrame}s (<code>ItemFrame[rows][columns]</code>)
      * @param force           if <code>false</code>, the map will not be shown if there is not Map-Item in the ItemFrames
      * @see MapController#showInFrame(Player, ItemFrame, boolean)
      */
@@ -115,7 +115,7 @@ public interface MultiMapController extends IMapController {
      * Show this {@link MultiMapController} in {@link ItemFrame}s
      *
      * @param player          {@link Player} that will be able to see the maps
-     * @param itemFrameMatrix 2D-Array of {@link ItemFrame}s (<code>ItemFrame[width][height]</code>)
+     * @param itemFrameMatrix 2D-Array of {@link ItemFrame}s (<code>ItemFrame[rows][columns]</code>)
      * @see MapController#showInFrame(Player, ItemFrame)
      */
     void showInFrames(Player player, ItemFrame[][] itemFrameMatrix);
@@ -124,7 +124,7 @@ public interface MultiMapController extends IMapController {
      * Clear the frames
      *
      * @param player         {@link Player} that will be able to see the cleared frames
-     * @param entityIdMatrix 2D-Array of entity-IDs of the {@link ItemFrame}s (<code>int[width][height]</code>)
+     * @param entityIdMatrix 2D-Array of entity-IDs of the {@link ItemFrame}s (<code>int[rows][columns]</code>)
      */
     void clearFrames(Player player, Integer[][] entityIdMatrix);
 
@@ -132,7 +132,7 @@ public interface MultiMapController extends IMapController {
      * Clear the frames
      *
      * @param player          {@link Player} that will be able to see the cleared frames
-     * @param itemFrameMatrix 2D-Array of {@link ItemFrame}s (<code>ItemFrame[width][height]</code>)
+     * @param itemFrameMatrix 2D-Array of {@link ItemFrame}s (<code>ItemFrame[rows][columns]</code>)
      */
     void clearFrames(Player player, ItemFrame[][] itemFrameMatrix);
 
@@ -144,11 +144,11 @@ public interface MultiMapController extends IMapController {
          * Called to get debug information for a frame
          *
          * @param controller the {@link MapController}
-         * @param x          X-Position of the current frame
-         * @param y          Y-Position of the current frame
+         * @param row          Row of the current frame
+         * @param column          Column of the current frame
          * @return {@link String} to show when a player looks at the map, or <code>null</code>
          * @see MapController#showInFrame(Player, int, String)
          */
-        String call(MapController controller, int x, int y);
+        String call(MapController controller, int row, int column);
     }
 }

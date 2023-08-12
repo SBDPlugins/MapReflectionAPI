@@ -33,6 +33,7 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.Ref;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -321,8 +322,10 @@ public class MapWrapper extends AbstractMapWrapper {
             Object nmsStack = createCraftItemStack(stack, mapId);
 
             String dataWatcherObjectName;
-            if (ReflectionUtil.supports(19)) { //1.19
-                dataWatcherObjectName = ReflectionUtil.VER_MINOR == 3 ? "g" : "ao"; //1.19.4 = g, >= 1.19.3 = ao
+            if (ReflectionUtil.supports(19, 3)) { //1.19.3 and 1.20(.1)
+                dataWatcherObjectName = "g";
+            } else if (ReflectionUtil.supports(19)) { //1.19-1.19.2
+                dataWatcherObjectName = "ao";
             } else if (ReflectionUtil.supports(18)) { //1.18
                 dataWatcherObjectName = ReflectionUtil.VER_MINOR == 1 ? "ap" : "ao"; //1.18.1 = ap, 1.18(.2) = ao
             } else if (ReflectionUtil.supports(17)) { //1.17

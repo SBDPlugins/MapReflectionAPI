@@ -35,10 +35,4 @@ public class MainUtil {
             return true;
         }
     }
-
-    public static <A, B> void validateArrayDimensions(A[][] arrayOne, B[][] arrayTwo) {
-        if (arrayOne.length != arrayTwo.length || arrayOne[0].length != arrayTwo[0].length) {
-            throw new IllegalArgumentException("The dimensions of two provided arrays (" + arrayOne.getClass().getName() + ", " + arrayTwo.getClass().getName() + ") do not match!");
-        }
-    }
 }

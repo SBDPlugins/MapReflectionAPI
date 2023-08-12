@@ -25,13 +25,10 @@ import org.jetbrains.annotations.NotNull;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import static tech.sbdevelopment.mapreflectionapi.utils.MainUtil.validateArrayDimensions;
 
 /**
  * A {@link MultiMapWrapper} wraps one image split in pieces.
@@ -39,38 +36,68 @@ import static tech.sbdevelopment.mapreflectionapi.utils.MainUtil.validateArrayDi
 public class MultiMapWrapper extends AbstractMapWrapper {
     private final MapWrapper[][] wrapperMatrix;
 
+    /**
+     * Creates a new {@link MultiMapWrapper} from the given image.
+     * The image will be split into the given amount of rows and columns.
+     *
+     * @param image   The image to wrap
+     * @param rows    The amount of rows
+     * @param columns The amount of columns
+     */
     public MultiMapWrapper(BufferedImage image, int rows, int columns) {
-        this(splitImage(image, columns, rows));
+        this(splitImage(image, rows, columns));
     }
 
+    /**
+     * Creates a new {@link MultiMapWrapper} from the given image.
+     * The image will be split into the given amount of rows and columns.
+     *
+     * @param image   The image to wrap
+     * @param rows    The amount of rows
+     * @param columns The amount of columns
+     */
     public MultiMapWrapper(ArrayImage image, int rows, int columns) {
-        this(splitImage(image.toBuffered(), columns, rows));
+        this(splitImage(image.toBuffered(), rows, columns));
     }
 
+    /**
+     * Creates a new {@link MultiMapWrapper} from the given image.
+     *
+     * @param imageMatrix The image matrix to wrap
+     * @deprecated Use {@link #MultiMapWrapper(ArrayImage, int, int)} instead, this method is meant for internal use only.
+     */
+    @Deprecated(since = "1.6", forRemoval = true)
     public MultiMapWrapper(ArrayImage[][] imageMatrix) {
         wrapperMatrix = new MapWrapper[imageMatrix.length][imageMatrix[0].length];
 
-        for (int x = 0; x < imageMatrix.length; x++) {
-            if (imageMatrix[x].length != imageMatrix[0].length) {
+        for (int row = 0; row < imageMatrix.length; row++) {
+            if (imageMatrix[row].length != imageMatrix[0].length) {
                 throw new IllegalArgumentException("An image in a MultiMapWrapper is not rectangular!");
             }
 
-            for (int y = 0; y < imageMatrix[x].length; y++) {
-                wrapperMatrix[x][y] = MapReflectionAPI.getMapManager().wrapImage(imageMatrix[x][y]);
+            for (int column = 0; column < imageMatrix[row].length; column++) {
+                wrapperMatrix[row][column] = MapReflectionAPI.getMapManager().wrapImage(imageMatrix[row][column]);
             }
         }
     }
 
+    /**
+     * Creates a new {@link MultiMapWrapper} from the given image.
+     *
+     * @param imageMatrix The image matrix to wrap
+     * @deprecated Use {@link #MultiMapWrapper(BufferedImage, int, int)} instead, this method is meant for internal use only.
+     */
+    @Deprecated(since = "1.6", forRemoval = true)
     public MultiMapWrapper(BufferedImage[][] imageMatrix) {
         wrapperMatrix = new MapWrapper[imageMatrix.length][imageMatrix[0].length];
 
-        for (int x = 0; x < imageMatrix.length; x++) {
-            if (imageMatrix[x].length != imageMatrix[0].length) {
+        for (int row = 0; row < imageMatrix.length; row++) {
+            if (imageMatrix[row].length != imageMatrix[0].length) {
                 throw new IllegalArgumentException("An image in a MultiMapWrapper is not rectangular!");
             }
 
-            for (int y = 0; y < imageMatrix[x].length; y++) {
-                wrapperMatrix[x][y] = MapReflectionAPI.getMapManager().wrapImage(imageMatrix[x][y]);
+            for (int column = 0; column < imageMatrix[row].length; column++) {
+                wrapperMatrix[row][column] = MapReflectionAPI.getMapManager().wrapImage(imageMatrix[row][column]);
             }
         }
     }
@@ -117,10 +144,10 @@ public class MultiMapWrapper extends AbstractMapWrapper {
 
         @Override
         public void update(@NotNull ArrayImage content) {
-            ArrayImage[][] split = splitImage(content.toBuffered(), wrapperMatrix[0].length, wrapperMatrix.length);
-            for (int x = 0; x < wrapperMatrix.length; x++) {
-                for (int y = 0; y < wrapperMatrix[x].length; y++) {
-                    wrapperMatrix[x][y].getController().update(split[x][y]);
+            ArrayImage[][] split = splitImage(content.toBuffered(), wrapperMatrix.length, wrapperMatrix[0].length);
+            for (int row = 0; row < wrapperMatrix.length; row++) {
+                for (int column = 0; column < wrapperMatrix[row].length; column++) {
+                    wrapperMatrix[row][column].getController().update(split[row][column]);
                 }
             }
         }
@@ -150,33 +177,27 @@ public class MultiMapWrapper extends AbstractMapWrapper {
 
         @Override
         public void showInFrames(Player player, Integer[][] entityIdMatrix) {
-            validateArrayDimensions(wrapperMatrix, entityIdMatrix);
-
-            for (int x = 0; x < entityIdMatrix.length; x++) {
-                for (int y = 0; y < entityIdMatrix[x].length; y++) {
-                    wrapperMatrix[y][x].getController().showInFrame(player, entityIdMatrix[x][wrapperMatrix.length - 1 - y]);
+            for (int row = 0; row < entityIdMatrix.length; row++) {
+                for (int column = 0; column < entityIdMatrix[row].length; column++) {
+                    wrapperMatrix[row][column].getController().showInFrame(player, entityIdMatrix[row][column]);
                 }
             }
         }
 
         @Override
         public void showInFrames(Player player, Integer[][] entityIdMatrix, DebugCallable callable) {
-            validateArrayDimensions(wrapperMatrix, entityIdMatrix);
-
-            for (int x = 0; x < entityIdMatrix.length; x++) {
-                for (int y = 0; y < entityIdMatrix[x].length; y++) {
-                    wrapperMatrix[y][x].getController().showInFrame(player, entityIdMatrix[x][wrapperMatrix.length - 1 - y], callable.call(wrapperMatrix[y][x].getController(), x, y));
+            for (int row = 0; row < entityIdMatrix.length; row++) {
+                for (int column = 0; column < entityIdMatrix[row].length; column++) {
+                    wrapperMatrix[row][column].getController().showInFrame(player, entityIdMatrix[row][column], callable.call(wrapperMatrix[row][column].getController(), row, column));
                 }
             }
         }
 
         @Override
         public void showInFrames(Player player, ItemFrame[][] itemFrameMatrix, boolean force) {
-            validateArrayDimensions(wrapperMatrix, itemFrameMatrix);
-
-            for (int x = 0; x < itemFrameMatrix.length; x++) {
-                for (int y = 0; y < itemFrameMatrix[x].length; y++) {
-                    wrapperMatrix[y][x].getController().showInFrame(player, itemFrameMatrix[x][wrapperMatrix.length - 1 - y], force);
+            for (int row = 0; row < itemFrameMatrix.length; row++) {
+                for (int column = 0; column < itemFrameMatrix[row].length; column++) {
+                    wrapperMatrix[row][column].getController().showInFrame(player, itemFrameMatrix[row][column], force);
                 }
             }
         }
@@ -188,47 +209,47 @@ public class MultiMapWrapper extends AbstractMapWrapper {
 
         @Override
         public void clearFrames(Player player, Integer[][] entityIdMatrix) {
-            validateArrayDimensions(wrapperMatrix, entityIdMatrix);
-
-            for (int x = 0; x < entityIdMatrix.length; x++) {
-                for (int y = 0; y < entityIdMatrix[x].length; y++) {
-                    wrapperMatrix[y][x].getController().clearFrame(player, entityIdMatrix[x][y]);
+            for (int row = 0; row < entityIdMatrix.length; row++) {
+                for (int column = 0; column < entityIdMatrix[row].length; column++) {
+                    wrapperMatrix[row][column].getController().clearFrame(player, entityIdMatrix[row][column]);
                 }
             }
         }
 
         @Override
         public void clearFrames(Player player, ItemFrame[][] itemFrameMatrix) {
-            validateArrayDimensions(wrapperMatrix, itemFrameMatrix);
-
-            for (int x = 0; x < itemFrameMatrix.length; x++) {
-                for (int y = 0; y < itemFrameMatrix[x].length; y++) {
-                    wrapperMatrix[y][x].getController().clearFrame(player, itemFrameMatrix[x][y]);
+            for (int row = 0; row < itemFrameMatrix.length; row++) {
+                for (int column = 0; column < itemFrameMatrix[row].length; column++) {
+                    wrapperMatrix[row][column].getController().clearFrame(player, itemFrameMatrix[row][column]);
                 }
             }
         }
     };
 
-    /*
-     * Modified Method from http://kalanir.blogspot.de/2010/02/how-to-split-image-into-chunks-java.html
+    /**
+     * Splits a BufferedImage into a matrix of ArrayImages.
+     *
+     * @param image   The image to split
+     * @param rows    The number of rows
+     * @param columns The number of columns
+     * @return The matrix of ArrayImages
      */
-    private static ArrayImage[][] splitImage(final BufferedImage image, final int columns, final int rows) {
+    private static ArrayImage[][] splitImage(final BufferedImage image, final int rows, final int columns) {
         int chunkWidth = image.getWidth() / columns;
         int chunkHeight = image.getHeight() / rows;
 
         ArrayImage[][] images = new ArrayImage[rows][columns];
-        for (int x = 0; x < rows; x++) {
-            for (int y = 0; y < columns; y++) {
-                BufferedImage raw = new BufferedImage(chunkWidth, chunkHeight, image.getType());
 
-                Graphics2D gr = raw.createGraphics();
-                gr.drawImage(image, 0, 0, chunkWidth, chunkHeight, chunkWidth * y, chunkHeight * x, chunkWidth * y + chunkWidth, chunkHeight * x + chunkHeight, null);
-                gr.dispose();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                int x = j * chunkWidth;
+                int y = i * chunkHeight;
 
-                images[x][y] = new ArrayImage(raw);
-                raw.flush();
+                BufferedImage raw = image.getSubimage(x, y, chunkWidth, chunkHeight);
+                images[i][j] = new ArrayImage(raw);
             }
         }
+
         return images;
     }
 
