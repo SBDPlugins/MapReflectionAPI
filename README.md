@@ -50,13 +50,13 @@ controller.showInHand(p, true);
 It's also possible to split one image onto multiple itemframes. For example using the following code.
 
 ```java
-BufferedImage leftTopFrame = ...;
-BufferedImage leftBottomFrame = ...;
-BufferedImage rightTopFrame = ...;
-BufferedImage rightBottomFrame = ...;
+BufferedImage leftTopImg = ...;
+BufferedImage leftBottomImg = ...;
+BufferedImage rightTopImg = ...;
+BufferedImage rightBottomImg = ...;
 BufferedImage[][] images = {
-    {leftBottomFrame, leftTopFrame},
-    {rightBottomFrame, rightTopFrame}
+    {leftBottomImg, leftTopImg},
+    {rightBottomImg, rightTopImg}
 };
 
 //--- Wrap image ---
