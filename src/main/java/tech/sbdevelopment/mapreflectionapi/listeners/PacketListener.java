@@ -39,6 +39,7 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import java.util.concurrent.TimeUnit;
 
 import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil.*;
+import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
 
 public class PacketListener implements Listener {
     private static final Class<?> packetPlayOutMapClass = getNMSClass("network.protocol.game", "PacketPlayOutMap");
@@ -92,15 +93,15 @@ public class PacketListener implements Listener {
                     Enum<?> actionEnum;
                     Enum<?> hand;
                     Object pos;
-                    if (ReflectionUtil.supports(17)) {
+                    if (supports(17)) {
                         Object action = getDeclaredField(packetPlayInEntity, "b");
                         actionEnum = (Enum<?>) callDeclaredMethod(action, "a"); //action type
                         hand = hasField(action, "a") ? (Enum<?>) getDeclaredField(action, "a") : null;
                         pos = hasField(action, "b") ? getDeclaredField(action, "b") : null;
                     } else {
-                        actionEnum = (Enum<?>) callDeclaredMethod(packetPlayInEntity, ReflectionUtil.supports(13) ? "b" : "a"); //1.13 = b, 1.12 = a
-                        hand = (Enum<?>) callDeclaredMethod(packetPlayInEntity, ReflectionUtil.supports(13) ? "c" : "b"); //1.13 = c, 1.12 = b
-                        pos = callDeclaredMethod(packetPlayInEntity, ReflectionUtil.supports(13) ? "d" : "c"); //1.13 = d, 1.12 = c
+                        actionEnum = (Enum<?>) callDeclaredMethod(packetPlayInEntity, supports(13) ? "b" : "a"); //1.13 = b, 1.12 = a
+                        hand = (Enum<?>) callDeclaredMethod(packetPlayInEntity, supports(13) ? "c" : "b"); //1.13 = c, 1.12 = b
+                        pos = callDeclaredMethod(packetPlayInEntity, supports(13) ? "d" : "c"); //1.13 = d, 1.12 = c
                     }
 
                     if (Bukkit.getScheduler().callSyncMethod(MapReflectionAPI.getInstance(), () -> {
@@ -115,8 +116,8 @@ public class PacketListener implements Listener {
                 } else if (packet.getClass().isAssignableFrom(packetPlayInSetCreativeSlotClass)) {
                     Object packetPlayInSetCreativeSlot = packetPlayInSetCreativeSlotClass.cast(packet);
 
-                    int slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, ReflectionUtil.supports(19, 3) ? "a" : ReflectionUtil.supports(13) ? "b" : "a"); //1.19.4 = a, 1.19.3 - 1.13 = b, 1.12 = a
-                    Object nmsStack = ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, ReflectionUtil.supports(18) ? "c" : "getItemStack"); //1.18 = c, 1.17 = getItemStack
+                    int slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(19, 3) ? "a" : supports(13) ? "b" : "a"); //1.19.4 = a, 1.19.3 - 1.13 = b, 1.12 = a
+                    Object nmsStack = ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(18) ? "c" : "getItemStack"); //1.18 = c, 1.17 = getItemStack
                     ItemStack craftStack = (ItemStack) ReflectionUtil.callMethod(craftStackClass, "asBukkitCopy", nmsStack);
 
                     boolean async = !MapReflectionAPI.getInstance().getServer().isPrimaryThread();
@@ -142,18 +143,18 @@ public class PacketListener implements Listener {
 
     private Channel getChannel(Player player) {
         Object playerHandle = getHandle(player);
-        Object playerConnection = getDeclaredField(playerHandle, ReflectionUtil.supports(20) ? "c" : ReflectionUtil.supports(17) ? "b" : "playerConnection"); //1.20 = c, 1.17-1.19 = b, 1.16 = playerConnection
-        Object networkManager = getDeclaredField(playerConnection, ReflectionUtil.supports(19, 3) ? "h" : ReflectionUtil.supports(19) ? "b" : ReflectionUtil.supports(17) ? "a" : "networkManager"); //1.20 & 1.19.4 = h, >= 1.19.3 = b, 1.18 = a, 1.16 = networkManager
-        return (Channel) getDeclaredField(networkManager, ReflectionUtil.supports(18) ? "m" : ReflectionUtil.supports(17) ? "k" : "channel"); //1.19 & 1.18 = m, 1.17 = k, 1.16 = channel
+        Object playerConnection = getDeclaredField(playerHandle, supports(20) ? "c" : supports(17) ? "b" : "playerConnection"); //1.20 = c, 1.17-1.19 = b, 1.16 = playerConnection
+        Object networkManager = getDeclaredField(playerConnection, supports(19, 3) ? "h" : supports(19) ? "b" : supports(17) ? "a" : "networkManager"); //1.20 & 1.19.4 = h, >= 1.19.3 = b, 1.18 = a, 1.16 = networkManager
+        return (Channel) getDeclaredField(networkManager, supports(18) ? "m" : supports(17) ? "k" : "channel"); //1.19 & 1.18 = m, 1.17 = k, 1.16 = channel
     }
 
     private Vector vec3DToVector(Object vec3d) {
         if (!(vec3d.getClass().isAssignableFrom(vec3DClass))) return new Vector(0, 0, 0);
 
         Object vec3dNMS = vec3DClass.cast(vec3d);
-        double x = (double) ReflectionUtil.getDeclaredField(vec3dNMS, ReflectionUtil.supports(19) ? "c" : ReflectionUtil.supports(17) ? "b" : "x"); //1.19 = c, 1.18 = b, 1.16 = x
-        double y = (double) ReflectionUtil.getDeclaredField(vec3dNMS, ReflectionUtil.supports(19) ? "d" : ReflectionUtil.supports(17) ? "c" : "y"); //1.19 = d, 1.18 = c, 1.16 = y
-        double z = (double) ReflectionUtil.getDeclaredField(vec3dNMS, ReflectionUtil.supports(19) ? "e" : ReflectionUtil.supports(17) ? "d" : "z"); //1.19 = e, 1.18 = d, 1.16 = z
+        double x = (double) getDeclaredField(vec3dNMS, supports(19) ? "c" : supports(17) ? "b" : "x"); //1.19 = c, 1.18 = b, 1.16 = x
+        double y = (double) getDeclaredField(vec3dNMS, supports(19) ? "d" : supports(17) ? "c" : "y"); //1.19 = d, 1.18 = c, 1.16 = y
+        double z = (double) getDeclaredField(vec3dNMS, supports(19) ? "e" : supports(17) ? "d" : "z"); //1.19 = e, 1.18 = d, 1.16 = z
 
         return new Vector(x, y, z);
     }

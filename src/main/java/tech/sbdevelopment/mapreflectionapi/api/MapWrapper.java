@@ -38,6 +38,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
+
 /**
  * A {@link MapWrapper} wraps one image.
  */
@@ -48,7 +50,7 @@ public class MapWrapper extends AbstractMapWrapper {
     private static final Material MAP_MATERIAL;
 
     static {
-        MAP_MATERIAL = ReflectionUtil.supports(13) ? Material.FILLED_MAP : Material.MAP;
+        MAP_MATERIAL = supports(13) ? Material.FILLED_MAP : Material.MAP;
     }
 
     /**
@@ -60,13 +62,13 @@ public class MapWrapper extends AbstractMapWrapper {
         this.content = image;
     }
 
-    private static final Class<?> craftStackClass = ReflectionUtil.getCraftClass("inventory.CraftItemStack");
-    private static final Class<?> setSlotPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
-    private static final Class<?> entityClass = ReflectionUtil.getNMSClass("world.entity", "Entity");
-    private static final Class<?> dataWatcherClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher");
-    private static final Class<?> entityMetadataPacketClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
-    private static final Class<?> entityItemFrameClass = ReflectionUtil.getNMSClass("world.entity.decoration", "EntityItemFrame");
-    private static final Class<?> dataWatcherItemClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher$Item");
+    private static final Class<?> craftStackClass = getCraftClass("inventory.CraftItemStack");
+    private static final Class<?> setSlotPacketClass = getNMSClass("network.protocol.game", "PacketPlayOutSetSlot");
+    private static final Class<?> entityClass = getNMSClass("world.entity", "Entity");
+    private static final Class<?> dataWatcherClass = getNMSClass("network.syncher", "DataWatcher");
+    private static final Class<?> entityMetadataPacketClass = getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
+    private static final Class<?> entityItemFrameClass = getNMSClass("world.entity.decoration", "EntityItemFrame");
+    private static final Class<?> dataWatcherItemClass = getNMSClass("network.syncher", "DataWatcher$Item");
 
     protected MapController controller = new MapController() {
         private final Map<UUID, Integer> viewers = new HashMap<>();
@@ -163,21 +165,21 @@ public class MapWrapper extends AbstractMapWrapper {
             }
 
             String inventoryMenuName;
-            if (ReflectionUtil.supports(20)) { //1.20
+            if (supports(20)) { //1.20
                 inventoryMenuName = "bQ";
-            } else if (ReflectionUtil.supports(19)) { //1.19
-                inventoryMenuName = ReflectionUtil.VER_MINOR == 3 ? "bO" : "bT"; //1.19.4 = bO, >= 1.19.3 = bT
-            } else if (ReflectionUtil.supports(18)) { //1.18
-                inventoryMenuName = ReflectionUtil.VER_MINOR == 1 ? "bV" : "bU"; //1.18.1 = ap, 1.18(.2) = ao
-            } else if (ReflectionUtil.supports(17)) { //1.17, same as 1.18(.2)
+            } else if (supports(19)) { //1.19
+                inventoryMenuName = PATCH_NUMBER == 3 ? "bO" : "bT"; //1.19.4 = bO, >= 1.19.3 = bT
+            } else if (supports(18)) { //1.18
+                inventoryMenuName = PATCH_NUMBER == 1 ? "bV" : "bU"; //1.18.1 = ap, 1.18(.2) = ao
+            } else if (supports(17)) { //1.17, same as 1.18(.2)
                 inventoryMenuName = "bU";
             } else { //1.12-1.16
                 inventoryMenuName = "defaultContainer";
             }
-            Object inventoryMenu = ReflectionUtil.getField(ReflectionUtil.getHandle(player), inventoryMenuName);
+            Object inventoryMenu = ReflectionUtil.getField(getHandle(player), inventoryMenuName);
 
             ItemStack stack;
-            if (ReflectionUtil.supports(13)) {
+            if (supports(13)) {
                 stack = new ItemStack(MAP_MATERIAL, 1);
             } else {
                 stack = new ItemStack(MAP_MATERIAL, 1, (short) getMapId(player));
@@ -186,8 +188,8 @@ public class MapWrapper extends AbstractMapWrapper {
             Object nmsStack = createCraftItemStack(stack, (short) getMapId(player));
 
             Object packet;
-            if (ReflectionUtil.supports(17)) { //1.17+
-                int stateId = (int) ReflectionUtil.callMethod(inventoryMenu, ReflectionUtil.supports(18) ? "j" : "getStateId");
+            if (supports(17)) { //1.17+
+                int stateId = (int) ReflectionUtil.callMethod(inventoryMenu, supports(18) ? "j" : "getStateId");
 
                 packet = ReflectionUtil.callConstructor(setSlotPacketClass,
                         0, //0 = Player inventory
@@ -203,7 +205,7 @@ public class MapWrapper extends AbstractMapWrapper {
                 );
             }
 
-            ReflectionUtil.sendPacketSync(player, packet);
+            sendPacketSync(player, packet);
         }
 
         @Override
@@ -280,14 +282,14 @@ public class MapWrapper extends AbstractMapWrapper {
 
         @Override
         public ItemFrame getItemFrameById(World world, int entityId) {
-            Object worldHandle = ReflectionUtil.getHandle(world);
-            Object nmsEntity = ReflectionUtil.callMethod(worldHandle, ReflectionUtil.supports(18) ? "a" : "getEntity", entityId);
+            Object worldHandle = getHandle(world);
+            Object nmsEntity = ReflectionUtil.callMethod(worldHandle, supports(18) ? "a" : "getEntity", entityId);
             if (nmsEntity == null) return null;
 
             Object craftEntity = ReflectionUtil.callMethod(nmsEntity, "getBukkitEntity");
             if (craftEntity == null) return null;
 
-            Class<?> itemFrameClass = ReflectionUtil.getNMSClass("world.entity.decoration", "EntityItemFrame");
+            Class<?> itemFrameClass = getNMSClass("world.entity.decoration", "EntityItemFrame");
             if (itemFrameClass == null) return null;
 
             if (craftEntity.getClass().isAssignableFrom(itemFrameClass))
@@ -301,19 +303,19 @@ public class MapWrapper extends AbstractMapWrapper {
 
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
 
-            if (ReflectionUtil.supports(13)) {
+            if (supports(13)) {
                 String nbtObjectName;
-                if (ReflectionUtil.supports(20)) { //1.20
+                if (supports(20)) { //1.20
                     nbtObjectName = "w";
-                } else if (ReflectionUtil.supports(19)) { //1.19
+                } else if (supports(19)) { //1.19
                     nbtObjectName = "v";
-                } else if (ReflectionUtil.supports(18)) { //1.18
-                    nbtObjectName = ReflectionUtil.VER_MINOR == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
+                } else if (supports(18)) { //1.18
+                    nbtObjectName = PATCH_NUMBER == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
                 } else { //1.13 - 1.17
                     nbtObjectName = "getOrCreateTag";
                 }
                 Object nbtObject = ReflectionUtil.callMethod(nmsStack, nbtObjectName);
-                ReflectionUtil.callMethod(nbtObject, ReflectionUtil.supports(18) ? "a" : "setInt", "map", mapId);
+                ReflectionUtil.callMethod(nbtObject, supports(18) ? "a" : "setInt", "map", mapId);
             }
             return nmsStack;
         }
@@ -322,17 +324,17 @@ public class MapWrapper extends AbstractMapWrapper {
             Object nmsStack = createCraftItemStack(stack, mapId);
 
             String dataWatcherObjectName;
-            if (ReflectionUtil.supports(19, 3)) { //1.19.3 and 1.20(.1)
+            if (supports(19, 3)) { //1.19.3 and 1.20(.1)
                 dataWatcherObjectName = "g";
-            } else if (ReflectionUtil.supports(19)) { //1.19-1.19.2
+            } else if (supports(19)) { //1.19-1.19.2
                 dataWatcherObjectName = "ao";
-            } else if (ReflectionUtil.supports(18)) { //1.18
-                dataWatcherObjectName = ReflectionUtil.VER_MINOR == 1 ? "ap" : "ao"; //1.18.1 = ap, 1.18(.2) = ao
-            } else if (ReflectionUtil.supports(17)) { //1.17
+            } else if (supports(18)) { //1.18
+                dataWatcherObjectName = PATCH_NUMBER == 1 ? "ap" : "ao"; //1.18.1 = ap, 1.18(.2) = ao
+            } else if (supports(17)) { //1.17
                 dataWatcherObjectName = "ao";
-            } else if (ReflectionUtil.supports(14)) { //1.14 - 1.16
+            } else if (supports(14)) { //1.14 - 1.16
                 dataWatcherObjectName = "ITEM";
-            } else if (ReflectionUtil.supports(13)) { //1.13
+            } else if (supports(13)) { //1.13
                 dataWatcherObjectName = "e";
             } else { //1.12
                 dataWatcherObjectName = "c";
@@ -342,8 +344,8 @@ public class MapWrapper extends AbstractMapWrapper {
             ReflectionUtil.ListParam list = new ReflectionUtil.ListParam<>();
 
             Object packet;
-            if (ReflectionUtil.supports(19, 2)) { //1.19.3
-                Class<?> dataWatcherRecordClass = ReflectionUtil.getNMSClass("network.syncher", "DataWatcher$b");
+            if (supports(19, 2)) { //1.19.3
+                Class<?> dataWatcherRecordClass = getNMSClass("network.syncher", "DataWatcher$b");
                 // Sadly not possible to use ReflectionUtil (in its current state), because of the Object parameter
                 Object dataWatcherItem;
                 try {
@@ -374,7 +376,7 @@ public class MapWrapper extends AbstractMapWrapper {
                 ReflectionUtil.setDeclaredField(packet, "b", list);
             }
 
-            ReflectionUtil.sendPacketSync(player, packet);
+            sendPacketSync(player, packet);
         }
     };
 

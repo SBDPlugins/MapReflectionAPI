@@ -27,6 +27,8 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
+
 /**
  * The {@link MapSender} sends the Map packets to players.
  */
@@ -82,8 +84,8 @@ public class MapSender {
         }, 0, 2);
     }
 
-    private static final Class<?> packetPlayOutMapClass = ReflectionUtil.getNMSClass("network.protocol.game", "PacketPlayOutMap");
-    private static final Class<?> worldMapData = ReflectionUtil.supports(17) ? ReflectionUtil.getNMSClass("world.level.saveddata.maps", "WorldMap$b") : null;
+    private static final Class<?> packetPlayOutMapClass = getNMSClass("network.protocol.game", "PacketPlayOutMap");
+    private static final Class<?> worldMapData = supports(17) ? getNMSClass("world.level.saveddata.maps", "WorldMap$b") : null;
 
     /**
      * Send a map to a player
@@ -110,7 +112,7 @@ public class MapSender {
 
         final int id = -id0;
         Object packet;
-        if (ReflectionUtil.supports(17)) { //1.17+
+        if (supports(17)) { //1.17+
             Object updateData = ReflectionUtil.callConstructor(worldMapData,
                     content.minX, //X pos
                     content.minY, //Y pos
@@ -126,7 +128,7 @@ public class MapSender {
                     new ReflectionUtil.CollectionParam<>(), //Icons
                     updateData
             );
-        } else if (ReflectionUtil.supports(14)) { //1.16-1.14
+        } else if (supports(14)) { //1.16-1.14
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     id, //ID
                     (byte) 0, //Scale, 0 = 1 block per pixel
@@ -153,7 +155,7 @@ public class MapSender {
             );
         }
 
-        ReflectionUtil.sendPacket(player, packet);
+        sendPacket(player, packet);
     }
 
     @Data

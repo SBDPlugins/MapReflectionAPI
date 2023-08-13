@@ -27,6 +27,8 @@ import java.awt.*;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.supports;
+
 /**
  * Additional functionality on top of Bukkit's MapPalette
  */
@@ -50,14 +52,12 @@ public class MapColorPalette {
             MCSDBubbleFormat bubbleData = new MCSDBubbleFormat();
             try {
                 String bub_path_postfix;
-                if (ReflectionUtil.supports(17)) {
+                if (supports(17)) {
                     bub_path_postfix = "map_1_17.bub";
-                } else if (ReflectionUtil.supports(16)) {
+                } else if (supports(16)) {
                     bub_path_postfix = "map_1_16.bub";
-                } else if (ReflectionUtil.supports(12)) {
-                    bub_path_postfix = "map_1_12.bub";
                 } else {
-                    bub_path_postfix = "map_1_8_8.bub";
+                    bub_path_postfix = "map_1_12.bub";
                 }
                 String bub_path = "/tech/sbdevelopment/mapreflectionapi/libs/bkcommonlib/internal/resources/map/" + bub_path_postfix;
                 InputStream input = MapColorPalette.class.getResourceAsStream(bub_path);
