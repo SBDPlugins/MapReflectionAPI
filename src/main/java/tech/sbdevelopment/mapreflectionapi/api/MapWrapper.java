@@ -166,7 +166,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
             String inventoryMenuName;
             if (supports(20)) { //1.20
-                inventoryMenuName = "bQ";
+                inventoryMenuName = PATCH_NUMBER == 2 ? "bR" : "bQ"; //1.20.2 = bR, 1.20(.1) = bQ
             } else if (supports(19)) { //1.19
                 inventoryMenuName = PATCH_NUMBER == 3 ? "bO" : "bT"; //1.19.4 = bO, >= 1.19.3 = bT
             } else if (supports(18)) { //1.18

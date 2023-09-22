@@ -145,7 +145,7 @@ public class PacketListener implements Listener {
         Object playerHandle = getHandle(player);
         Object playerConnection = getDeclaredField(playerHandle, supports(20) ? "c" : supports(17) ? "b" : "playerConnection"); //1.20 = c, 1.17-1.19 = b, 1.16 = playerConnection
         Object networkManager = getDeclaredField(playerConnection, supports(19, 3) ? "h" : supports(19) ? "b" : supports(17) ? "a" : "networkManager"); //1.20 & 1.19.4 = h, >= 1.19.3 = b, 1.18 = a, 1.16 = networkManager
-        return (Channel) getDeclaredField(networkManager, supports(18) ? "m" : supports(17) ? "k" : "channel"); //1.19 & 1.18 = m, 1.17 = k, 1.16 = channel
+        return (Channel) getDeclaredField(networkManager, supports(20, 2) ? "n" : supports(18) ? "m" : supports(17) ? "k" : "channel"); //1.20.2 = n, 1.20(.1), 1.19 & 1.18 = m, 1.17 = k, 1.16 = channel
     }
 
     private Vector vec3DToVector(Object vec3d) {
