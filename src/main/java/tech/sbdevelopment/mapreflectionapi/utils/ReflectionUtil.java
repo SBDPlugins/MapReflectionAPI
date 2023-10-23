@@ -299,6 +299,26 @@ public class ReflectionUtil {
         }
     }
 
+    @Nullable
+    public static Object getSuperDeclaredField(Object object, String field) {
+        try {
+            String cacheKey = "SuperDeclaredField:" + object.getClass().getSuperclass().getName() + ":" + field;
+
+            if (fieldCache.containsKey(cacheKey)) {
+                Field cachedField = fieldCache.get(cacheKey);
+                return cachedField.get(object);
+            } else {
+                Field f = object.getClass().getSuperclass().getDeclaredField(field);
+                f.setAccessible(true);
+                fieldCache.put(cacheKey, f);
+                return f.get(object);
+            }
+        } catch (NoSuchFieldException | IllegalAccessException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
     public static void setDeclaredField(Object object, String field, Object value) {
         try {
             String cacheKey = "DeclaredField:" + object.getClass().getName() + ":" + field;
