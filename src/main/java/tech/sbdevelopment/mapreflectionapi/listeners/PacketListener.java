@@ -117,7 +117,7 @@ public class PacketListener implements Listener {
                     Object packetPlayInSetCreativeSlot = packetPlayInSetCreativeSlotClass.cast(packet);
 
                     int slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(19, 3) ? "a" : supports(13) ? "b" : "a"); //1.19.4 = a, 1.19.3 - 1.13 = b, 1.12 = a
-                    Object nmsStack = ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(18) ? "c" : "getItemStack"); //1.18 = c, 1.17 = getItemStack
+                    Object nmsStack = ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(20, 2) ? "d" : supports(18) ? "c" : "getItemStack"); //1.20.2 = d, >= 1.18 = c, 1.17 = getItemStack
                     ItemStack craftStack = (ItemStack) ReflectionUtil.callMethod(craftStackClass, "asBukkitCopy", nmsStack);
 
                     boolean async = !MapReflectionAPI.getInstance().getServer().isPrimaryThread();
