@@ -344,7 +344,7 @@ public class MapWrapper extends AbstractMapWrapper {
             ReflectionUtil.ListParam list = new ReflectionUtil.ListParam<>();
 
             Object packet;
-            if (supports(19, 2)) { //1.19.3
+            if (supports(19, 3)) { //1.19.3
                 Class<?> dataWatcherRecordClass = getNMSClass("network.syncher", "DataWatcher$b");
                 // Sadly not possible to use ReflectionUtil (in its current state), because of the Object parameter
                 Object dataWatcherItem;

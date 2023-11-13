@@ -47,6 +47,16 @@ public class PacketListener implements Listener {
     private static final Class<?> packetPlayInSetCreativeSlotClass = getNMSClass("network.protocol.game", "PacketPlayInSetCreativeSlot");
     private static final Class<?> vec3DClass = getNMSClass("world.phys", "Vec3D");
     private static final Class<?> craftStackClass = getCraftClass("inventory.CraftItemStack");
+    private static final Class<?> playerCommonConnection;
+
+    static {
+        if (supports(20) && supportsPatch(2)) {
+            // The packet send method has been abstracted from ServerGamePacketListenerImpl to ServerCommonPacketListenerImpl in 1.20.2
+            playerCommonConnection = getNMSClass("server.network", "ServerCommonPacketListenerImpl");
+        } else {
+            playerCommonConnection = getNMSClass("server.network", "PlayerConnection");
+        }
+    }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
@@ -116,7 +126,7 @@ public class PacketListener implements Listener {
                 } else if (packet.getClass().isAssignableFrom(packetPlayInSetCreativeSlotClass)) {
                     Object packetPlayInSetCreativeSlot = packetPlayInSetCreativeSlotClass.cast(packet);
 
-                    int slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(19, 3) ? "a" : supports(13) ? "b" : "a"); //1.19.4 = a, 1.19.3 - 1.13 = b, 1.12 = a
+                    int slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(19, 4) ? "a" : supports(13) ? "b" : "a"); //1.19.4 = a, 1.19.3 - 1.13 = b, 1.12 = a
                     Object nmsStack = ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(20, 2) ? "d" : supports(18) ? "c" : "getItemStack"); //1.20.2 = d, >= 1.18 = c, 1.17 = getItemStack
                     ItemStack craftStack = (ItemStack) ReflectionUtil.callMethod(craftStackClass, "asBukkitCopy", nmsStack);
 
@@ -144,13 +154,7 @@ public class PacketListener implements Listener {
     private Channel getChannel(Player player) {
         Object playerHandle = getHandle(player);
         Object playerConnection = getDeclaredField(playerHandle, supports(20) ? "c" : supports(17) ? "b" : "playerConnection"); //1.20 = c, 1.17-1.19 = b, 1.16 = playerConnection
-
-        Object networkManager;
-        if (supports(20, 2))
-            networkManager = getSuperDeclaredField(playerConnection, "c"); //1.20.2 = c
-        else
-            networkManager = getDeclaredField(playerConnection, supports(19, 3) ? "h" : supports(19) ? "b" : supports(17) ? "a" : "networkManager"); //1.20 & 1.19.4 = h, >= 1.19.3 = b, 1.18 = a, 1.16 = networkManager
-
+        Object networkManager = getDeclaredField(playerCommonConnection, playerConnection, supports(20, 2) ? "c" : supports(19, 4) ? "h" : supports(19) ? "b" : supports(17) ? "a" : "networkManager"); //1.20.2 = ServerCommonPacketListenerImpl#c, 1.20(.1) & 1.19.4 = h, >= 1.19.3 = b, 1.18 - 1.17 = a, 1.16 = networkManager
         return (Channel) getDeclaredField(networkManager, supports(20, 2) ? "n" : supports(18) ? "m" : supports(17) ? "k" : "channel"); //1.20.2 = n, 1.20(.1), 1.19 & 1.18 = m, 1.17 = k, 1.16 = channel
     }
 

@@ -300,15 +300,15 @@ public class ReflectionUtil {
     }
 
     @Nullable
-    public static Object getSuperDeclaredField(Object object, String field) {
+    public static Object getDeclaredField(Class<?> clazz, Object object, String field) {
         try {
-            String cacheKey = "SuperDeclaredField:" + object.getClass().getSuperclass().getName() + ":" + field;
+            String cacheKey = "DeclaredField:" + clazz.getName() + ":" + field;
 
             if (fieldCache.containsKey(cacheKey)) {
                 Field cachedField = fieldCache.get(cacheKey);
                 return cachedField.get(object);
             } else {
-                Field f = object.getClass().getSuperclass().getDeclaredField(field);
+                Field f = clazz.getDeclaredField(field);
                 f.setAccessible(true);
                 fieldCache.put(cacheKey, f);
                 return f.get(object);

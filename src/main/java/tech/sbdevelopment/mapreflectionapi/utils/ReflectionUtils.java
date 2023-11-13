@@ -107,7 +107,7 @@ public final class ReflectionUtils {
     public static final int MINOR_NUMBER;
     /**
      * The raw patch version number.
-     * E.g. {@code v1_17_R1} to {@code 1}
+     * E.g. {@code 1.19.2} to {@code 2}
      * <p>
      * I'd not recommend developers to support individual patches at all. You should always support the latest patch.
      * For example, between v1.14.0, v1.14.1, v1.14.2, v1.14.3 and v1.14.4 you should only support v1.14.4
@@ -254,7 +254,7 @@ public final class ReflectionUtils {
                     v(20, "c").v(17, "b").orElse("playerConnection"), playerConnection);
             getHandle = lookup.findVirtual(craftPlayer, "getHandle", MethodType.methodType(entityPlayer));
             getHandleWorld = lookup.findVirtual(craftWorld, "getHandle", MethodType.methodType(worldServer));
-            sendPacket = lookup.findVirtual(playerConnection,
+            sendPacket = lookup.findVirtual(playerCommonConnection,
                     v(20, 2, "b").v(18, "a").orElse("sendPacket"),
                     MethodType.methodType(void.class, getNMSClass("network.protocol", "Packet")));
         } catch (NoSuchMethodException | NoSuchFieldException | IllegalAccessException ex) {
