@@ -4,6 +4,8 @@ This plugin helps developer with displaying images on maps. It supports Spigot 1
 
 ## Usage:
 
+### Using the API:
+
 First, include the API using Maven:
 
 ```xml
@@ -79,6 +81,84 @@ controller.showInFrames(p, frames, true);
 ```
 
 More information can be found on the [JavaDoc](https://sbdevelopment.tech/javadoc/mapreflectionapi/).
+
+### Notes on map render distance:
+
+MapReflectionAPI does not implement render distance to images shown on maps. This should be implemented by yourself. An example of this is below.
+
+```java
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
+
+public class MapRenderDistanceListener implements Listener {
+    private static final int MAP_RENDER_DISTANCE_SQUARED = 1024;
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MyPluginInstance, () -> {
+            //Show the maps to the player which are within distance
+        });
+    }
+
+    @EventHandler
+    public void onPlayerLeave(PlayerQuitEvent e) {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MyPluginInstance, () -> {
+            //Hide the maps to the player which are within distance
+        });
+    }
+
+    @EventHandler
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent e) {
+        //Hide all the maps in the e.getFrom() world
+
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MyPluginInstance, () -> {
+            //Show the maps to the player which are within distance in e.getPlayer().getWorld()
+        }, 20);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        //Hide all the maps in the e.getEntity().getWorld()
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerRespawn(PlayerRespawnEvent e) {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(MyPluginInstance, () -> {
+            //Show the maps to the player which are within distance in e.getPlayer().getWorld()
+        }, 20);
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        //Hide all the maps in the e.getFrom() world
+        //Show the maps to the player which are within distance in e.getTo().getWorld()
+    
+        //FOR EXAMPLE:
+        if (e.getTo() == null) return;
+        if (e.getFrom().getChunk().equals(e.getTo().getChunk())) return;
+        
+        for (Frame frame : API.getFramesInWorld(e.getPlayer().getWorld())) {
+            double distanceSquared = e.getTo().distanceSquared(frame.getLocation());
+            
+            if (distanceSquared > MAP_RENDER_DISTANCE_SQUARED) {
+                API.hideFrame(e.getPlayer(), frame);
+            } else {
+                API.showFrame(e.getPlayer(), frame);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent e) {
+        //Hide all the maps in the e.getFrom() world
+        //Show the maps to the player which are within distance in e.getTo().getWorld()
+    
+        //SEE EXAMPLE ABOVE
+    }
+}
+```
 
 ## Credits:
 
