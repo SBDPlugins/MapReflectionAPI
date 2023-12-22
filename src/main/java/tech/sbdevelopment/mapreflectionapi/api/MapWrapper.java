@@ -18,6 +18,7 @@
 
 package tech.sbdevelopment.mapreflectionapi.api;
 
+import lombok.Getter;
 import org.bukkit.*;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
@@ -33,7 +34,6 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Ref;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -43,6 +43,7 @@ import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
 /**
  * A {@link MapWrapper} wraps one image.
  */
+@Getter
 public class MapWrapper extends AbstractMapWrapper {
     private static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
     protected ArrayImage content;
@@ -108,7 +109,8 @@ public class MapWrapper extends AbstractMapWrapper {
 
         @Override
         public void update(@NotNull ArrayImage content) {
-            MapContentUpdateEvent event = new MapContentUpdateEvent(MapWrapper.this, content);
+            boolean async = !MapReflectionAPI.getInstance().getServer().isPrimaryThread();
+            MapContentUpdateEvent event = new MapContentUpdateEvent(MapWrapper.this, content, async);
             Bukkit.getPluginManager().callEvent(event);
 
             if (Configuration.getInstance().isImageCache()) {
@@ -165,27 +167,25 @@ public class MapWrapper extends AbstractMapWrapper {
             }
 
             String inventoryMenuName;
-            if (supports(20)) { //1.20
-                inventoryMenuName = PATCH_NUMBER == 2 ? "bR" : "bQ"; //1.20.2 = bR, 1.20(.1) = bQ
-            } else if (supports(19)) { //1.19
-                inventoryMenuName = PATCH_NUMBER == 3 ? "bO" : "bT"; //1.19.4 = bO, >= 1.19.3 = bT
-            } else if (supports(18)) { //1.18
-                inventoryMenuName = PATCH_NUMBER == 1 ? "bV" : "bU"; //1.18.1 = ap, 1.18(.2) = ao
-            } else if (supports(17)) { //1.17, same as 1.18(.2)
+            if (supports(20)) {
+                //>= 1.20.2 = bR, 1.20(.1) = bQ
+                inventoryMenuName = supports(20, 2) ? "bR" : "bQ";
+            } else if (supports(19)) {
+                //1.19.4 = bO, >= 1.19.3 = bT
+                inventoryMenuName = supports(19, 3) ? "bO" : "bT";
+            } else if (supports(18)) {
+                //1.18.1 = ap, 1.18(.2) = ao
+                inventoryMenuName = supports(18, 1) ? "bV" : "bU";
+            } else if (supports(17)) {
+                //1.17, same as 1.18(.2)
                 inventoryMenuName = "bU";
-            } else { //1.12-1.16
+            } else {
+                //1.12-1.16
                 inventoryMenuName = "defaultContainer";
             }
             Object inventoryMenu = ReflectionUtil.getField(getHandle(player), inventoryMenuName);
 
-            ItemStack stack;
-            if (supports(13)) {
-                stack = new ItemStack(MAP_MATERIAL, 1);
-            } else {
-                stack = new ItemStack(MAP_MATERIAL, 1, (short) getMapId(player));
-            }
-
-            Object nmsStack = createCraftItemStack(stack, (short) getMapId(player));
+            Object nmsStack = asCraftItemStack(player);
 
             Object packet;
             if (supports(17)) { //1.17+
@@ -298,6 +298,13 @@ public class MapWrapper extends AbstractMapWrapper {
             return null;
         }
 
+        private Object asCraftItemStack(Player player) {
+            return createCraftItemStack(supports(13)
+                    ? new ItemStack(MAP_MATERIAL, 1)
+                    : new ItemStack(MAP_MATERIAL, 1, (short) getMapId(player)
+            ), (short) getMapId(player));
+        }
+
         private Object createCraftItemStack(@NotNull ItemStack stack, int mapId) {
             if (mapId < 0) return null;
 
@@ -310,7 +317,7 @@ public class MapWrapper extends AbstractMapWrapper {
                 } else if (supports(19)) { //1.19
                     nbtObjectName = "v";
                 } else if (supports(18)) { //1.18
-                    nbtObjectName = PATCH_NUMBER == 1 ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
+                    nbtObjectName = supports(18, 1) ? "t" : "u"; //1.18.1 = t, 1.18(.2) = u
                 } else { //1.13 - 1.17
                     nbtObjectName = "getOrCreateTag";
                 }
@@ -329,7 +336,7 @@ public class MapWrapper extends AbstractMapWrapper {
             } else if (supports(19)) { //1.19-1.19.2
                 dataWatcherObjectName = "ao";
             } else if (supports(18)) { //1.18
-                dataWatcherObjectName = PATCH_NUMBER == 1 ? "ap" : "ao"; //1.18.1 = ap, 1.18(.2) = ao
+                dataWatcherObjectName = supports(18, 1) ? "ap" : "ao"; //1.18.1 = ap, 1.18(.2) = ao
             } else if (supports(17)) { //1.17
                 dataWatcherObjectName = "ao";
             } else if (supports(14)) { //1.14 - 1.16
@@ -341,7 +348,7 @@ public class MapWrapper extends AbstractMapWrapper {
             }
             Object dataWatcherObject = ReflectionUtil.getDeclaredField(entityItemFrameClass, dataWatcherObjectName);
 
-            ReflectionUtil.ListParam list = new ReflectionUtil.ListParam<>();
+            ReflectionUtil.ListParam<Object> list = new ReflectionUtil.ListParam<>();
 
             Object packet;
             if (supports(19, 3)) { //1.19.3
@@ -379,13 +386,4 @@ public class MapWrapper extends AbstractMapWrapper {
             sendPacketSync(player, packet);
         }
     };
-
-    public ArrayImage getContent() {
-        return content;
-    }
-
-    @Override
-    public MapController getController() {
-        return controller;
-    }
 }

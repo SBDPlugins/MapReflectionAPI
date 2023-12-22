@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
  * A useful resource used to compare mappings is <a href="https://minidigger.github.io/MiniMappingViewer/#/spigot">Mini's Mapping Viewer</a>
  *
  * @author Crypto Morin
- * @version 7.1.0
+ * @version 7.1.0.0.1
  */
 public final class ReflectionUtils {
     /**
@@ -106,8 +106,13 @@ public final class ReflectionUtils {
      */
     public static final int MINOR_NUMBER;
     /**
-     * The raw patch version number.
-     * E.g. {@code 1.19.2} to {@code 2}
+     * The raw patch version number. Refers to the <a href="https://en.wikipedia.org/wiki/Software_versioning">major.minor.patch version scheme</a>.
+     * E.g.
+     * <ul>
+     *     <li>{@code v1.20.4} to {@code 4}</li>
+     *     <li>{@code v1.18.2} to {@code 2}</li>
+     *     <li>{@code v1.19.1} to {@code 1}</li>
+     * </ul>
      * <p>
      * I'd not recommend developers to support individual patches at all. You should always support the latest patch.
      * For example, between v1.14.0, v1.14.1, v1.14.2, v1.14.3 and v1.14.4 you should only support v1.14.4
@@ -195,7 +200,7 @@ public final class ReflectionUtils {
                 /* 17 */ 1,//            \_!_/
                 /* 18 */ 2,
                 /* 19 */ 4,
-                /* 20 */ 2,
+                /* 20 */ 4,
         };
 
         if (minorVersion > patches.length) return null;
