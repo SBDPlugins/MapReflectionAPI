@@ -31,7 +31,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
-import tech.sbdevelopment.mapreflectionapi.api.events.CreateInventoryMapUpdateEvent;
+import tech.sbdevelopment.mapreflectionapi.api.events.CreativeInventoryMapUpdateEvent;
 import tech.sbdevelopment.mapreflectionapi.api.events.MapCancelEvent;
 import tech.sbdevelopment.mapreflectionapi.api.events.MapInteractEvent;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
@@ -131,7 +131,7 @@ public class PacketListener implements Listener {
                     ItemStack craftStack = (ItemStack) ReflectionUtil.callMethod(craftStackClass, "asBukkitCopy", nmsStack);
 
                     boolean async = !MapReflectionAPI.getInstance().getServer().isPrimaryThread();
-                    CreateInventoryMapUpdateEvent event = new CreateInventoryMapUpdateEvent(player, slot, craftStack, async);
+                    CreativeInventoryMapUpdateEvent event = new CreativeInventoryMapUpdateEvent(player, slot, craftStack, async);
                     if (event.getMapWrapper() != null) {
                         Bukkit.getPluginManager().callEvent(event);
                         if (event.isCancelled()) return;

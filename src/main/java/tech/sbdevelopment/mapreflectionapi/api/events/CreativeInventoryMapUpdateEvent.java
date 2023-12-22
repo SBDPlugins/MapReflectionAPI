@@ -37,7 +37,7 @@ import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
  */
 @RequiredArgsConstructor
 @Getter
-public class CreateInventoryMapUpdateEvent extends Event implements Cancellable {
+public class CreativeInventoryMapUpdateEvent extends Event implements Cancellable {
     private static final HandlerList handlerList = new HandlerList();
     @Setter
     private boolean cancelled;
@@ -48,14 +48,14 @@ public class CreateInventoryMapUpdateEvent extends Event implements Cancellable 
     private MapWrapper mapWrapper;
 
     /**
-     * Construct a new {@link CreateInventoryMapUpdateEvent}
+     * Construct a new {@link CreativeInventoryMapUpdateEvent}
      *
      * @param player  The player whose inventory is updated
      * @param slot    The new slot
      * @param item    The item in the new slot
      * @param isAsync Is this event called async?
      */
-    public CreateInventoryMapUpdateEvent(Player player, int slot, ItemStack item, boolean isAsync) {
+    public CreativeInventoryMapUpdateEvent(Player player, int slot, ItemStack item, boolean isAsync) {
         super(isAsync);
         this.player = player;
         this.slot = slot;
