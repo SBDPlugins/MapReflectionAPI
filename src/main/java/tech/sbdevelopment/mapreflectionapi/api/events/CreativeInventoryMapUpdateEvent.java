@@ -20,16 +20,12 @@ package tech.sbdevelopment.mapreflectionapi.api.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.map.MapView;
 import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 import tech.sbdevelopment.mapreflectionapi.api.events.types.CancellableEvent;
-import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils;
 import tech.sbdevelopment.mapreflectionapi.utils.XMaterial;
 
 /**

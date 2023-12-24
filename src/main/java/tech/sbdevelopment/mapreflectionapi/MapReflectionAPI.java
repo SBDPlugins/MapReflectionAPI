@@ -30,7 +30,6 @@ import tech.sbdevelopment.mapreflectionapi.listeners.MapListener;
 import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
 import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
 import tech.sbdevelopment.mapreflectionapi.utils.MainUtil;
-import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import tech.sbdevelopment.mapreflectionapi.utils.UpdateManager;
 
 import java.util.logging.Level;

@@ -37,14 +37,16 @@ public class ReflectionUtil {
      *
      * @param <E> The storage type
      */
-    public static class ListParam<E> extends ArrayList<E> {}
+    public static class ListParam<E> extends ArrayList<E> {
+    }
 
     /**
      * Helper class converted to {@link Collection}
      *
      * @param <E> The storage type
      */
-    public static class CollectionParam<E> extends ArrayList<E> {}
+    public static class CollectionParam<E> extends ArrayList<E> {
+    }
 
     private static Class<?> wrapperToPrimitive(Class<?> clazz) {
         if (clazz == Boolean.class) return boolean.class;

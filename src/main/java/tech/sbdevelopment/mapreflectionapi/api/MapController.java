@@ -19,7 +19,6 @@
 package tech.sbdevelopment.mapreflectionapi.api;
 
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
