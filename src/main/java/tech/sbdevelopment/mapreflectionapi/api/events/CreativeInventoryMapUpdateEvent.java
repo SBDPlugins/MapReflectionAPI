@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,28 +20,24 @@ package tech.sbdevelopment.mapreflectionapi.api.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
+import org.bukkit.map.MapView;
 import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
+import tech.sbdevelopment.mapreflectionapi.api.events.types.CancellableEvent;
+import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils;
+import tech.sbdevelopment.mapreflectionapi.utils.XMaterial;
 
 /**
  * This event gets fired when a map in the creative inventory gets updated
  */
 @RequiredArgsConstructor
 @Getter
-public class CreativeInventoryMapUpdateEvent extends Event implements Cancellable {
-    private static final HandlerList handlerList = new HandlerList();
-    @Setter
-    private boolean cancelled;
-
+public class CreativeInventoryMapUpdateEvent extends CancellableEvent {
     private final Player player;
     private final int slot;
     private final ItemStack item;
@@ -62,11 +58,6 @@ public class CreativeInventoryMapUpdateEvent extends Event implements Cancellabl
         this.item = item;
     }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return handlerList;
-    }
-
     /**
      * Get the {@link MapWrapper} of the map of this event
      *
@@ -76,7 +67,7 @@ public class CreativeInventoryMapUpdateEvent extends Event implements Cancellabl
     public MapWrapper getMapWrapper() {
         if (mapWrapper == null) {
             if (item == null) return null;
-            if (item.getType() != Material.MAP) return null;
+            if (!XMaterial.FILLED_MAP.isSimilar(item)) return null;
             mapWrapper = MapReflectionAPI.getMapManager().getWrapperForId(player, item.getDurability());
         }
 

@@ -72,6 +72,8 @@ public class PacketListener implements Listener {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
             @Override
             public void write(ChannelHandlerContext ctx, Object packet, ChannelPromise promise) throws Exception {
+                boolean cancel = false;
+
                 if (packet.getClass().isAssignableFrom(packetPlayOutMapClass)) {
                     Object packetPlayOutMap = packetPlayOutMapClass.cast(packet);
 
@@ -83,18 +85,19 @@ public class PacketListener implements Listener {
                         boolean async = !MapReflectionAPI.getInstance().getServer().isPrimaryThread();
                         MapCancelEvent event = new MapCancelEvent(player, id, async);
                         if (MapReflectionAPI.getMapManager().isIdUsedBy(player, id)) event.setCancelled(true);
-                        if (event.getHandlers().getRegisteredListeners().length > 0)
-                            Bukkit.getPluginManager().callEvent(event);
+                        Bukkit.getPluginManager().callEvent(event);
 
-                        if (event.isCancelled()) return;
+                        if (event.isCancelled()) cancel = true;
                     }
                 }
 
-                super.write(ctx, packet, promise);
+                if (!cancel) super.write(ctx, packet, promise);
             }
 
             @Override
             public void channelRead(ChannelHandlerContext ctx, Object packet) throws Exception {
+                boolean cancel = false;
+
                 if (packet.getClass().isAssignableFrom(packetPlayInUseEntityClass)) {
                     Object packetPlayInEntity = packetPlayInUseEntityClass.cast(packet);
 
@@ -105,9 +108,20 @@ public class PacketListener implements Listener {
                     Object pos;
                     if (supports(17)) {
                         Object action = getDeclaredField(packetPlayInEntity, "b");
-                        actionEnum = (Enum<?>) callDeclaredMethod(action, "a"); //action type
-                        hand = hasField(action, "a") ? (Enum<?>) getDeclaredField(action, "a") : null;
-                        pos = hasField(action, "b") ? getDeclaredField(action, "b") : null;
+                        actionEnum = (Enum<?>) callDeclaredMethod(action, "a");
+                        Class<?> d = getNMSClass("network.protocol.game", "PacketPlayInUseEntity$d");
+                        Class<?> e = getNMSClass("network.protocol.game", "PacketPlayInUseEntity$e");
+                        if (action.getClass().isAssignableFrom(e)) {
+                            hand = (Enum<?>) getDeclaredField(action, "a");
+                            pos = getDeclaredField(action, "b");
+                        } else {
+                            pos = null;
+                            if (action.getClass().isAssignableFrom(d)) {
+                                hand = (Enum<?>) getDeclaredField(action, "a");
+                            } else {
+                                hand = null;
+                            }
+                        }
                     } else {
                         actionEnum = (Enum<?>) callDeclaredMethod(packetPlayInEntity, supports(13) ? "b" : "a"); //1.13 = b, 1.12 = a
                         hand = (Enum<?>) callDeclaredMethod(packetPlayInEntity, supports(13) ? "c" : "b"); //1.13 = c, 1.12 = b
@@ -122,7 +136,7 @@ public class PacketListener implements Listener {
                             return event.isCancelled();
                         }
                         return false;
-                    }).get(1, TimeUnit.SECONDS)) return;
+                    }).get(1, TimeUnit.SECONDS)) cancel = true;
                 } else if (packet.getClass().isAssignableFrom(packetPlayInSetCreativeSlotClass)) {
                     Object packetPlayInSetCreativeSlot = packetPlayInSetCreativeSlotClass.cast(packet);
 
@@ -134,11 +148,11 @@ public class PacketListener implements Listener {
                     CreativeInventoryMapUpdateEvent event = new CreativeInventoryMapUpdateEvent(player, slot, craftStack, async);
                     if (event.getMapWrapper() != null) {
                         Bukkit.getPluginManager().callEvent(event);
-                        if (event.isCancelled()) return;
+                        if (event.isCancelled()) cancel = true;
                     }
                 }
 
-                super.channelRead(ctx, packet);
+                if (!cancel) super.channelRead(ctx, packet);
             }
         };
 

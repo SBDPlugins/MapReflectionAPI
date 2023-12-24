@@ -31,6 +31,7 @@ import tech.sbdevelopment.mapreflectionapi.api.events.MapContentUpdateEvent;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
+import tech.sbdevelopment.mapreflectionapi.utils.XMaterial;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -45,14 +46,8 @@ import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
  */
 @Getter
 public class MapWrapper extends AbstractMapWrapper {
-    private static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
+    public static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
     protected ArrayImage content;
-
-    private static final Material MAP_MATERIAL;
-
-    static {
-        MAP_MATERIAL = supports(13) ? Material.FILLED_MAP : Material.MAP;
-    }
 
     /**
      * Construct a new {@link MapWrapper}
@@ -215,7 +210,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
         @Override
         public void showInHand(Player player, boolean force) {
-            if (player.getInventory().getItemInMainHand().getType() != MAP_MATERIAL && !force)
+            if (player.getInventory().getItemInMainHand().getType() != XMaterial.FILLED_MAP.parseMaterial() && !force)
                 return;
 
             showInInventory(player, player.getInventory().getHeldItemSlot(), force);
@@ -233,7 +228,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
         @Override
         public void showInFrame(Player player, ItemFrame frame, boolean force) {
-            if (frame.getItem().getType() != MAP_MATERIAL && !force)
+            if (frame.getItem().getType() != XMaterial.FILLED_MAP.parseMaterial() && !force)
                 return;
 
             showInFrame(player, frame.getEntityId());
@@ -248,7 +243,7 @@ public class MapWrapper extends AbstractMapWrapper {
         public void showInFrame(Player player, int entityId, String debugInfo) {
             if (!isViewing(player)) return;
 
-            ItemStack stack = new ItemStack(MAP_MATERIAL, 1);
+            ItemStack stack = new ItemStack(XMaterial.FILLED_MAP.parseMaterial(), 1);
             if (debugInfo != null) {
                 ItemMeta itemMeta = stack.getItemMeta();
                 itemMeta.setDisplayName(debugInfo);
@@ -256,7 +251,7 @@ public class MapWrapper extends AbstractMapWrapper {
             }
 
             Bukkit.getScheduler().runTask(MapReflectionAPI.getInstance(), () -> {
-                ItemFrame frame = getItemFrameById(player.getWorld(), entityId);
+                ItemFrame frame = MapReflectionAPI.getMapManager().getItemFrameById(player.getWorld(), entityId);
                 if (frame != null) {
                     frame.removeMetadata(REFERENCE_METADATA, MapReflectionAPI.getInstance());
                     frame.setMetadata(REFERENCE_METADATA, new FixedMetadataValue(MapReflectionAPI.getInstance(), MapWrapper.this));
@@ -270,7 +265,7 @@ public class MapWrapper extends AbstractMapWrapper {
         public void clearFrame(Player player, int entityId) {
             sendItemFramePacket(player, entityId, null, -1);
             Bukkit.getScheduler().runTask(MapReflectionAPI.getInstance(), () -> {
-                ItemFrame frame = getItemFrameById(player.getWorld(), entityId);
+                ItemFrame frame = MapReflectionAPI.getMapManager().getItemFrameById(player.getWorld(), entityId);
                 if (frame != null) frame.removeMetadata(REFERENCE_METADATA, MapReflectionAPI.getInstance());
             });
         }
@@ -280,29 +275,8 @@ public class MapWrapper extends AbstractMapWrapper {
             clearFrame(player, frame.getEntityId());
         }
 
-        @Override
-        public ItemFrame getItemFrameById(World world, int entityId) {
-            Object worldHandle = getHandle(world);
-            Object nmsEntity = ReflectionUtil.callMethod(worldHandle, supports(18) ? "a" : "getEntity", entityId);
-            if (nmsEntity == null) return null;
-
-            Object craftEntity = ReflectionUtil.callMethod(nmsEntity, "getBukkitEntity");
-            if (craftEntity == null) return null;
-
-            Class<?> itemFrameClass = getNMSClass("world.entity.decoration", "EntityItemFrame");
-            if (itemFrameClass == null) return null;
-
-            if (craftEntity.getClass().isAssignableFrom(itemFrameClass))
-                return (ItemFrame) itemFrameClass.cast(craftEntity);
-
-            return null;
-        }
-
         private Object asCraftItemStack(Player player) {
-            return createCraftItemStack(supports(13)
-                    ? new ItemStack(MAP_MATERIAL, 1)
-                    : new ItemStack(MAP_MATERIAL, 1, (short) getMapId(player)
-            ), (short) getMapId(player));
+            return createCraftItemStack(new ItemStack(XMaterial.FILLED_MAP.parseMaterial(), 1, (short) getMapId(player)), (short) getMapId(player));
         }
 
         private Object createCraftItemStack(@NotNull ItemStack stack, int mapId) {

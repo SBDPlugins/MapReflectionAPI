@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,28 +20,20 @@ package tech.sbdevelopment.mapreflectionapi.api.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
+import tech.sbdevelopment.mapreflectionapi.api.events.types.CancellableEvent;
 
 /**
  * This event gets fired when a player interact with a map
  */
 @RequiredArgsConstructor
 @Getter
-public class MapInteractEvent extends Event implements Cancellable {
-    private static final HandlerList handlerList = new HandlerList();
-    @Setter
-    private boolean cancelled;
-
+public class MapInteractEvent extends CancellableEvent {
     private final Player player;
     private final int entityID;
     private final int action;
@@ -69,11 +61,6 @@ public class MapInteractEvent extends Event implements Cancellable {
         this.hand = hand;
     }
 
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return handlerList;
-    }
-
     /**
      * Get the {@link ItemFrame} the map is in
      *
@@ -81,10 +68,8 @@ public class MapInteractEvent extends Event implements Cancellable {
      */
     @Nullable
     public ItemFrame getFrame() {
-        if (getMapWrapper() == null) return null;
-
         if (frame == null) {
-            frame = getMapWrapper().getController().getItemFrameById(player.getWorld(), entityID);
+            frame = MapReflectionAPI.getMapManager().getItemFrameById(player.getWorld(), entityID);
         }
         return frame;
     }
@@ -96,10 +81,11 @@ public class MapInteractEvent extends Event implements Cancellable {
      */
     @Nullable
     public MapWrapper getMapWrapper() {
+        if (getFrame() == null) return null;
         if (mapWrapper == null) {
-            mapWrapper = MapReflectionAPI.getMapManager().getWrapperForId(player, entityID);
+            if (!frame.hasMetadata(MapWrapper.REFERENCE_METADATA)) return null;
+            mapWrapper = (MapWrapper) frame.getMetadata(MapWrapper.REFERENCE_METADATA).get(0).value();
         }
-
         return mapWrapper;
     }
 }

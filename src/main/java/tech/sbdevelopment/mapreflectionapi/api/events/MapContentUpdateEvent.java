@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,11 +21,9 @@ package tech.sbdevelopment.mapreflectionapi.api.events;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
 import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
 import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
+import tech.sbdevelopment.mapreflectionapi.api.events.types.Event;
 
 /**
  * This event gets fired when the content of a {@link MapWrapper} is updated
@@ -33,8 +31,6 @@ import tech.sbdevelopment.mapreflectionapi.api.MapWrapper;
 @RequiredArgsConstructor
 @Getter
 public class MapContentUpdateEvent extends Event {
-    private static final HandlerList handlerList = new HandlerList();
-
     private final MapWrapper wrapper;
     private final ArrayImage content;
     @Setter
@@ -51,10 +47,5 @@ public class MapContentUpdateEvent extends Event {
         super(isAsync);
         this.wrapper = wrapper;
         this.content = content;
-    }
-
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return handlerList;
     }
 }

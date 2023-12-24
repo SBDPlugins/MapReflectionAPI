@@ -143,14 +143,12 @@ public class UpdateManager {
         File pluginFile = getPluginFile(); // /plugins/XXX.jar
         if (pluginFile == null) {
             this.downloadResponse.accept(DownloadResponse.ERROR, null);
-            Bukkit.getLogger().info("Pluginfile is null");
             return;
         }
         File updateFolder = Bukkit.getUpdateFolderFile();
         if (!updateFolder.exists()) {
             if (!updateFolder.mkdirs()) {
                 this.downloadResponse.accept(DownloadResponse.ERROR, null);
-                Bukkit.getLogger().info("Updatefolder doesn't exists, and can't be made");
                 return;
             }
         }

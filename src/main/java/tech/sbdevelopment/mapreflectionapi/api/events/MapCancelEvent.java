@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,23 +20,15 @@ package tech.sbdevelopment.mapreflectionapi.api.events;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
-import org.bukkit.event.HandlerList;
-import org.jetbrains.annotations.NotNull;
+import tech.sbdevelopment.mapreflectionapi.api.events.types.CancellableEvent;
 
 /**
  * This event gets fired when a map creation is cancelled
  */
 @RequiredArgsConstructor
 @Getter
-public class MapCancelEvent extends Event implements Cancellable {
-    private static final HandlerList handlerList = new HandlerList();
-    @Setter
-    private boolean cancelled;
-
+public class MapCancelEvent extends CancellableEvent {
     private final Player player;
     private final int id;
 
@@ -51,10 +43,5 @@ public class MapCancelEvent extends Event implements Cancellable {
         super(isAsync);
         this.player = player;
         this.id = id;
-    }
-
-    @Override
-    public @NotNull HandlerList getHandlers() {
-        return handlerList;
     }
 }
