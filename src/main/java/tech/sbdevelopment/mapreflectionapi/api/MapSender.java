@@ -113,8 +113,6 @@ public class MapSender {
         final int id = -id0;
         Object packet;
         if (supports(20, 4)) { //1.20.5+
-            //TODO: Implement 1.20.5+ map sending
-
             Object updateData = ReflectionUtil.callConstructor(worldMapData,
                     content.minX, //X pos
                     content.minY, //Y pos
@@ -123,8 +121,10 @@ public class MapSender {
                     content.array //Data
             );
 
+            Object mapId = ReflectionUtil.callConstructor(getNMSClass("world.level.saveddata.maps", "MapId"), id);
+
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
-                    id, //ID
+                    mapId, //ID
                     (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //Show icons
                     new ReflectionUtil.CollectionParam<>(), //Icons
