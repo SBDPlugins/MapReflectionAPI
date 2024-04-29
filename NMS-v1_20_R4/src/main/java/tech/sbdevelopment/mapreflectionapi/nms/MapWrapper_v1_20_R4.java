@@ -18,15 +18,18 @@
 
 package tech.sbdevelopment.mapreflectionapi.nms;
 
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.EntityItemFrame;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -40,7 +43,7 @@ import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededExcept
 
 import java.util.*;
 
-public class MapWrapper_v1_20_R1 extends MapWrapper {
+public class MapWrapper_v1_20_R4 extends MapWrapper {
     protected MapController controller = new MapController() {
         private final Map<UUID, Integer> viewers = new HashMap<>();
 
@@ -81,11 +84,11 @@ public class MapWrapper_v1_20_R1 extends MapWrapper {
         public void update(ArrayImage content) {
             MapWrapper duplicate = MapReflectionAPI.getMapManager().getDuplicate(content);
             if (duplicate != null) {
-                MapWrapper_v1_20_R1.this.content = duplicate.getContent();
+                MapWrapper_v1_20_R4.this.content = duplicate.getContent();
                 return;
             }
 
-            MapWrapper_v1_20_R1.this.content = content;
+            MapWrapper_v1_20_R4.this.content = content;
 
             for (UUID id : viewers.keySet()) {
                 sendContent(Bukkit.getPlayer(id));
@@ -103,16 +106,16 @@ public class MapWrapper_v1_20_R1 extends MapWrapper {
 
             int id = getMapId(player);
             if (withoutQueue) {
-                MapSender_v1_20_R1.sendMap(id, MapWrapper_v1_20_R1.this.content, player);
+                MapSender_v1_20_R4.sendMap(id, MapWrapper_v1_20_R4.this.content, player);
             } else {
-                MapSender_v1_20_R1.addToQueue(id, MapWrapper_v1_20_R1.this.content, player);
+                MapSender_v1_20_R4.addToQueue(id, MapWrapper_v1_20_R4.this.content, player);
             }
         }
 
         @Override
         public void cancelSend() {
             for (int s : viewers.values()) {
-                MapSender_v1_20_R1.cancelID(s);
+                MapSender_v1_20_R4.cancelID(s);
             }
         }
 
@@ -129,8 +132,8 @@ public class MapWrapper_v1_20_R1 extends MapWrapper {
             }
 
             CraftPlayer craftPlayer = (CraftPlayer) player;
-            int windowId = craftPlayer.getHandle().bQ.j; //inventoryMenu containerId
-            int stateId = craftPlayer.getHandle().bQ.j(); //inventoryMenu getStateId()
+            int windowId = craftPlayer.getHandle().cb.j; //inventoryMenu containerId
+            int stateId = craftPlayer.getHandle().cb.j(); //inventoryMenu getStateId()
 
             ItemStack stack = new ItemStack(Material.FILLED_MAP, 1);
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
@@ -186,7 +189,7 @@ public class MapWrapper_v1_20_R1 extends MapWrapper {
                 ItemFrame frame = getItemFrameById(player.getWorld(), entityId);
                 if (frame != null) {
                     frame.removeMetadata("MAP_WRAPPER_REF", MapReflectionAPI.getInstance());
-                    frame.setMetadata("MAP_WRAPPER_REF", new FixedMetadataValue(MapReflectionAPI.getInstance(), MapWrapper_v1_20_R1.this));
+                    frame.setMetadata("MAP_WRAPPER_REF", new FixedMetadataValue(MapReflectionAPI.getInstance(), MapWrapper_v1_20_R4.this));
                 }
 
                 sendItemFramePacket(player, entityId, stack, getMapId(player));
@@ -217,10 +220,11 @@ public class MapWrapper_v1_20_R1 extends MapWrapper {
 
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
-            nmsStack.w().a("map", mapId); //getOrCreateTag putInt
+            MapId mapId1 = new MapId(mapId);
+            nmsStack.b(DataComponents.B, mapId1); //set
 
-            List<DataWatcher.b<?>> list = new ArrayList<>();
-            DataWatcher.b<?> dataWatcherItem = DataWatcher.b.a(EntityItemFrame.g, nmsStack);
+            List<DataWatcher.c<?>> list = new ArrayList<>();
+            DataWatcher.c<?> dataWatcherItem = DataWatcher.c.a(EntityItemFrame.g, nmsStack);
             list.add(dataWatcherItem);
             PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(entityId, list);
 
@@ -228,7 +232,7 @@ public class MapWrapper_v1_20_R1 extends MapWrapper {
         }
     };
 
-    public MapWrapper_v1_20_R1(ArrayImage image) {
+    public MapWrapper_v1_20_R4(ArrayImage image) {
         super(image);
     }
 

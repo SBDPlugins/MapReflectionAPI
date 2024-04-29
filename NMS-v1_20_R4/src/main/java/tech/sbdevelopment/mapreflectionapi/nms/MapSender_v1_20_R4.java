@@ -19,9 +19,10 @@
 package tech.sbdevelopment.mapreflectionapi.nms;
 
 import net.minecraft.network.protocol.game.PacketPlayOutMap;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.WorldMap;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
@@ -29,14 +30,16 @@ import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil.supports;
+
 /**
- * The {@link MapSender_v1_20_R1} sends the Map packets to players.
+ * The {@link MapSender_v1_20_R4} sends the Map packets to players.
  */
-public class MapSender_v1_20_R1 {
+public class MapSender_v1_20_R4 {
     private static final List<QueuedMap> sendQueue = new ArrayList<>();
     private static int senderID = -1;
 
-    private MapSender_v1_20_R1() {
+    private MapSender_v1_20_R4() {
     }
 
     /**
@@ -118,8 +121,10 @@ public class MapSender_v1_20_R1 {
                         content.array //Data
                 );
 
+                MapId mapId = new MapId(id);
+
                 PacketPlayOutMap packet = new PacketPlayOutMap(
-                        id, //ID
+                        mapId, //ID
                         (byte) 0, //Scale
                         false, //Show icons
                         new ArrayList<>(), //Icons

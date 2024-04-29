@@ -27,8 +27,8 @@ import net.minecraft.world.EnumHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R4.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil.*;
 
-public class PacketListener_v1_20_R1 extends PacketListener {
+public class PacketListener_v1_20_R4 extends PacketListener {
     @Override
     protected void injectPlayer(Player p) {
         ChannelDuplexHandler channelDuplexHandler = new ChannelDuplexHandler() {
@@ -89,8 +89,8 @@ public class PacketListener_v1_20_R1 extends PacketListener {
                         return false;
                     }).get(1, TimeUnit.SECONDS)) return;
                 } else if (packet instanceof PacketPlayInSetCreativeSlot packetPlayInSetCreativeSlot) {
-                    int slot = packetPlayInSetCreativeSlot.a();
-                    ItemStack item = packetPlayInSetCreativeSlot.c();
+                    int slot = (int) getDeclaredField(packetPlayInSetCreativeSlot, supports(20, 4) ? "b" : "a"); //slot, 1.20.5 = b, lower is a
+                    ItemStack item = (ItemStack) getDeclaredField(packetPlayInSetCreativeSlot, supports(20, 4) ? "e" : "d"); //item, 1.20.5 = e, lower is d
 
                     boolean async = !plugin.getServer().isPrimaryThread();
                     CreateInventoryMapUpdateEvent event = new CreateInventoryMapUpdateEvent(p, slot, CraftItemStack.asBukkitCopy(item), async);
@@ -106,7 +106,7 @@ public class PacketListener_v1_20_R1 extends PacketListener {
 
         //The connection is private since 1.19.4 :|
         NetworkManager networkManager = (NetworkManager) getField(((CraftPlayer) p).getHandle().c, "h");
-        ChannelPipeline pipeline = networkManager.m.pipeline(); //connection channel
+        ChannelPipeline pipeline = networkManager.n.pipeline(); //connection channel
         pipeline.addBefore("packet_handler", p.getName(), channelDuplexHandler);
     }
 
@@ -114,7 +114,7 @@ public class PacketListener_v1_20_R1 extends PacketListener {
     public void removePlayer(Player p) {
         //The connection is private since 1.19.4 :|
         NetworkManager networkManager = (NetworkManager) getField(((CraftPlayer) p).getHandle().c, "h");
-        Channel channel = networkManager.m; //connection channel
+        Channel channel = networkManager.n; //connection channel
         channel.eventLoop().submit(() -> channel.pipeline().remove(p.getName()));
     }
 
