@@ -112,7 +112,25 @@ public class MapSender {
 
         final int id = -id0;
         Object packet;
-        if (supports(17)) { //1.17+
+        if (supports(20, 4)) { //1.20.5+
+            //TODO: Implement 1.20.5+ map sending
+
+            Object updateData = ReflectionUtil.callConstructor(worldMapData,
+                    content.minX, //X pos
+                    content.minY, //Y pos
+                    content.maxX, //X size (2nd X pos)
+                    content.maxY, //Y size (2nd Y pos)
+                    content.array //Data
+            );
+
+            packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
+                    id, //ID
+                    (byte) 0, //Scale, 0 = 1 block per pixel
+                    false, //Show icons
+                    new ReflectionUtil.CollectionParam<>(), //Icons
+                    updateData
+            );
+        } else if (supports(17)) { //1.17+
             Object updateData = ReflectionUtil.callConstructor(worldMapData,
                     content.minX, //X pos
                     content.minY, //Y pos
