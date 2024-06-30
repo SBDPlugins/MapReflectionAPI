@@ -35,6 +35,7 @@ public class ReflectionUtil {
     private static final Map<String, Constructor<?>> constructorCache = new HashMap<>();
     private static final Map<String, Method> methodCache = new HashMap<>();
     private static final Map<String, Field> fieldCache = new HashMap<>();
+    private static final Class<?> craftWorld = getCraftClass("CraftWorld");
 
     /**
      * Helper class converted to {@link List}
@@ -76,17 +77,8 @@ public class ReflectionUtil {
     }
 
     @Nullable
-    public static Object getHandle(@NotNull World world) {
-        Class<?> worldServer = getNMSClass("server.level", "WorldServer");
-        Class<?> craftWorld = getCraftClass("CraftWorld");
-        try {
-            Method m = craftWorld.getMethod("getHandle", worldServer);
-            m.setAccessible(true);
-            return m.invoke(null, world);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-            ex.printStackTrace();
-            return null;
-        }
+    public static Object getHandle(@NotNull World world) {;
+        return callDeclaredMethod(craftWorld, world, "getHandle");
     }
 
     @Nullable
@@ -233,6 +225,26 @@ public class ReflectionUtil {
                 return cachedMethod.invoke(obj, params);
             } else {
                 Method m = obj.getClass().getDeclaredMethod(method, toParamTypes(params));
+                m.setAccessible(true);
+                methodCache.put(cacheKey, m);
+                return m.invoke(obj, params);
+            }
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    public static Object callDeclaredMethod(Class<?> clazz, Object obj, String method, Object... params) {
+        try {
+            String cacheKey = "DeclaredMethod:" + clazz.getName() + ":" + method + ":" + Arrays.hashCode(params);
+
+            if (methodCache.containsKey(cacheKey)) {
+                Method cachedMethod = methodCache.get(cacheKey);
+                return cachedMethod.invoke(obj, params);
+            } else {
+                Method m = clazz.getDeclaredMethod(method, toParamTypes(params));
                 m.setAccessible(true);
                 methodCache.put(cacheKey, m);
                 return m.invoke(obj, params);

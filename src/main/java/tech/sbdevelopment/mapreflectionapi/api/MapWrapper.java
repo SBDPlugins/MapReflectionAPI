@@ -297,7 +297,17 @@ public class MapWrapper extends AbstractMapWrapper {
             if (supports(20, 4)) {
                 Object mapIdComponent = ReflectionUtil.getDeclaredField(getNMSClass("core.component", "DataComponents"), "B");
                 Object mapId1 = ReflectionUtil.callConstructor(getNMSClass("world.level.saveddata.maps", "MapId"), mapId);
-                ReflectionUtil.callMethod(nmsStack, "b", mapIdComponent, mapId1);
+
+                // Use generic reflection because of generics
+                // <T> T ItemStack#b(DataComponentType<? super T> dataComponentType, T t)
+                try {
+                    Method m = nmsStack.getClass().getMethod("b", getNMSClass("core.component", "DataComponentType"), Object.class);
+                    m.setAccessible(true);
+                    m.invoke(nmsStack, mapIdComponent, mapId1);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                    ex.printStackTrace();
+                    return null;
+                }
             } else if (supports(13)) {
                 String nbtObjectName;
                 if (supports(20)) { //1.20

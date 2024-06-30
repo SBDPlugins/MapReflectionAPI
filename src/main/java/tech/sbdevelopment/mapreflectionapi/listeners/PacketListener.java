@@ -30,14 +30,18 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
+import sun.misc.Unsafe;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.events.CreativeInventoryMapUpdateEvent;
 import tech.sbdevelopment.mapreflectionapi.api.events.MapCancelEvent;
 import tech.sbdevelopment.mapreflectionapi.api.events.MapInteractEvent;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.concurrent.TimeUnit;
 
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getConnection;
 import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getHandle;
 import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil.*;
 import static com.cryptomorin.xseries.reflection.XReflection.*;
@@ -51,7 +55,7 @@ public class PacketListener implements Listener {
     private static final Class<?> playerCommonConnection;
 
     static {
-        if (supports(20) && supportsPatch(2)) {
+        if (supports(20, 2)) {
             // The packet send method has been abstracted from ServerGamePacketListenerImpl to ServerCommonPacketListenerImpl in 1.20.2
             playerCommonConnection = getNMSClass("server.network", "ServerCommonPacketListenerImpl");
         } else {
@@ -78,11 +82,34 @@ public class PacketListener implements Listener {
                 if (packet.getClass().isAssignableFrom(packetPlayOutMapClass)) {
                     Object packetPlayOutMap = packetPlayOutMapClass.cast(packet);
 
-                    int id = (int) getDeclaredField(packetPlayOutMap, "a");
-                    if (id < 0) {
-                        int newId = -id;
-                        setDeclaredField(packetPlayOutMap, "a", newId);
+                    int id;
+                    boolean inv = false;
+                    if (supports(20, 4)) { //1.20.4 uses MapId class and record classes (final fields...)
+                        Object mapId = getDeclaredField(packetPlayOutMap, "b");
+                        id = (int) getDeclaredField(mapId, "c");
+
+                        if (id < 0) {
+                            Object newMapid = callConstructor(mapId.getClass(), -id);
+                            Object c = getDeclaredField(packetPlayOutMap, "c");
+                            Object d = getDeclaredField(packetPlayOutMap, "d");
+                            Object e = getDeclaredField(packetPlayOutMap, "e");
+                            Object f = getDeclaredField(packetPlayOutMap, "f");
+
+                            packetPlayOutMap = callConstructor(packetPlayOutMapClass, newMapid, c, d, e, f);
+                            packet = packetPlayOutMap;
+
+                            inv = true;
+                        }
                     } else {
+                        id = (int) getDeclaredField(packetPlayOutMap, "a");
+
+                        if (id < 0) {
+                            setDeclaredField(packetPlayOutMap, "a", -id);
+                            inv = true;
+                        }
+                    }
+
+                    if (!inv) {
                         boolean async = !MapReflectionAPI.getInstance().getServer().isPrimaryThread();
                         MapCancelEvent event = new MapCancelEvent(player, id, async);
                         if (MapReflectionAPI.getMapManager().isIdUsedBy(player, id)) event.setCancelled(true);
@@ -102,13 +129,13 @@ public class PacketListener implements Listener {
                 if (packet.getClass().isAssignableFrom(packetPlayInUseEntityClass)) {
                     Object packetPlayInEntity = packetPlayInUseEntityClass.cast(packet);
 
-                    int entityId = (int) getDeclaredField(packetPlayInEntity, "a");
+                    int entityId = (int) getDeclaredField(packetPlayInEntity, supports(20, 4) ? "b" : "a");
 
                     Enum<?> actionEnum;
                     Enum<?> hand;
                     Object pos;
                     if (supports(17)) {
-                        Object action = getDeclaredField(packetPlayInEntity, "b");
+                        Object action = getDeclaredField(packetPlayInEntity, supports(20, 4) ? "c" : "b");
                         actionEnum = (Enum<?>) callDeclaredMethod(action, "a");
                         Class<?> d = getNMSClass("network.protocol.game", "PacketPlayInUseEntity$d");
                         Class<?> e = getNMSClass("network.protocol.game", "PacketPlayInUseEntity$e");
@@ -141,7 +168,12 @@ public class PacketListener implements Listener {
                 } else if (packet.getClass().isAssignableFrom(packetPlayInSetCreativeSlotClass)) {
                     Object packetPlayInSetCreativeSlot = packetPlayInSetCreativeSlotClass.cast(packet);
 
-                    int slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(20, 4) ? "b" : supports(19, 4) ? "a" : supports(13) ? "b" : "a"); //1.20.4 - 1.19.4 = a, 1.19.3 - 1.13 and 1.20.5 = b, 1.12 = a
+                    int slot;
+                    if (supports(20, 4)) { //1.20.4+ uses short
+                        slot = (short) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, "b");
+                    } else { //1.20.3 and lower uses int
+                        slot = (int) ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(19, 4) ? "a" : supports(13) ? "b" : "a"); //1.20.4 - 1.19.4 = a, 1.19.3 - 1.13 and 1.20.5 = b, 1.12 = a
+                    }
                     Object nmsStack = ReflectionUtil.callDeclaredMethod(packetPlayInSetCreativeSlot, supports(20, 4) ? "e" : supports(20, 2) ? "d" : supports(18) ? "c" : "getItemStack"); //1.20.5 = e, 1.20.2-1.20.4 = d, >= 1.18 = c, 1.17 = getItemStack
                     ItemStack craftStack = (ItemStack) ReflectionUtil.callMethod(craftStackClass, "asBukkitCopy", nmsStack);
 
@@ -167,9 +199,7 @@ public class PacketListener implements Listener {
     }
 
     private Channel getChannel(Player player) {
-        Object playerHandle = getHandle(player);
-        Object playerConnection = getDeclaredField(playerHandle, supports(20) ? "c" : supports(17) ? "b" : "playerConnection"); //1.20 = c, 1.17-1.19 = b, 1.16 = playerConnection
-        Object networkManager = getDeclaredField(playerCommonConnection, playerConnection, supports(20, 2) ? "c" : supports(19, 4) ? "h" : supports(19) ? "b" : supports(17) ? "a" : "networkManager"); //1.20.2 = ServerCommonPacketListenerImpl#c, 1.20(.1) & 1.19.4 = h, >= 1.19.3 = b, 1.18 - 1.17 = a, 1.16 = networkManager
+        Object networkManager = getDeclaredField(playerCommonConnection, getConnection(player), supports(21) ? "e" : supports(20, 2) ? "c" : supports(19, 4) ? "h" : supports(19) ? "b" : supports(17) ? "a" : "networkManager"); //1.20.2 = ServerCommonPacketListenerImpl#c, 1.20(.1) & 1.19.4 = h, >= 1.19.3 = b, 1.18 - 1.17 = a, 1.16 = networkManager
         return (Channel) getDeclaredField(networkManager, supports(20, 2) ? "n" : supports(18) ? "m" : supports(17) ? "k" : "channel"); //1.20.2 = n, 1.20(.1), 1.19 & 1.18 = m, 1.17 = k, 1.16 = channel
     }
 

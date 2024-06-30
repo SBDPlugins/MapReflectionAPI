@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.cryptomorin.xseries.reflection.XReflection.*;
-import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getHandle;
 
 /**
  * The {@link MapManager} manages all the maps. It also contains functions for wrapping.
