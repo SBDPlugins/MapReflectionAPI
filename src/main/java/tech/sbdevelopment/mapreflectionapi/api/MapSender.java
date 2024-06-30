@@ -27,7 +27,8 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
+import static com.cryptomorin.xseries.reflection.XReflection.*;
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.sendPacket;
 
 /**
  * The {@link MapSender} sends the Map packets to players.
@@ -86,6 +87,7 @@ public class MapSender {
 
     private static final Class<?> packetPlayOutMapClass = getNMSClass("network.protocol.game", "PacketPlayOutMap");
     private static final Class<?> worldMapData = supports(17) ? getNMSClass("world.level.saveddata.maps", "WorldMap$b") : null;
+    private static final Class<?> mapId = supports(21) ? getNMSClass("world.level.saveddata.maps", "MapId") : null;
 
     /**
      * Send a map to a player
@@ -110,9 +112,28 @@ public class MapSender {
             return;
         }
 
-        final int id = -id0;
+        int id = -id0;
+
         Object packet;
-        if (supports(17)) { //1.17+
+        if (supports(20, 4)) { //1.20.5+
+            Object updateData = ReflectionUtil.callConstructor(worldMapData,
+                    content.minX, //X pos
+                    content.minY, //Y pos
+                    content.maxX, //X size (2nd X pos)
+                    content.maxY, //Y size (2nd Y pos)
+                    content.array //Data
+            );
+
+            Object mapId = ReflectionUtil.callConstructor(getNMSClass("world.level.saveddata.maps", "MapId"), id);
+
+            packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
+                    mapId, //ID
+                    (byte) 0, //Scale, 0 = 1 block per pixel
+                    false, //Show icons
+                    new ReflectionUtil.CollectionParam<>(), //Icons
+                    updateData
+            );
+        } else if (supports(17)) { //1.17+
             Object updateData = ReflectionUtil.callConstructor(worldMapData,
                     content.minX, //X pos
                     content.minY, //Y pos

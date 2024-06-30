@@ -30,12 +30,11 @@ import tech.sbdevelopment.mapreflectionapi.listeners.MapListener;
 import tech.sbdevelopment.mapreflectionapi.listeners.PacketListener;
 import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
 import tech.sbdevelopment.mapreflectionapi.utils.MainUtil;
-import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import tech.sbdevelopment.mapreflectionapi.utils.UpdateManager;
 
 import java.util.logging.Level;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.supports;
+import static com.cryptomorin.xseries.reflection.XReflection.supports;
 
 public class MapReflectionAPI extends JavaPlugin {
     private static MapReflectionAPI instance;
@@ -70,7 +69,7 @@ public class MapReflectionAPI extends JavaPlugin {
         getLogger().info("Made by © Copyright SBDevelopment 2023");
 
         if (!supports(12)) {
-            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12 - 1.19.4!");
+            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12 - 1.20.5!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }

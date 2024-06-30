@@ -1,6 +1,6 @@
 /*
  * This file is part of MapReflectionAPI.
- * Copyright (c) 2022-2023 inventivetalent / SBDevelopment - All Rights Reserved
+ * Copyright (c) 2023 inventivetalent / SBDevelopment - All Rights Reserved
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +16,31 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package tech.sbdevelopment.mapreflectionapi.utils;
+package tech.sbdevelopment.mapreflectionapi.api.events.types;
 
-import java.util.Map;
-import java.util.function.Supplier;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.bukkit.event.HandlerList;
 
-public class MainUtil {
-    private MainUtil() {
+@NoArgsConstructor
+public class Event extends org.bukkit.event.Event {
+    public Event(boolean isAsync) {
+        super(isAsync);
     }
 
     /**
-     * Gets whether this is a headless JDK that doesn't contain the Java AWT library
-     *
-     * @return True if java.awt is not available
+     * A list of EventHandlers listening to this event.
      */
-    public static boolean isHeadlessJDK() {
-        try {
-            Class.forName("java.awt.Color");
-            return false;
-        } catch (ClassNotFoundException ex) {
-            return true;
-        }
+    @Getter
+    private static final HandlerList handlerList = new HandlerList();
+
+    /**
+     * Get the EventHandlers listening to this event.
+     *
+     * @return The EventHandlers listening to this event.
+     */
+    @Override
+    public HandlerList getHandlers() {
+        return handlerList;
     }
 }

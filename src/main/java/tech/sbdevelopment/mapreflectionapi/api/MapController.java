@@ -19,7 +19,6 @@
 package tech.sbdevelopment.mapreflectionapi.api;
 
 import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 
@@ -117,13 +116,4 @@ public interface MapController extends IMapController {
      * @param frame  {@link ItemFrame} to clear
      */
     void clearFrame(Player player, ItemFrame frame);
-
-    /**
-     * Get an {@link ItemFrame} by its entity ID
-     *
-     * @param world    The world the {@link ItemFrame} is in
-     * @param entityId Entity-ID of the {@link ItemFrame}
-     * @return The found {@link ItemFrame}, or <code>null</code>
-     */
-    ItemFrame getItemFrameById(World world, int entityId);
 }

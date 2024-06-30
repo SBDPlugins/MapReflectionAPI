@@ -19,7 +19,9 @@
 package tech.sbdevelopment.mapreflectionapi.api;
 
 import lombok.Getter;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +33,7 @@ import tech.sbdevelopment.mapreflectionapi.api.events.MapContentUpdateEvent;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
+import tech.sbdevelopment.mapreflectionapi.utils.XMaterial;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,21 +41,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
+import static com.cryptomorin.xseries.reflection.XReflection.*;
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getHandle;
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.sendPacket;
 
 /**
  * A {@link MapWrapper} wraps one image.
  */
 @Getter
 public class MapWrapper extends AbstractMapWrapper {
-    private static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
+    public static final String REFERENCE_METADATA = "MAP_WRAPPER_REF";
     protected ArrayImage content;
-
-    private static final Material MAP_MATERIAL;
-
-    static {
-        MAP_MATERIAL = supports(13) ? Material.FILLED_MAP : Material.MAP;
-    }
 
     /**
      * Construct a new {@link MapWrapper}
@@ -70,6 +69,8 @@ public class MapWrapper extends AbstractMapWrapper {
     private static final Class<?> entityMetadataPacketClass = getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
     private static final Class<?> entityItemFrameClass = getNMSClass("world.entity.decoration", "EntityItemFrame");
     private static final Class<?> dataWatcherItemClass = getNMSClass("network.syncher", "DataWatcher$Item");
+    private static final Class<?> minecraftKeyClass = getNMSClass("resources", "MinecraftKey");
+    private static final Class<?> builtInRegistriesClass = getNMSClass("core.registries", "BuiltInRegistries");
 
     protected MapController controller = new MapController() {
         private final Map<UUID, Integer> viewers = new HashMap<>();
@@ -167,9 +168,12 @@ public class MapWrapper extends AbstractMapWrapper {
             }
 
             String inventoryMenuName;
-            if (supports(20)) {
-                //>= 1.20.2 = bR, 1.20(.1) = bQ
-                inventoryMenuName = supports(20, 2) ? "bR" : "bQ";
+            if (supports(21)) {
+                //1.21 = cc
+                inventoryMenuName = "cc";
+            } else if (supports(20)) {
+                //1.20.5 = cb, 1.20.2 - 1.20.4 = bR, 1.20(.1) = bQ
+                inventoryMenuName = supports(20, 4) ? "cb" : supports(20, 2) ? "bR" : "bQ";
             } else if (supports(19)) {
                 //1.19.4 = bO, >= 1.19.3 = bT
                 inventoryMenuName = supports(19, 3) ? "bO" : "bT";
@@ -205,7 +209,7 @@ public class MapWrapper extends AbstractMapWrapper {
                 );
             }
 
-            sendPacketSync(player, packet);
+            sendPacket(player, packet);
         }
 
         @Override
@@ -215,7 +219,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
         @Override
         public void showInHand(Player player, boolean force) {
-            if (player.getInventory().getItemInMainHand().getType() != MAP_MATERIAL && !force)
+            if (player.getInventory().getItemInMainHand().getType() != XMaterial.FILLED_MAP.parseMaterial() && !force)
                 return;
 
             showInInventory(player, player.getInventory().getHeldItemSlot(), force);
@@ -233,7 +237,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
         @Override
         public void showInFrame(Player player, ItemFrame frame, boolean force) {
-            if (frame.getItem().getType() != MAP_MATERIAL && !force)
+            if (frame.getItem().getType() != XMaterial.FILLED_MAP.parseMaterial() && !force)
                 return;
 
             showInFrame(player, frame.getEntityId());
@@ -248,7 +252,7 @@ public class MapWrapper extends AbstractMapWrapper {
         public void showInFrame(Player player, int entityId, String debugInfo) {
             if (!isViewing(player)) return;
 
-            ItemStack stack = new ItemStack(MAP_MATERIAL, 1);
+            ItemStack stack = new ItemStack(XMaterial.FILLED_MAP.parseMaterial(), 1);
             if (debugInfo != null) {
                 ItemMeta itemMeta = stack.getItemMeta();
                 itemMeta.setDisplayName(debugInfo);
@@ -256,7 +260,7 @@ public class MapWrapper extends AbstractMapWrapper {
             }
 
             Bukkit.getScheduler().runTask(MapReflectionAPI.getInstance(), () -> {
-                ItemFrame frame = getItemFrameById(player.getWorld(), entityId);
+                ItemFrame frame = MapReflectionAPI.getMapManager().getItemFrameById(player.getWorld(), entityId);
                 if (frame != null) {
                     frame.removeMetadata(REFERENCE_METADATA, MapReflectionAPI.getInstance());
                     frame.setMetadata(REFERENCE_METADATA, new FixedMetadataValue(MapReflectionAPI.getInstance(), MapWrapper.this));
@@ -270,7 +274,7 @@ public class MapWrapper extends AbstractMapWrapper {
         public void clearFrame(Player player, int entityId) {
             sendItemFramePacket(player, entityId, null, -1);
             Bukkit.getScheduler().runTask(MapReflectionAPI.getInstance(), () -> {
-                ItemFrame frame = getItemFrameById(player.getWorld(), entityId);
+                ItemFrame frame = MapReflectionAPI.getMapManager().getItemFrameById(player.getWorld(), entityId);
                 if (frame != null) frame.removeMetadata(REFERENCE_METADATA, MapReflectionAPI.getInstance());
             });
         }
@@ -280,29 +284,8 @@ public class MapWrapper extends AbstractMapWrapper {
             clearFrame(player, frame.getEntityId());
         }
 
-        @Override
-        public ItemFrame getItemFrameById(World world, int entityId) {
-            Object worldHandle = getHandle(world);
-            Object nmsEntity = ReflectionUtil.callMethod(worldHandle, supports(18) ? "a" : "getEntity", entityId);
-            if (nmsEntity == null) return null;
-
-            Object craftEntity = ReflectionUtil.callMethod(nmsEntity, "getBukkitEntity");
-            if (craftEntity == null) return null;
-
-            Class<?> itemFrameClass = getNMSClass("world.entity.decoration", "EntityItemFrame");
-            if (itemFrameClass == null) return null;
-
-            if (craftEntity.getClass().isAssignableFrom(itemFrameClass))
-                return (ItemFrame) itemFrameClass.cast(craftEntity);
-
-            return null;
-        }
-
         private Object asCraftItemStack(Player player) {
-            return createCraftItemStack(supports(13)
-                    ? new ItemStack(MAP_MATERIAL, 1)
-                    : new ItemStack(MAP_MATERIAL, 1, (short) getMapId(player)
-            ), (short) getMapId(player));
+            return createCraftItemStack(new ItemStack(XMaterial.FILLED_MAP.parseMaterial(), 1, (short) getMapId(player)), (short) getMapId(player));
         }
 
         private Object createCraftItemStack(@NotNull ItemStack stack, int mapId) {
@@ -310,7 +293,22 @@ public class MapWrapper extends AbstractMapWrapper {
 
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
 
-            if (supports(13)) {
+            //1.20.5 uses new NBT compound system
+            if (supports(20, 4)) {
+                Object mapIdComponent = ReflectionUtil.getDeclaredField(getNMSClass("core.component", "DataComponents"), "B");
+                Object mapId1 = ReflectionUtil.callConstructor(getNMSClass("world.level.saveddata.maps", "MapId"), mapId);
+
+                // Use generic reflection because of generics
+                // <T> T ItemStack#b(DataComponentType<? super T> dataComponentType, T t)
+                try {
+                    Method m = nmsStack.getClass().getMethod("b", getNMSClass("core.component", "DataComponentType"), Object.class);
+                    m.setAccessible(true);
+                    m.invoke(nmsStack, mapIdComponent, mapId1);
+                } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                    ex.printStackTrace();
+                    return null;
+                }
+            } else if (supports(13)) {
                 String nbtObjectName;
                 if (supports(20)) { //1.20
                     nbtObjectName = "w";
@@ -331,7 +329,9 @@ public class MapWrapper extends AbstractMapWrapper {
             Object nmsStack = createCraftItemStack(stack, mapId);
 
             String dataWatcherObjectName;
-            if (supports(19, 3)) { //1.19.3 and 1.20(.1)
+            if (supports(21)) { //1.21
+                dataWatcherObjectName = "f";
+            } else if (supports(19, 3)) { //1.19.3 and 1.20(.1)
                 dataWatcherObjectName = "g";
             } else if (supports(19)) { //1.19-1.19.2
                 dataWatcherObjectName = "ao";
@@ -352,7 +352,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
             Object packet;
             if (supports(19, 3)) { //1.19.3
-                Class<?> dataWatcherRecordClass = getNMSClass("network.syncher", "DataWatcher$b");
+                Class<?> dataWatcherRecordClass = getNMSClass("network.syncher", "DataWatcher$" + (supports(20, 4) ? "c" : "b"));
                 // Sadly not possible to use ReflectionUtil (in its current state), because of the Object parameter
                 Object dataWatcherItem;
                 try {
@@ -383,7 +383,7 @@ public class MapWrapper extends AbstractMapWrapper {
                 ReflectionUtil.setDeclaredField(packet, "b", list);
             }
 
-            sendPacketSync(player, packet);
+            sendPacket(player, packet);
         }
     };
 }

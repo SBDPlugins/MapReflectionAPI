@@ -144,8 +144,8 @@ public interface MultiMapController extends IMapController {
          * Called to get debug information for a frame
          *
          * @param controller the {@link MapController}
-         * @param row          Row of the current frame
-         * @param column          Column of the current frame
+         * @param row        Row of the current frame
+         * @param column     Column of the current frame
          * @return {@link String} to show when a player looks at the map, or <code>null</code>
          * @see MapController#showInFrame(Player, int, String)
          */

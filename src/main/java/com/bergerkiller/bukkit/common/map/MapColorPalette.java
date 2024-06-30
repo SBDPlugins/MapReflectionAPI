@@ -27,7 +27,7 @@ import java.awt.*;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.supports;
+import static com.cryptomorin.xseries.reflection.XReflection.supports;
 
 /**
  * Additional functionality on top of Bukkit's MapPalette

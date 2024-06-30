@@ -19,16 +19,21 @@
 package tech.sbdevelopment.mapreflectionapi.api;
 
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 import tech.sbdevelopment.mapreflectionapi.api.exceptions.MapLimitExceededException;
 import tech.sbdevelopment.mapreflectionapi.managers.Configuration;
+import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static com.cryptomorin.xseries.reflection.XReflection.*;
 
 /**
  * The {@link MapManager} manages all the maps. It also contains functions for wrapping.
@@ -169,6 +174,30 @@ public class MapManager {
                 return wrapper;
             }
         }
+        return null;
+    }
+
+    /**
+     * Get an {@link ItemFrame} by its entity ID
+     *
+     * @param world    The world the {@link ItemFrame} is in
+     * @param entityId Entity-ID of the {@link ItemFrame}
+     * @return The found {@link ItemFrame}, or <code>null</code>
+     */
+    public ItemFrame getItemFrameById(World world, int entityId) {
+        Object worldHandle = ReflectionUtil.getHandle(world);
+        Object nmsEntity = ReflectionUtil.callMethod(worldHandle, supports(18) ? "a" : "getEntity", entityId);
+        if (nmsEntity == null) return null;
+
+        Object craftEntity = ReflectionUtil.callMethod(nmsEntity, "getBukkitEntity");
+        if (craftEntity == null) return null;
+
+        Class<?> itemFrameClass = getNMSClass("world.entity.decoration", "EntityItemFrame");
+        if (itemFrameClass == null) return null;
+
+        if (craftEntity.getClass().isAssignableFrom(itemFrameClass))
+            return (ItemFrame) itemFrameClass.cast(craftEntity);
+
         return null;
     }
 

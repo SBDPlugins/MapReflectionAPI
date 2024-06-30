@@ -18,6 +18,7 @@
 
 package tech.sbdevelopment.mapreflectionapi.utils;
 
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,24 +28,30 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static com.cryptomorin.xseries.reflection.XReflection.getCraftClass;
+import static com.cryptomorin.xseries.reflection.XReflection.getNMSClass;
+
 public class ReflectionUtil {
     private static final Map<String, Constructor<?>> constructorCache = new HashMap<>();
     private static final Map<String, Method> methodCache = new HashMap<>();
     private static final Map<String, Field> fieldCache = new HashMap<>();
+    private static final Class<?> craftWorld = getCraftClass("CraftWorld");
 
     /**
      * Helper class converted to {@link List}
      *
      * @param <E> The storage type
      */
-    public static class ListParam<E> extends ArrayList<E> {}
+    public static class ListParam<E> extends ArrayList<E> {
+    }
 
     /**
      * Helper class converted to {@link Collection}
      *
      * @param <E> The storage type
      */
-    public static class CollectionParam<E> extends ArrayList<E> {}
+    public static class CollectionParam<E> extends ArrayList<E> {
+    }
 
     private static Class<?> wrapperToPrimitive(Class<?> clazz) {
         if (clazz == Boolean.class) return boolean.class;
@@ -67,6 +74,11 @@ public class ReflectionUtil {
         return Arrays.stream(params)
                 .map(obj -> obj != null ? wrapperToPrimitive(obj.getClass()) : null)
                 .toArray(Class<?>[]::new);
+    }
+
+    @Nullable
+    public static Object getHandle(@NotNull World world) {;
+        return callDeclaredMethod(craftWorld, world, "getHandle");
     }
 
     @Nullable
@@ -213,6 +225,26 @@ public class ReflectionUtil {
                 return cachedMethod.invoke(obj, params);
             } else {
                 Method m = obj.getClass().getDeclaredMethod(method, toParamTypes(params));
+                m.setAccessible(true);
+                methodCache.put(cacheKey, m);
+                return m.invoke(obj, params);
+            }
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    public static Object callDeclaredMethod(Class<?> clazz, Object obj, String method, Object... params) {
+        try {
+            String cacheKey = "DeclaredMethod:" + clazz.getName() + ":" + method + ":" + Arrays.hashCode(params);
+
+            if (methodCache.containsKey(cacheKey)) {
+                Method cachedMethod = methodCache.get(cacheKey);
+                return cachedMethod.invoke(obj, params);
+            } else {
+                Method m = clazz.getDeclaredMethod(method, toParamTypes(params));
                 m.setAccessible(true);
                 methodCache.put(cacheKey, m);
                 return m.invoke(obj, params);
