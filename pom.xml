@@ -40,6 +40,7 @@
     <modules>
         <module>API</module>
         <module>Dist</module>
+        <module>NMS-v1_21_R1</module>
         <module>NMS-v1_20_R3</module>
         <module>NMS-v1_20_R2</module>
         <module>NMS-v1_20_R1</module>
