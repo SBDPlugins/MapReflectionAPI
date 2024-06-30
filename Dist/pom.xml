@@ -77,7 +77,7 @@
         </dependency>
         <dependency>
             <groupId>tech.sbdevelopment</groupId>
-            <artifactId>MapReflectionAPI-NMS-v1_20_R1</artifactId>
+            <artifactId>MapReflectionAPI-NMS-v1_20_R4</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>
