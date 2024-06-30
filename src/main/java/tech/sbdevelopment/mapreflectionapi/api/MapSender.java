@@ -27,7 +27,8 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
+import static com.cryptomorin.xseries.reflection.XReflection.*;
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.sendPacket;
 
 /**
  * The {@link MapSender} sends the Map packets to players.
@@ -111,6 +112,8 @@ public class MapSender {
             return;
         }
 
+        int id = -id0;
+
         Object packet;
         if (supports(20, 4)) { //1.20.5+
             Object updateData = ReflectionUtil.callConstructor(worldMapData,
@@ -139,26 +142,16 @@ public class MapSender {
                     content.array //Data
             );
 
-            if (supports(21)) { //1.21+
-                packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
-                        ReflectionUtil.callConstructor(mapId, -id0), //ID
-                        (byte) 0, //Scale, 0 = 1 block per pixel
-                        false, //Show icons
-                        new ReflectionUtil.CollectionParam<>(), //Icons
-                        updateData
-                );
-            } else {
-                packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
-                        -id0, //ID
-                        (byte) 0, //Scale, 0 = 1 block per pixel
-                        false, //Show icons
-                        new ReflectionUtil.CollectionParam<>(), //Icons
-                        updateData
-                );
-            }
+            packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
+                    id, //ID
+                    (byte) 0, //Scale, 0 = 1 block per pixel
+                    false, //Show icons
+                    new ReflectionUtil.CollectionParam<>(), //Icons
+                    updateData
+            );
         } else if (supports(14)) { //1.16-1.14
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
-                    -id0, //ID
+                    id, //ID
                     (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //Tracking position
                     false, //Locked
@@ -171,7 +164,7 @@ public class MapSender {
             );
         } else { //1.13-
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
-                    -id0, //ID
+                    id, //ID
                     (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //???
                     new ReflectionUtil.CollectionParam<>(), //Icons

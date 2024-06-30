@@ -38,8 +38,9 @@ import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getHandle;
 import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil.*;
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
+import static com.cryptomorin.xseries.reflection.XReflection.*;
 
 public class PacketListener implements Listener {
     private static final Class<?> packetPlayOutMapClass = getNMSClass("network.protocol.game", "PacketPlayOutMap");

@@ -18,6 +18,7 @@
 
 package tech.sbdevelopment.mapreflectionapi.utils;
 
+import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +27,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+
+import static com.cryptomorin.xseries.reflection.XReflection.getCraftClass;
+import static com.cryptomorin.xseries.reflection.XReflection.getNMSClass;
 
 public class ReflectionUtil {
     private static final Map<String, Constructor<?>> constructorCache = new HashMap<>();
@@ -69,6 +73,20 @@ public class ReflectionUtil {
         return Arrays.stream(params)
                 .map(obj -> obj != null ? wrapperToPrimitive(obj.getClass()) : null)
                 .toArray(Class<?>[]::new);
+    }
+
+    @Nullable
+    public static Object getHandle(@NotNull World world) {
+        Class<?> worldServer = getNMSClass("server.level", "WorldServer");
+        Class<?> craftWorld = getCraftClass("CraftWorld");
+        try {
+            Method m = craftWorld.getMethod("getHandle", worldServer);
+            m.setAccessible(true);
+            return m.invoke(null, world);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Nullable

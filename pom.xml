@@ -81,6 +81,10 @@
                                     <pattern>org.bstats</pattern>
                                     <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.bstats</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>com.cryptomorin.xseries</pattern>
+                                    <shadedPattern>tech.sbdevelopment.mapreflectionapi.libs.xseries</shadedPattern>
+                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -177,12 +181,16 @@
             <version>1.18.34</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
             <version>3.0.2</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cryptomorin</groupId>
+            <artifactId>XSeries</artifactId>
+            <version>11.2.0</version>
         </dependency>
 
         <!-- Libraries below are provided by CraftBukkit -->

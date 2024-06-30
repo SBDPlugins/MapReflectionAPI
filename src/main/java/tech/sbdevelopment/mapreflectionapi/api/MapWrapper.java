@@ -41,7 +41,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
+import static com.cryptomorin.xseries.reflection.XReflection.*;
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getHandle;
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.sendPacket;
 
 /**
  * A {@link MapWrapper} wraps one image.
@@ -207,7 +209,7 @@ public class MapWrapper extends AbstractMapWrapper {
                 );
             }
 
-            sendPacketSync(player, packet);
+            sendPacket(player, packet);
         }
 
         @Override
@@ -371,7 +373,7 @@ public class MapWrapper extends AbstractMapWrapper {
                 ReflectionUtil.setDeclaredField(packet, "b", list);
             }
 
-            sendPacketSync(player, packet);
+            sendPacket(player, packet);
         }
     };
 }

@@ -34,7 +34,7 @@ import tech.sbdevelopment.mapreflectionapi.utils.UpdateManager;
 
 import java.util.logging.Level;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.supports;
+import static com.cryptomorin.xseries.reflection.XReflection.supports;
 
 public class MapReflectionAPI extends JavaPlugin {
     private static MapReflectionAPI instance;

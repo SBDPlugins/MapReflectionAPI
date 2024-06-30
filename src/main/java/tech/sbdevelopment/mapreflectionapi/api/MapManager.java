@@ -33,7 +33,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtils.*;
+import static com.cryptomorin.xseries.reflection.XReflection.*;
+import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getHandle;
 
 /**
  * The {@link MapManager} manages all the maps. It also contains functions for wrapping.
@@ -185,7 +186,7 @@ public class MapManager {
      * @return The found {@link ItemFrame}, or <code>null</code>
      */
     public ItemFrame getItemFrameById(World world, int entityId) {
-        Object worldHandle = getHandle(world);
+        Object worldHandle = ReflectionUtil.getHandle(world);
         Object nmsEntity = ReflectionUtil.callMethod(worldHandle, supports(18) ? "a" : "getEntity", entityId);
         if (nmsEntity == null) return null;
 
