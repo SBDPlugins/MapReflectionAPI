@@ -170,8 +170,8 @@ public class MapWrapper extends AbstractMapWrapper {
                 //1.21 = cc
                 inventoryMenuName = "cc";
             } else if (supports(20)) {
-                //>= 1.20.2 = bR, 1.20(.1) = bQ
-                inventoryMenuName = supports(20, 2) ? "bR" : "bQ";
+                //1.20.5 = cb, 1.20.2 - 1.20.4 = bR, 1.20(.1) = bQ
+                inventoryMenuName = supports(20, 4) ? "cb" : supports(20, 2) ? "bR" : "bQ";
             } else if (supports(19)) {
                 //1.19.4 = bO, >= 1.19.3 = bT
                 inventoryMenuName = supports(19, 3) ? "bO" : "bT";
@@ -291,14 +291,12 @@ public class MapWrapper extends AbstractMapWrapper {
 
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
 
-            if (supports(21)) { //1.21 method
-                Object minecraftKey = ReflectionUtil.callDeclaredMethod(minecraftKeyClass, "a", "minecraft:map_id");
-                Object dataComponentTypeRegistery = ReflectionUtil.getDeclaredField(builtInRegistriesClass, "aq");
-                Object dataComponentType = ReflectionUtil.callMethod(dataComponentTypeRegistery, "a", minecraftKey);
-
-                Object dataComponentMap = ReflectionUtil.callMethod(nmsStack, "a");
-                ReflectionUtil.callMethod(dataComponentMap, "a", dataComponentType, mapId);
-            } else if (supports(13)) { //1.13 - 1.20 method
+            //1.20.5 uses new NBT compound system
+            if (supports(20, 4)) {
+                Object mapIdComponent = ReflectionUtil.getDeclaredField(getNMSClass("core.component", "DataComponents"), "B");
+                Object mapId1 = ReflectionUtil.callConstructor(getNMSClass("world.level.saveddata.maps", "MapId"), mapId);
+                ReflectionUtil.callMethod(nmsStack, "b", mapIdComponent, mapId1);
+            } else if (supports(13)) {
                 String nbtObjectName;
                 if (supports(20)) { //1.20
                     nbtObjectName = "w";
@@ -342,7 +340,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
             Object packet;
             if (supports(19, 3)) { //1.19.3
-                Class<?> dataWatcherRecordClass = getNMSClass("network.syncher", "DataWatcher$" + (supports(21) ? "c" : "b"));
+                Class<?> dataWatcherRecordClass = getNMSClass("network.syncher", "DataWatcher$" + (supports(20, 4) ? "c" : "b"));
                 // Sadly not possible to use ReflectionUtil (in its current state), because of the Object parameter
                 Object dataWatcherItem;
                 try {

@@ -69,7 +69,7 @@ public class MapReflectionAPI extends JavaPlugin {
         getLogger().info("Made by © Copyright SBDevelopment 2023");
 
         if (!supports(12)) {
-            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12 - 1.19.4!");
+            getLogger().severe("MapReflectionAPI only supports Minecraft 1.12 - 1.20.5!");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
