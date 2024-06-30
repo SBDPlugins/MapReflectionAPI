@@ -1,6 +1,6 @@
 # MapReflectionAPI
 
-This plugin helps developer with displaying images on maps. It supports Spigot 1.12 - 1.20.
+This plugin helps developer with displaying images on maps. It supports Spigot 1.12 - 1.21.
 
 ## Usage:
 
@@ -18,7 +18,7 @@ First, include the API using Maven:
 <dependency>
   <groupId>tech.sbdevelopment</groupId>
   <artifactId>MapReflectionAPI</artifactId>
-  <version>1.6</version>
+  <version>1.6.4</version>
   <scope>provided</scope>
 </dependency>
 ```
@@ -162,7 +162,6 @@ public class MapRenderDistanceListener implements Listener {
 
 ## Credits:
 
-This is a fork of [MapManager](https://github.com/InventivetalentDev/MapManager). It updates the API to 1.19 and uses
-other dependencies.
+This is a fork of [MapManager](https://github.com/InventivetalentDev/MapManager). It updates the API to the latest version of Minecraft and uses other dependencies.
 
 This plugin includes classes from BKCommonLib. Please checkout the README in that package for more information.
