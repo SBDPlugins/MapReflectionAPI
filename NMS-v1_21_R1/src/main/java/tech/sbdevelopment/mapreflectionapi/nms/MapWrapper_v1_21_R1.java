@@ -19,14 +19,13 @@
 package tech.sbdevelopment.mapreflectionapi.nms;
 
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.protocol.game.PacketPlayOutSetSlot;
 import net.minecraft.network.syncher.DataWatcher;
-import net.minecraft.resources.MinecraftKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.EntityItemFrame;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_21_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R1.entity.CraftPlayer;
@@ -221,7 +220,8 @@ public class MapWrapper_v1_21_R1 extends MapWrapper {
 
         private void sendItemFramePacket(Player player, int entityId, ItemStack stack, int mapId) {
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(stack);
-            nmsStack.a().a(BuiltInRegistries.aq.a(MinecraftKey.a("minecraft:map_id")), mapId); //getOrCreateTag putInt
+            MapId mapId1 = new MapId(mapId);
+            nmsStack.b(DataComponents.B, mapId1); //set
 
             List<DataWatcher.c<?>> list = new ArrayList<>();
             DataWatcher.c<?> dataWatcherItem = DataWatcher.c.a(EntityItemFrame.f, nmsStack);

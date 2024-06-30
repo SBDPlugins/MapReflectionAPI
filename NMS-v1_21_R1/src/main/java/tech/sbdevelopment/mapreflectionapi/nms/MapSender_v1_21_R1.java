@@ -108,7 +108,7 @@ public class MapSender_v1_21_R1 {
             return;
         }
 
-        final MapId id = new MapId(-id0);
+        final int id = -id0;
         Bukkit.getScheduler().runTaskAsynchronously(MapReflectionAPI.getInstance(), () -> {
             try {
                 WorldMap.b updateData = new WorldMap.b(
@@ -119,8 +119,10 @@ public class MapSender_v1_21_R1 {
                         content.array //Data
                 );
 
+                MapId mapId = new MapId(id);
+
                 PacketPlayOutMap packet = new PacketPlayOutMap(
-                        id, //ID
+                        mapId, //ID
                         (byte) 0, //Scale
                         false, //Show icons
                         new ArrayList<>(), //Icons

@@ -30,8 +30,6 @@ import tech.sbdevelopment.mapreflectionapi.api.ArrayImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil.supports;
-
 /**
  * The {@link MapSender_v1_20_R4} sends the Map packets to players.
  */

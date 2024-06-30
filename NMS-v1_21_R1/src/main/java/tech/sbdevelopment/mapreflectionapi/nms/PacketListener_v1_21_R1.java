@@ -89,8 +89,8 @@ public class PacketListener_v1_21_R1 extends PacketListener {
                         return false;
                     }).get(1, TimeUnit.SECONDS)) return;
                 } else if (packet instanceof PacketPlayInSetCreativeSlot packetPlayInSetCreativeSlot) {
-                    int slot = packetPlayInSetCreativeSlot.b();
-                    ItemStack item = packetPlayInSetCreativeSlot.e();
+                    int slot = (int) getDeclaredField(packetPlayInSetCreativeSlot, supports(20, 4) ? "b" : "a"); //slot, 1.20.5 = b, lower is a
+                    ItemStack item = (ItemStack) getDeclaredField(packetPlayInSetCreativeSlot, supports(20, 4) ? "e" : "d"); //item, 1.20.5 = e, lower is d
 
                     boolean async = !plugin.getServer().isPrimaryThread();
                     CreateInventoryMapUpdateEvent event = new CreateInventoryMapUpdateEvent(p, slot, CraftItemStack.asBukkitCopy(item), async);
