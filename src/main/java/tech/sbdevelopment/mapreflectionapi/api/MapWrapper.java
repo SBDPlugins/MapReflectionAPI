@@ -67,6 +67,8 @@ public class MapWrapper extends AbstractMapWrapper {
     private static final Class<?> entityMetadataPacketClass = getNMSClass("network.protocol.game", "PacketPlayOutEntityMetadata");
     private static final Class<?> entityItemFrameClass = getNMSClass("world.entity.decoration", "EntityItemFrame");
     private static final Class<?> dataWatcherItemClass = getNMSClass("network.syncher", "DataWatcher$Item");
+    private static final Class<?> minecraftKeyClass = getNMSClass("resources", "MinecraftKey");
+    private static final Class<?> builtInRegistriesClass = getNMSClass("core.registries", "BuiltInRegistries");
 
     protected MapController controller = new MapController() {
         private final Map<UUID, Integer> viewers = new HashMap<>();
@@ -164,7 +166,10 @@ public class MapWrapper extends AbstractMapWrapper {
             }
 
             String inventoryMenuName;
-            if (supports(20)) {
+            if (supports(21)) {
+                //1.21 = cc
+                inventoryMenuName = "cc";
+            } else if (supports(20)) {
                 //>= 1.20.2 = bR, 1.20(.1) = bQ
                 inventoryMenuName = supports(20, 2) ? "bR" : "bQ";
             } else if (supports(19)) {
@@ -286,7 +291,14 @@ public class MapWrapper extends AbstractMapWrapper {
 
             Object nmsStack = ReflectionUtil.callMethod(craftStackClass, "asNMSCopy", stack);
 
-            if (supports(13)) {
+            if (supports(21)) { //1.21 method
+                Object minecraftKey = ReflectionUtil.callDeclaredMethod(minecraftKeyClass, "a", "minecraft:map_id");
+                Object dataComponentTypeRegistery = ReflectionUtil.getDeclaredField(builtInRegistriesClass, "aq");
+                Object dataComponentType = ReflectionUtil.callMethod(dataComponentTypeRegistery, "a", minecraftKey);
+
+                Object dataComponentMap = ReflectionUtil.callMethod(nmsStack, "a");
+                ReflectionUtil.callMethod(dataComponentMap, "a", dataComponentType, mapId);
+            } else if (supports(13)) { //1.13 - 1.20 method
                 String nbtObjectName;
                 if (supports(20)) { //1.20
                     nbtObjectName = "w";
@@ -307,7 +319,9 @@ public class MapWrapper extends AbstractMapWrapper {
             Object nmsStack = createCraftItemStack(stack, mapId);
 
             String dataWatcherObjectName;
-            if (supports(19, 3)) { //1.19.3 and 1.20(.1)
+            if (supports(21)) { //1.21
+                dataWatcherObjectName = "f";
+            } else if (supports(19, 3)) { //1.19.3 and 1.20(.1)
                 dataWatcherObjectName = "g";
             } else if (supports(19)) { //1.19-1.19.2
                 dataWatcherObjectName = "ao";
@@ -328,7 +342,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
             Object packet;
             if (supports(19, 3)) { //1.19.3
-                Class<?> dataWatcherRecordClass = getNMSClass("network.syncher", "DataWatcher$b");
+                Class<?> dataWatcherRecordClass = getNMSClass("network.syncher", "DataWatcher$" + (supports(21) ? "c" : "b"));
                 // Sadly not possible to use ReflectionUtil (in its current state), because of the Object parameter
                 Object dataWatcherItem;
                 try {

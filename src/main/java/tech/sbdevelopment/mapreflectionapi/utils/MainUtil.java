@@ -18,6 +18,9 @@
 
 package tech.sbdevelopment.mapreflectionapi.utils;
 
+import java.util.Map;
+import java.util.function.Supplier;
+
 public class MainUtil {
     private MainUtil() {
     }

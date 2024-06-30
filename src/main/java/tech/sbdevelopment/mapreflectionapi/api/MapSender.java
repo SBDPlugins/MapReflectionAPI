@@ -86,6 +86,7 @@ public class MapSender {
 
     private static final Class<?> packetPlayOutMapClass = getNMSClass("network.protocol.game", "PacketPlayOutMap");
     private static final Class<?> worldMapData = supports(17) ? getNMSClass("world.level.saveddata.maps", "WorldMap$b") : null;
+    private static final Class<?> mapId = supports(21) ? getNMSClass("world.level.saveddata.maps", "MapId") : null;
 
     /**
      * Send a map to a player
@@ -110,7 +111,6 @@ public class MapSender {
             return;
         }
 
-        final int id = -id0;
         Object packet;
         if (supports(17)) { //1.17+
             Object updateData = ReflectionUtil.callConstructor(worldMapData,
@@ -121,16 +121,26 @@ public class MapSender {
                     content.array //Data
             );
 
-            packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
-                    id, //ID
-                    (byte) 0, //Scale, 0 = 1 block per pixel
-                    false, //Show icons
-                    new ReflectionUtil.CollectionParam<>(), //Icons
-                    updateData
-            );
+            if (supports(21)) { //1.21+
+                packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
+                        ReflectionUtil.callConstructor(mapId, -id0), //ID
+                        (byte) 0, //Scale, 0 = 1 block per pixel
+                        false, //Show icons
+                        new ReflectionUtil.CollectionParam<>(), //Icons
+                        updateData
+                );
+            } else {
+                packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
+                        -id0, //ID
+                        (byte) 0, //Scale, 0 = 1 block per pixel
+                        false, //Show icons
+                        new ReflectionUtil.CollectionParam<>(), //Icons
+                        updateData
+                );
+            }
         } else if (supports(14)) { //1.16-1.14
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
-                    id, //ID
+                    -id0, //ID
                     (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //Tracking position
                     false, //Locked
@@ -143,7 +153,7 @@ public class MapSender {
             );
         } else { //1.13-
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
-                    id, //ID
+                    -id0, //ID
                     (byte) 0, //Scale, 0 = 1 block per pixel
                     false, //???
                     new ReflectionUtil.CollectionParam<>(), //Icons
