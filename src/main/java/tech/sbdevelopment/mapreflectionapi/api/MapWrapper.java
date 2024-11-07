@@ -295,7 +295,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
             //1.20.5 uses new NBT compound system
             if (supports(20, 4)) {
-                Object mapIdComponent = ReflectionUtil.getDeclaredField(getNMSClass("core.component", "DataComponents"), "B");
+                Object mapIdComponent = ReflectionUtil.getDeclaredField(getNMSClass("core.component", "DataComponents"), supports(21, 2) ? "L" : "B"); //1.21.2+ uses L, otherwise B
                 Object mapId1 = ReflectionUtil.callConstructor(getNMSClass("world.level.saveddata.maps", "MapId"), mapId);
 
                 // Use generic reflection because of generics
@@ -330,7 +330,7 @@ public class MapWrapper extends AbstractMapWrapper {
 
             String dataWatcherObjectName;
             if (supports(21)) { //1.21
-                dataWatcherObjectName = "f";
+                dataWatcherObjectName = supports(21, 2) ? "e" : "f"; //1.21.2+ = e, 1.21(.1) = f
             } else if (supports(19, 3)) { //1.19.3 and 1.20(.1)
                 dataWatcherObjectName = "g";
             } else if (supports(19)) { //1.19-1.19.2

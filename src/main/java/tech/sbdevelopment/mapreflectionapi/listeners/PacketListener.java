@@ -30,19 +30,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import sun.misc.Unsafe;
 import tech.sbdevelopment.mapreflectionapi.MapReflectionAPI;
 import tech.sbdevelopment.mapreflectionapi.api.events.CreativeInventoryMapUpdateEvent;
 import tech.sbdevelopment.mapreflectionapi.api.events.MapCancelEvent;
 import tech.sbdevelopment.mapreflectionapi.api.events.MapInteractEvent;
 import tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.concurrent.TimeUnit;
 
 import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getConnection;
-import static com.cryptomorin.xseries.reflection.minecraft.MinecraftConnection.getHandle;
 import static tech.sbdevelopment.mapreflectionapi.utils.ReflectionUtil.*;
 import static com.cryptomorin.xseries.reflection.XReflection.*;
 
@@ -207,9 +203,9 @@ public class PacketListener implements Listener {
         if (!(vec3d.getClass().isAssignableFrom(vec3DClass))) return new Vector(0, 0, 0);
 
         Object vec3dNMS = vec3DClass.cast(vec3d);
-        double x = (double) getDeclaredField(vec3dNMS, supports(19) ? "c" : supports(17) ? "b" : "x"); //1.19 = c, 1.18 = b, 1.16 = x
-        double y = (double) getDeclaredField(vec3dNMS, supports(19) ? "d" : supports(17) ? "c" : "y"); //1.19 = d, 1.18 = c, 1.16 = y
-        double z = (double) getDeclaredField(vec3dNMS, supports(19) ? "e" : supports(17) ? "d" : "z"); //1.19 = e, 1.18 = d, 1.16 = z
+        double x = (double) getDeclaredField(vec3dNMS, supports(21, 2) ? "d" : supports(19) ? "c" : supports(17) ? "b" : "x"); //1.21.2+ = d, 1.19 = c, 1.18 = b, 1.16 = x
+        double y = (double) getDeclaredField(vec3dNMS, supports(21, 2) ? "e" : supports(19) ? "d" : supports(17) ? "c" : "y"); //1.21.2+ = e, 1.19 = d, 1.18 = c, 1.16 = y
+        double z = (double) getDeclaredField(vec3dNMS, supports(21, 2) ? "f" : supports(19) ? "e" : supports(17) ? "d" : "z"); //1.21.2+ = f, 1.19 = e, 1.18 = d, 1.16 = z
 
         return new Vector(x, y, z);
     }
