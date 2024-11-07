@@ -27,10 +27,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>MapReflectionAPI-NMS-v1_20_R4</artifactId>
+    <artifactId>MapReflectionAPI-NMS-v1_21_R2</artifactId>
 
     <properties>
-        <NMSVersion>1.20.6-R0.1-SNAPSHOT</NMSVersion>
+        <NMSVersion>1.21.3-R0.1-SNAPSHOT</NMSVersion>
         <jdk.version>21</jdk.version>
     </properties>
 
