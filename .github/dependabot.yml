@@ -4,5 +4,6 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    target-branch: "development"
     commit-message:
       prefix: "chore(deps): "
