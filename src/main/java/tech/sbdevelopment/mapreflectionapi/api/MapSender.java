@@ -86,8 +86,8 @@ public class MapSender {
     }
 
     private static final Class<?> packetPlayOutMapClass = getNMSClass("network.protocol.game", "PacketPlayOutMap");
-    private static final Class<?> worldMapData = supports(17) ? getNMSClass("world.level.saveddata.maps", "WorldMap$b") : null;
-    private static final Class<?> mapId = supports(21) ? getNMSClass("world.level.saveddata.maps", "MapId") : null;
+    private static final Class<?> worldMapData = supports(17) ? getNMSClass("world.level.saveddata.maps", supports(21, 2) ? "WorldMap$c" : "WorldMap$b") : null; //1.21.2+ uses WorldMap$c, 1.17+ uses WorldMap$b
+    private static final Class<?> mapIdClazz = supports(21) ? getNMSClass("world.level.saveddata.maps", "MapId") : null;
 
     /**
      * Send a map to a player
@@ -124,7 +124,7 @@ public class MapSender {
                     content.array //Data
             );
 
-            Object mapId = ReflectionUtil.callConstructor(getNMSClass("world.level.saveddata.maps", "MapId"), id);
+            Object mapId = ReflectionUtil.callConstructor(mapIdClazz, id);
 
             packet = ReflectionUtil.callConstructor(packetPlayOutMapClass,
                     mapId, //ID
